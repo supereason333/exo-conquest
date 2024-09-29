@@ -52,11 +52,15 @@ func add_path_point(pos:Vector2, replace_list:bool = false):
 
 
 func box_select(box: Rect2, epsteins_list: Array):
+	if !is_owned_by_user(): return
+	
 	var self_box := Rect2(collision_shape.get_shape().get_rect().position + position, collision_shape.get_shape().get_rect().size)
 	if box.intersects(self_box):
 		epsteins_list.append(self)
 
 func point_select(point: Vector2, list:Array):
+	if !is_owned_by_user(): return
+	
 	var self_box := Rect2(collision_shape.get_shape().get_rect().position + position, collision_shape.get_shape().get_rect().size)
 	if self_box.has_point(point):
 		list.append(self)
@@ -65,9 +69,13 @@ func get_sprite_frame_from_rotation(rotation:float, frames:int = 16) -> float:
 	return snapped(rotation / TAU * (frames - 1), 1)
 
 func selected():
+	if !is_owned_by_user(): return
+	
 	add_to_group("selected_unit")
 
 func deselected():
+	if !is_owned_by_user(): return
+	
 	remove_from_group("selected_unit")
 
 func _draw():
@@ -82,3 +90,8 @@ func _draw():
 			else:
 				draw_line(Vector2.ZERO, path_list[0] - position, Color.GRAY, 2)
 			draw_circle(path_list[i] - position, 10, Color.GRAY, false, 2)
+
+func is_owned_by_user() -> bool:
+	if team_id == RTS.player.team_id:
+		return true
+	return false

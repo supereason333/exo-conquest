@@ -17,11 +17,17 @@ func _ready() -> void:
 
 func set_default_team() -> void:
 	var a := Team.new()
+	var b := Team.new()
 	a.color = Color.BLUE
 	a.name = "TEAM 0"
 	a.id = 0
 	
+	b.color = Color.RED
+	b.name = "TEAM 1"
+	b.id = 1
+	
 	team_list.append(a)
+	team_list.append(b)
 
 ################################################################################
 # Multiplayer stuff above

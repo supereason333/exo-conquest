@@ -56,3 +56,4 @@ position = Vector2(72, 216)
 
 [node name="TestingUnit5" parent="." instance=ExtResource("3_r0sjy")]
 position = Vector2(80, 136)
+team_id = 1
