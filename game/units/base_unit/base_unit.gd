@@ -10,8 +10,8 @@ var peer_id:int
 var path_list:Array[Vector2]
 
 func _ready() -> void:
-	RTS.point_select.connect(point_select)
-	RTS.box_select.connect(box_select)
+	#RTS.point_select.connect(point_select)
+	#RTS.box_select.connect(box_select)
 	var team := MultiplayerScript.get_team_from_id(team_id)
 	if team:
 		base_sprite.color = team.color
@@ -51,17 +51,24 @@ func add_path_point(pos:Vector2, replace_list:bool = false):
 
 
 
-func box_select(box: Rect2):
+func box_select(box: Rect2, epsteins_list: Array):
 	var self_box := Rect2(collision_shape.get_shape().get_rect().position + position, collision_shape.get_shape().get_rect().size)
 	if box.intersects(self_box):
-		return self
-	return
+		epsteins_list.append(self)
 
-func point_select(point: Vector2):
+func point_select(point: Vector2, list:Array):
 	var self_box := Rect2(collision_shape.get_shape().get_rect().position + position, collision_shape.get_shape().get_rect().size)
+	if self_box.has_point(point):
+		list.append(self)
 
 func get_sprite_frame_from_rotation(rotation:float, frames:int = 16) -> float:
 	return snapped(rotation / TAU * (frames - 1), 1)
+
+func selected():
+	add_to_group("selected_unit")
+
+func deselected():
+	remove_from_group("selected_unit")
 
 func _draw():
 	if is_in_group("selected_unit"):
