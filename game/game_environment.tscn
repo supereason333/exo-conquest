@@ -1,0 +1,58 @@
+[gd_scene load_steps=5 format=3 uid="uid://hivohb7mbcwr"]
+
+[ext_resource type="Script" path="res://game/game_environment.gd" id="1_lm007"]
+[ext_resource type="PackedScene" uid="uid://drqqxt68xirk5" path="res://game/units/testing_unit.tscn" id="3_r0sjy"]
+[ext_resource type="PackedScene" uid="uid://c4vu28w7nfnwt" path="res://game/player/player_control.tscn" id="3_vgnbn"]
+
+[sub_resource type="GDScript" id="GDScript_f342u"]
+script/source = "extends Node2D
+
+@onready var buildable_color := $ColorRect
+@onready var material_label := $VBoxContainer/MaterialLabel
+"
+
+[node name="GameEnvironment" type="Node2D"]
+script = ExtResource("1_lm007")
+
+[node name="PlayerControl" parent="." instance=ExtResource("3_vgnbn")]
+
+[node name="TileDataViewer" type="Node2D" parent="."]
+script = SubResource("GDScript_f342u")
+
+[node name="Panel" type="Panel" parent="TileDataViewer"]
+custom_minimum_size = Vector2(32, 32)
+offset_right = 32.0
+offset_bottom = 32.0
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="TileDataViewer"]
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 20.0
+offset_bottom = 20.0
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TileDataViewer"]
+offset_left = 48.0
+offset_right = 128.0
+offset_bottom = 88.0
+mouse_filter = 2
+
+[node name="MaterialLabel" type="Label" parent="TileDataViewer/VBoxContainer"]
+layout_mode = 2
+text = "Material"
+
+[node name="TestingUnit" parent="." instance=ExtResource("3_r0sjy")]
+position = Vector2(184, 160)
+
+[node name="TestingUnit2" parent="." instance=ExtResource("3_r0sjy")]
+position = Vector2(288, 160)
+
+[node name="TestingUnit3" parent="." instance=ExtResource("3_r0sjy")]
+position = Vector2(232, 256)
+
+[node name="TestingUnit4" parent="." instance=ExtResource("3_r0sjy")]
+position = Vector2(72, 216)
+
+[node name="TestingUnit5" parent="." instance=ExtResource("3_r0sjy")]
+position = Vector2(80, 136)

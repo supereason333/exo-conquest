@@ -1,0 +1,1 @@
+Sprite sheets frame 0 pointed left and rotates counterclockwise 360/16 degrees

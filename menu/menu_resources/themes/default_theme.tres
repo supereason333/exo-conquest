@@ -1,0 +1,11 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dk83qmx0ytnuw"]
+
+[ext_resource type="FontFile" uid="uid://t16xvynp6x2d" path="res://menu/menu_resources/themes/fonts/RobotoMono-VariableFont_wght.ttf" id="1_0gi78"]
+
+[resource]
+Button/fonts/font = ExtResource("1_0gi78")
+Label/fonts/font = ExtResource("1_0gi78")
+MarginContainer/constants/margin_bottom = 15
+MarginContainer/constants/margin_left = 15
+MarginContainer/constants/margin_right = 15
+MarginContainer/constants/margin_top = 15

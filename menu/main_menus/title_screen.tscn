@@ -1,0 +1,74 @@
+[gd_scene load_steps=4 format=3 uid="uid://cow1ps2r237w0"]
+
+[ext_resource type="Texture2D" uid="uid://cvwhr7nkrey7h" path="res://menu/menu_resources/backgrounds/planet1.png" id="1_exoh1"]
+[ext_resource type="Theme" uid="uid://dk83qmx0ytnuw" path="res://menu/menu_resources/themes/default_theme.tres" id="1_uq4o8"]
+[ext_resource type="Script" path="res://menu/main_menus/title_screen.gd" id="2_0g1p0"]
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_uq4o8")
+script = ExtResource("2_0g1p0")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_exoh1")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/PanelContainer/MarginContainer"]
+custom_minimum_size = Vector2(200, 2.08165e-12)
+layout_mode = 2
+
+[node name="Title" type="Label" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Exo-Conquest"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HostButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Host game"
+
+[node name="JoinButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Join game"
+
+[node name="SettingsButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Settings"
+
+[node name="Spacer" type="Control" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ExitButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Exit"
+
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HostButton" to="." method="_on_singleplayer_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/JoinButton" to="." method="_on_multiplayer_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]

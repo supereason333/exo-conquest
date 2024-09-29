@@ -1,0 +1,105 @@
+- Standard RTS game with controllable units and buildings
+- Resource gathering
+
+Gameplay:
+
+- Gather resources though using troops to mine or automated systems
+- Automate actions like mining resources with conveyers to transport items
+- Create buildings to make upgrades or make troops
+- Create troops for use in combat
+
+Features:
+
+- Many things to manage and some aspects can be automated
+- Different maps for different gameplay
+- Maps with multiple Z layers for strategical use
+- Fog of war 
+- Pixel art style graphics
+- Multiplayer over LAN
+- Custom sound effects - or sound from free sources
+- Soundtrack from free music sources
+
+# 28/08/2024
+Requirements
+- Multiplayer, otherwise it will be boring
+- Different units which attack each other
+- Balanced gameplay for users
+- Units with different abilities
+- Resource collecting
+
+Things that might be difficult in development
+- Godot multiplayer over LAN
+	This will be difficult because it is hard to sync data from different hosts and ensure smooth gameplay. I also have no experience in making multiplayer systems.
+- Computer AI
+	The computer AI will be crucial in the gameplay as it will allow users to play single player or even a campaign mode. The AI will have to be good at the game and play like a real player.
+	This will be hard to implement because it requires a lot of logic that allows a computer to play similarly to a real human.
+- Pathfinding of units
+	The pathfinding of units will be difficult because I have never programmed pathfinding.
+	Pathfinding will also be needed in the project.
+
+
+░▒▓███████▓▒░░▒▓███████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░░▒▓███████▓▒░▒▓███████▓▒░ 
+░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░        
+░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░        
+░▒▓███████▓▒░░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓██████▓▒░  ░▒▓██████▓▒░░▒▓██████▓▒░  
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░             ░▒▓█▓▒░     ░▒▓█▓▒░ 
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░             ░▒▓█▓▒░     ░▒▓█▓▒░ 
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓███████▓▒░▒▓███████▓▒░   log
+
+# Before the next one	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+Basic tilemap system in testing game
+Camera movement system
+Building check
+Gummy bee
+
+# 28/08/2024 	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+Made basic drop ship sprite
+Made process to make sprites:
+- Model in blender
+- Render at 32x * 32y resolution
+- Compositing with posterization, color balance etc
+- Add team color layer
+- Compile into sprite sheet
+
+# dd/mm/yyyy 	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+Click to enter text
+
+# dd/mm/yyyy 	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+Click to enter text
+
+# dd/mm/yyyy 	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+Click to enter text
+
+░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓███████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓███████▓▒░ 
+   ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
+   ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
+   ░▒▓█▓▒░  ░▒▓████████▓▒░░▒▓██████▓▒░░▒▓███████▓▒░ ░▒▓██████▓▒░  
+   ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░ 
+   ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░ 
+   ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░  to never do
+             
+	~ Testing game task
+	- Main game task
+                  
+# 28/08/2024
+~ Map cliff collisions system
+~ Make units be able to move
+~ Make one basic building
+- Main game tast
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

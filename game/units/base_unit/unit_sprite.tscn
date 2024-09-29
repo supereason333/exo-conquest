@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://od13t5sdilfi"]
+
+[sub_resource type="GDScript" id="GDScript_coc2h"]
+resource_name = "Unit sprite"
+script/source = "extends AnimatedSprite2D
+
+@onready var color_sprite := $Color
+
+@export var color_sprite_frames: SpriteFrames
+@export var color:Color:
+	set(value):
+		color_sprite.modulate = value
+	get:
+		return color_sprite.modulate
+
+func _ready() -> void:
+	color_sprite.sprite_frames = color_sprite_frames
+
+func _on_frame_changed() -> void:
+	color_sprite.frame = frame
+"
+
+[node name="Base" type="AnimatedSprite2D"]
+script = SubResource("GDScript_coc2h")
+
+[node name="Color" type="AnimatedSprite2D" parent="."]
+
+[connection signal="frame_changed" from="." to="." method="_on_frame_changed"]
