@@ -99,12 +99,15 @@ func on_body_entered(body:Node2D):
 	if body.is_in_group("unit"):
 		if body.team_id != team_id:
 			targets.append(body)
-			target = get_close_target()
+			if !target:
+				target = targets[0]
 
 func on_body_exited(body:Node2D):
 	if targets.has(body):
 		targets.remove_at(targets.find(body))
-		target = get_close_target()
+		if !targets.has(target):
+			if targets:
+				target = targets[0]
 
 func attack():
 	if target:
@@ -112,15 +115,6 @@ func attack():
 
 func on_attack(damage:float):
 	health -= damage
-
-func get_close_target() -> Node2D:
-	var closest:Node2D
-	var closest_dist := 1000000.0
-	for a in targets:
-		if (a.position - position).length_squared() < closest_dist:
-			closest = a
-	
-	return closest
 
 
 
