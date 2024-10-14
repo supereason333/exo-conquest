@@ -17,6 +17,7 @@ script = ExtResource("1_lm007")
 [node name="PlayerControl" parent="." instance=ExtResource("3_vgnbn")]
 
 [node name="TileDataViewer" type="Node2D" parent="."]
+visible = false
 script = SubResource("GDScript_f342u")
 
 [node name="Panel" type="Panel" parent="TileDataViewer"]
@@ -43,17 +44,31 @@ layout_mode = 2
 text = "Material"
 
 [node name="TestingUnit" parent="." instance=ExtResource("3_r0sjy")]
-position = Vector2(184, 160)
+position = Vector2(172, 336)
 
 [node name="TestingUnit2" parent="." instance=ExtResource("3_r0sjy")]
-position = Vector2(288, 160)
+position = Vector2(389, 269)
+detect_radius = 200
 
 [node name="TestingUnit3" parent="." instance=ExtResource("3_r0sjy")]
-position = Vector2(232, 256)
+position = Vector2(286, 269)
 
 [node name="TestingUnit4" parent="." instance=ExtResource("3_r0sjy")]
-position = Vector2(72, 216)
+position = Vector2(135, 250)
 
 [node name="TestingUnit5" parent="." instance=ExtResource("3_r0sjy")]
 position = Vector2(80, 136)
+team_id = 1
+
+[node name="TestingUnit6" parent="." instance=ExtResource("3_r0sjy")]
+position = Vector2(165, 111)
+team_id = 1
+
+[node name="TestingUnit7" parent="." instance=ExtResource("3_r0sjy")]
+position = Vector2(539, 125)
+team_id = 1
+detect_radius = 200
+
+[node name="TestingUnit8" parent="." instance=ExtResource("3_r0sjy")]
+position = Vector2(69, 84)
 team_id = 1

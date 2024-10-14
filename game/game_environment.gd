@@ -69,15 +69,15 @@ func _unhandled_input(event: InputEvent) -> void:
 			mouse_down = event.pressed
 			
 			if mouse_down:
-				box.position = event.position
+				box.position = event.position + player.position
 				box_select = false
 			else:		# When user lets go of mouse
 				box = box.abs()
 				
 				if !box_select:		# A click ( Where the selection code should be executed from )
-					RTS.emit_signal("point_select", event.position)
+					RTS.emit_signal("point_select", event.position + player.position)
 					var point_select_list:Array
-					get_tree().call_group("unit", "point_select", event.position, point_select_list)
+					get_tree().call_group("unit", "point_select", event.position + player.position, point_select_list)
 					if point_select_list:
 						RTS.handle_point_select(point_select_list[0], Input.is_action_pressed("shift"))
 					else:
@@ -98,6 +98,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				box_select = false
 	elif event is InputEventMouseMotion:
 		if mouse_down:
-			box.end = event.position
+			box.end = event.position + player.position
 			if box.size.length_squared() >= 50:		# Not a click (box select)
 				box_select = true

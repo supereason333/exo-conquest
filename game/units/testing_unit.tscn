@@ -6,6 +6,15 @@
 
 [sub_resource type="GDScript" id="GDScript_4vpni"]
 script/source = "extends \"res://game/units/base_unit/base_unit.gd\"
+
+func _ready() -> void:
+	super()
+
+func _process(delta: float) -> void:
+	super(delta)
+
+func _physics_process(delta: float) -> void:
+	super(delta)
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gcpxn"]
@@ -254,6 +263,9 @@ animations = [{
 [node name="TestingUnit" type="CharacterBody2D" groups=["unit"]]
 script = SubResource("GDScript_4vpni")
 base_speed = 100
+attack_cooldown = 100.0
+damage = 10.0
+detect_radius = 100
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_gcpxn")

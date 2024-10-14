@@ -1,22 +1,66 @@
 extends CharacterBody2D
 
+var Unit_vision := preload("res://game/units/base_unit/unit_vision.tscn")
+
 @onready var collision_shape := $CollisionShape2D
 @onready var base_sprite := $Base
+var vision
+var health_bar
 
 @export var base_speed:int
+@export var base_health:float
+@export var attack_cooldown:float
+@export var damage:float
 @export var team_id:int
+@export var detect_radius:int
 
 var peer_id:int
 var path_list:Array[Vector2]
+var targets:Array[Node2D]
+var target:Node2D
+
+var health:float:
+	get():
+		return health
+	set(value):
+		health = value
+		health_bar.value = health / base_health * 100
+
+enum states {STANDBY, ATTACKING, HOLD}
+var cur_state := states.STANDBY
 
 func _ready() -> void:
-	#RTS.point_select.connect(point_select)
-	#RTS.box_select.connect(box_select)
+	var unit_vision := Unit_vision.instantiate()
+	unit_vision.name = "UnitVision"
+	add_child(unit_vision)
+	unit_vision.get_child(0).shape = CircleShape2D.new()
+	unit_vision.get_child(0).shape.radius = detect_radius
+	vision = unit_vision
+	vision.body_entered.connect(on_body_entered)
+	vision.body_exited.connect(on_body_exited)
+	
+	health_bar = ProgressBar.new()
+	health_bar.name = "HealthBar"
+	health_bar.show_percentage = false
+	health_bar.size = Vector2(50, 6)
+	health_bar.position = Vector2(-health_bar.size.x / 2, collision_shape.shape.size.y / 2 + 10)
+	var style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color.RED
+	health_bar.add_theme_stylebox_override("background", style_box)
+	style_box.bg_color = Color.GREEN
+	health_bar.add_theme_stylebox_override("fill", style_box)
+	health_bar.visible = false
+	health = base_health
+	add_child(health_bar)
+	
 	var team := MultiplayerScript.get_team_from_id(team_id)
 	if team:
 		base_sprite.color = team.color
+	
+	
 
 func _process(delta: float) -> void:
+	attack()
 	if Input.is_action_just_pressed("unit_move") and is_in_group("selected_unit"):
 		if Input.is_action_pressed("shift"):
 			add_path_point(get_global_mouse_position())
@@ -51,6 +95,35 @@ func add_path_point(pos:Vector2, replace_list:bool = false):
 
 
 
+func on_body_entered(body:Node2D):
+	if body.is_in_group("unit"):
+		if body.team_id != team_id:
+			targets.append(body)
+			target = get_close_target()
+
+func on_body_exited(body:Node2D):
+	if targets.has(body):
+		targets.remove_at(targets.find(body))
+		target = get_close_target()
+
+func attack():
+	if target:
+		target.on_attack(damage)
+
+func on_attack(damage:float):
+	health -= damage
+
+func get_close_target() -> Node2D:
+	var closest:Node2D
+	var closest_dist := 1000000.0
+	for a in targets:
+		if (a.position - position).length_squared() < closest_dist:
+			closest = a
+	
+	return closest
+
+
+
 func box_select(box: Rect2, epsteins_list: Array):
 	if !is_owned_by_user(): return
 	
@@ -71,11 +144,13 @@ func get_sprite_frame_from_rotation(rotation:float, frames:int = 16) -> float:
 func selected():
 	if !is_owned_by_user(): return
 	
+	health_bar.show()
 	add_to_group("selected_unit")
 
 func deselected():
 	if !is_owned_by_user(): return
 	
+	health_bar.hide()
 	remove_from_group("selected_unit")
 
 func _draw():
@@ -90,6 +165,9 @@ func _draw():
 			else:
 				draw_line(Vector2.ZERO, path_list[0] - position, Color.GRAY, 2)
 			draw_circle(path_list[i] - position, 10, Color.GRAY, false, 2)
+	
+	if target:
+		draw_line(Vector2.ZERO, target.position - position, Color.RED, 1)
 
 func is_owned_by_user() -> bool:
 	if team_id == RTS.player.team_id:
