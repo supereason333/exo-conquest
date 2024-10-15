@@ -100,14 +100,13 @@ func on_body_entered(body:Node2D):
 		if body.team_id != team_id:
 			targets.append(body)
 			if !target:
-				target = targets[0]
+				target = body
 
 func on_body_exited(body:Node2D):
 	if targets.has(body):
 		targets.remove_at(targets.find(body))
-		if !targets.has(target):
-			if targets:
-				target = targets[0]
+		if target == body:
+			target = null
 
 func attack():
 	if target:
@@ -155,13 +154,16 @@ func _draw():
 		# Draws the path
 		for i in len(path_list):
 			if i >= 1:
-				draw_line(path_list[i - 1] - position, path_list[i] - position, Color.GRAY, 2)
+				draw_line(path_list[i - 1] - position, path_list[i] - position, Color.GRAY, 1)
 			else:
-				draw_line(Vector2.ZERO, path_list[0] - position, Color.GRAY, 2)
-			draw_circle(path_list[i] - position, 10, Color.GRAY, false, 2)
+				draw_line(Vector2.ZERO, path_list[0] - position, Color.GRAY, 1)
+			draw_circle(path_list[i] - position, 10, Color.GRAY, false, 1)
+		
+		if target:
+			draw_line(Vector2.ZERO, target.position - position, Color.RED, 1)
 	
-	if target:
-		draw_line(Vector2.ZERO, target.position - position, Color.RED, 1)
+	#if target:
+		#draw_line(Vector2.ZERO, target.position - position, Color.RED, 1)
 
 func is_owned_by_user() -> bool:
 	if team_id == RTS.player.team_id:

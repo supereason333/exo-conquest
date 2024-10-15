@@ -7,7 +7,8 @@ const MOVE_SPEED := 1000.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass
+	for team in MultiplayerScript.team_list:
+		pass
 
 func _process(delta):
 	handle_camera_move(delta)

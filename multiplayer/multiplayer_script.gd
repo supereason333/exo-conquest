@@ -16,18 +16,24 @@ func _ready() -> void:
 	set_default_team()
 
 func set_default_team() -> void:
-	var a := Team.new()
-	var b := Team.new()
-	a.color = Color.BLUE
-	a.name = "TEAM 0"
-	a.id = 0
+	new_team("TEAM 0", Color.BLUE, 0)
+	new_team("TEAM 1", Color.RED, 1)
+
+func new_team(name:String, color:Color, id:int = -1):
+	id = abs(id)
+	var team = Team.new()
+	for a in team_list:
+		if a.name == name or id == a.id:
+			return "NAME OR ID TAKEN"
 	
-	b.color = Color.RED
-	b.name = "TEAM 1"
-	b.id = 1
+	team.name = name
+	team.color = color
+	if id != -1:
+		team.id = id
+	else:
+		team.id = hash(name)
 	
-	team_list.append(a)
-	team_list.append(b)
+	team_list.append(team)
 
 ################################################################################
 # Multiplayer stuff above
