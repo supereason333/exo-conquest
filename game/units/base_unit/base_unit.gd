@@ -5,7 +5,8 @@ var Unit_vision := preload("res://game/units/base_unit/unit_vision.tscn")
 @onready var collision_shape := $CollisionShape2D
 @onready var base_sprite := $Base
 var vision
-var health_bar
+var health_bar:ProgressBar
+var attack_timer:Timer
 
 @export var base_speed:int
 @export var base_health:float
@@ -25,6 +26,7 @@ var health:float:
 	set(value):
 		health = value
 		health_bar.value = health / base_health * 100
+		#health_bar.value = 100
 
 enum states {STANDBY, ATTACKING, HOLD}
 var cur_state := states.STANDBY
@@ -39,6 +41,11 @@ func _ready() -> void:
 	vision.body_entered.connect(on_body_entered)
 	vision.body_exited.connect(on_body_exited)
 	
+	attack_timer = Timer.new()
+	attack_timer.wait_time = attack_cooldown
+	attack_timer.one_shot = true
+	add_child(attack_timer)
+	
 	health_bar = ProgressBar.new()
 	health_bar.name = "HealthBar"
 	health_bar.show_percentage = false
@@ -47,6 +54,7 @@ func _ready() -> void:
 	var style_box = StyleBoxFlat.new()
 	style_box.bg_color = Color.RED
 	health_bar.add_theme_stylebox_override("background", style_box)
+	style_box = StyleBoxFlat.new()
 	style_box.bg_color = Color.GREEN
 	health_bar.add_theme_stylebox_override("fill", style_box)
 	health_bar.visible = false
@@ -56,11 +64,9 @@ func _ready() -> void:
 	var team := MultiplayerScript.get_team_from_id(team_id)
 	if team:
 		base_sprite.color = team.color
-	
-	
 
 func _process(delta: float) -> void:
-	attack()
+	attack_ai()
 	if Input.is_action_just_pressed("unit_move") and is_in_group("selected_unit"):
 		if Input.is_action_pressed("shift"):
 			add_path_point(get_global_mouse_position())
@@ -106,14 +112,40 @@ func on_body_exited(body:Node2D):
 	if targets.has(body):
 		targets.remove_at(targets.find(body))
 		if target == body:
-			target = null
+			if targets:
+				target = targets[0]
+			else:
+				target = null
 
-func attack():
-	if target:
-		target.on_attack(damage)
+func attack_ai():
+	match cur_state:
+		states.STANDBY:
+			if target:
+				cur_state = states.ATTACKING
+		states.ATTACKING:
+			if target:
+				if attack_timer.is_stopped():
+					attack_target()
+					attack_timer.start()
+			else:
+				cur_state = states.STANDBY
+		_:
+			pass
+
+var draw_attack := false
+func attack_target():
+	target.on_attack(damage)
+	draw_attack = true
 
 func on_attack(damage:float):
 	health -= damage
+	if health <= 0:
+		killed()
+
+func killed():
+	if is_in_group("selected_unit"):
+		RTS.remove_from_select(self)
+	queue_free()
 
 
 
@@ -141,8 +173,6 @@ func selected():
 	add_to_group("selected_unit")
 
 func deselected():
-	if !is_owned_by_user(): return
-	
 	health_bar.hide()
 	remove_from_group("selected_unit")
 
@@ -158,12 +188,11 @@ func _draw():
 			else:
 				draw_line(Vector2.ZERO, path_list[0] - position, Color.GRAY, 1)
 			draw_circle(path_list[i] - position, 10, Color.GRAY, false, 1)
-		
-		if target:
-			draw_line(Vector2.ZERO, target.position - position, Color.RED, 1)
 	
-	#if target:
-		#draw_line(Vector2.ZERO, target.position - position, Color.RED, 1)
+	if draw_attack:
+		if target:
+			draw_line(Vector2.ZERO, target.position - position, MultiplayerScript.get_team_from_id(team_id).color, 1)
+			draw_attack = false
 
 func is_owned_by_user() -> bool:
 	if team_id == RTS.player.team_id:

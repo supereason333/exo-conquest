@@ -72,7 +72,24 @@ func clear_selected():
 	selected_list = []
 
 func remove_from_select(unit):
-	for i in len(selected_list):
-		if selected_list[i] == unit:
-			selected_list.remove_at(i)
+	if selected_list.has(unit): selected_list.remove_at(selected_list.find(unit))
+	#for i in len(selected_list):
+	#	if selected_list[i] == unit:
+	#		selected_list.remove_at(i)
+
+func deselect_all():
+	selected_list = []
+	var nodes := get_tree().get_nodes_in_group("selected_unit")
+	for node in nodes:
+		node.deselected()
+		node.remove_from_group("selected_unit")
+
+func change_team(team_id:int):
+	var has := false
+	for t in MultiplayerScript.team_list: if t.id == team_id: 
+		has = true
+		break
+	if !has: return false
 	
+	player.team_id = team_id
+	deselect_all()

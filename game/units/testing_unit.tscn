@@ -263,7 +263,8 @@ animations = [{
 [node name="TestingUnit" type="CharacterBody2D" groups=["unit"]]
 script = SubResource("GDScript_4vpni")
 base_speed = 100
-attack_cooldown = 100.0
+base_health = 100.0
+attack_cooldown = 1.0
 damage = 10.0
 detect_radius = 100
 
