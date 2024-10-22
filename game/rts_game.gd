@@ -13,9 +13,14 @@ signal box_select(box:Rect2)
 var deselect_queue:Array
 var called_deselect := false
 var selected_list:Array
-const MAX_SELECT_AMOUNT := 4
+var selected_building:Node2D
+
+var unit_loader := preload("res://game/units/unit_loader.tscn").instantiate()
+
+const MAX_SELECT_AMOUNT := 10
 
 func _ready() -> void:
+	add_child(unit_loader)
 	set_default_player()
 
 func _process(delta: float) -> void:
@@ -27,6 +32,15 @@ func set_default_player():
 	player.peer_id = 1
 	player.team_id = 0
 	player.username = "DEFAULT PLAYER"
+
+func handle_building_point_select(building:Node2D):
+	if selected_building: selected_building.deselected()
+	selected_building = building
+	selected_building.selected()
+
+func clear_selected_building():
+	if selected_building: selected_building.deselected()
+	selected_building = null
 
 func handle_box_select(epsteins_list:Array, add:bool = false):
 	if add:
@@ -44,6 +58,8 @@ func handle_box_select(epsteins_list:Array, add:bool = false):
 	
 	for unit in selected_list:
 		unit.selected()
+	
+	emit_signal("select_list_changed")
 
 func handle_point_select(unit, add:bool = false):
 	if add:
@@ -64,6 +80,8 @@ func handle_point_select(unit, add:bool = false):
 	
 	for a in selected_list:
 		a.selected()
+	
+	emit_signal("select_list_changed")
 
 func clear_selected():
 	for i in selected_list:
@@ -77,13 +95,6 @@ func remove_from_select(unit):
 	#	if selected_list[i] == unit:
 	#		selected_list.remove_at(i)
 
-func deselect_all():
-	selected_list = []
-	var nodes := get_tree().get_nodes_in_group("selected_unit")
-	for node in nodes:
-		node.deselected()
-		node.remove_from_group("selected_unit")
-
 func change_team(team_id:int):
 	var has := false
 	for t in MultiplayerScript.team_list: if t.id == team_id: 
@@ -92,4 +103,5 @@ func change_team(team_id:int):
 	if !has: return false
 	
 	player.team_id = team_id
-	deselect_all()
+	clear_selected()
+	clear_selected_building()

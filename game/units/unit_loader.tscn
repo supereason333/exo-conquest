@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cbree5fr8x4ff"]
+
+[ext_resource type="Script" path="res://game/units/unit_loader.gd" id="1_iboui"]
+
+[node name="UnitLoader" type="Node"]
+script = ExtResource("1_iboui")

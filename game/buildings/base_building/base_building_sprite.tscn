@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://hanc83gq25q3"]
+
+[sub_resource type="GDScript" id="GDScript_c2ids"]
+script/source = "extends AnimatedSprite2D
+
+@export var team_color:Color:
+	set(value):
+		sprite.modulate = value
+		team_color = value
+@export var color_sprite:SpriteFrames
+
+
+@onready var sprite := $Color
+
+func _ready() -> void:
+	sprite.sprite_frames = color_sprite
+	sprite.modulate = team_color
+"
+
+[node name="BaseBuildingSprite" type="AnimatedSprite2D"]
+script = SubResource("GDScript_c2ids")
+
+[node name="Color" type="AnimatedSprite2D" parent="."]

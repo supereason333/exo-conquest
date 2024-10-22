@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://bb6o5c0opmh0b"]
+
+[ext_resource type="Script" path="res://game/buildings/base_building/base_building.gd" id="1_mo4da"]
+[ext_resource type="PackedScene" uid="uid://hanc83gq25q3" path="res://game/buildings/base_building/base_building_sprite.tscn" id="2_1jb0x"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lvl4v"]
+
+[node name="BaseBuilding" type="StaticBody2D"]
+script = ExtResource("1_mo4da")
+
+[node name="BaseBuildingSprite" parent="." instance=ExtResource("2_1jb0x")]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_lvl4v")

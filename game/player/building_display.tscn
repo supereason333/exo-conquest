@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3 uid="uid://x28sveuv0ixp"]
+
+[sub_resource type="GDScript" id="GDScript_4e3rt"]
+script/source = "extends HBoxContainer
+
+signal building_selected(building_id:int)
+
+var building_id:int
+
+@onready var building_node := $Building
+@onready var button := $Button
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	var building = BuildingLoader.load_building_from_id(building_id)
+	if !building: return
+	
+	building_node.custom_minimum_size = building.size * 32
+	building_node.add_child(building)
+	
+	button.text = building.building_name
+
+func _on_button_pressed() -> void:
+	emit_signal(\"building_selected\", building_id)
+"
+
+[node name="BuildingDisplay" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = SubResource("GDScript_4e3rt")
+
+[node name="Building" type="Control" parent="."]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

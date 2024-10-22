@@ -8,12 +8,14 @@ var vision
 var health_bar:ProgressBar
 var attack_timer:Timer
 
+@export var unit_name:String
 @export var base_speed:int
 @export var base_health:float
 @export var attack_cooldown:float
 @export var damage:float
 @export var team_id:int
 @export var detect_radius:int
+@export var unit_id:int
 
 var peer_id:int
 var path_list:Array[Vector2]
@@ -29,9 +31,13 @@ var health:float:
 		#health_bar.value = 100
 
 enum states {STANDBY, ATTACKING, HOLD}
-var cur_state := states.STANDBY
+var cur_state:int = states.STANDBY
+
+enum TAGS {NONE, NOAI, UNDETECTABLE, INVINCIBLE, UNSELECTABLE}
+var tags:Array = [TAGS.NONE]
 
 func _ready() -> void:
+	y_sort_enabled = true
 	var unit_vision := Unit_vision.instantiate()
 	unit_vision.name = "UnitVision"
 	add_child(unit_vision)
@@ -50,7 +56,7 @@ func _ready() -> void:
 	health_bar.name = "HealthBar"
 	health_bar.show_percentage = false
 	health_bar.size = Vector2(50, 6)
-	health_bar.position = Vector2(-health_bar.size.x / 2, collision_shape.shape.size.y / 2 + 10)
+	#health_bar.position = Vector2(-health_bar.size.x / 2, collision_shape.shape.size.y / 2 + 10)
 	var style_box = StyleBoxFlat.new()
 	style_box.bg_color = Color.RED
 	health_bar.add_theme_stylebox_override("background", style_box)
@@ -83,6 +89,8 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 
 func movement():
+	if tags.has(TAGS.NOAI): return
+	
 	var dist_to_target:Vector2 = path_list[0] - position
 	
 	velocity += dist_to_target.normalized() * base_speed
@@ -102,13 +110,17 @@ func add_path_point(pos:Vector2, replace_list:bool = false):
 
 
 func on_body_entered(body:Node2D):
-	if body.is_in_group("unit"):
+	if tags.has(TAGS.NOAI): return
+	
+	if body.is_in_group("unit") or body.is_in_group("building"):
 		if body.team_id != team_id:
 			targets.append(body)
 			if !target:
 				target = body
 
 func on_body_exited(body:Node2D):
+	if tags.has(TAGS.NOAI): return
+	
 	if targets.has(body):
 		targets.remove_at(targets.find(body))
 		if target == body:
@@ -118,6 +130,8 @@ func on_body_exited(body:Node2D):
 				target = null
 
 func attack_ai():
+	if tags.has(TAGS.NOAI): return
+	
 	match cur_state:
 		states.STANDBY:
 			if target:
@@ -134,15 +148,21 @@ func attack_ai():
 
 var draw_attack := false
 func attack_target():
+	if tags.has(TAGS.NOAI): return
+	
 	target.on_attack(damage)
 	draw_attack = true
 
 func on_attack(damage:float):
+	if tags.has(TAGS.INVINCIBLE): return
+	
 	health -= damage
 	if health <= 0:
 		killed()
 
 func killed():
+	if tags.has(TAGS.INVINCIBLE): return
+	
 	if is_in_group("selected_unit"):
 		RTS.remove_from_select(self)
 	queue_free()
@@ -151,6 +171,7 @@ func killed():
 
 func box_select(box: Rect2, epsteins_list: Array):
 	if !is_owned_by_user(): return
+	if tags.has(TAGS.UNSELECTABLE): return
 	
 	var self_box := Rect2(collision_shape.get_shape().get_rect().position + position, collision_shape.get_shape().get_rect().size)
 	if box.intersects(self_box):
@@ -158,6 +179,7 @@ func box_select(box: Rect2, epsteins_list: Array):
 
 func point_select(point: Vector2, list:Array):
 	if !is_owned_by_user(): return
+	if tags.has(TAGS.UNSELECTABLE): return
 	
 	var self_box := Rect2(collision_shape.get_shape().get_rect().position + position, collision_shape.get_shape().get_rect().size)
 	if self_box.has_point(point):
@@ -168,6 +190,7 @@ func get_sprite_frame_from_rotation(rotation:float, frames:int = 16) -> float:
 
 func selected():
 	if !is_owned_by_user(): return
+	if tags.has(TAGS.UNSELECTABLE): return
 	
 	health_bar.show()
 	add_to_group("selected_unit")

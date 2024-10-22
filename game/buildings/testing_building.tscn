@@ -1,0 +1,42 @@
+[gd_scene load_steps=7 format=3 uid="uid://bvpj8t50h2n76"]
+
+[ext_resource type="Script" path="res://game/buildings/testing_building.gd" id="1_ymmw5"]
+[ext_resource type="PackedScene" uid="uid://hanc83gq25q3" path="res://game/buildings/base_building/base_building_sprite.tscn" id="2_1pqp8"]
+[ext_resource type="Texture2D" uid="uid://b7r1vmcxjtovp" path="res://game/resources/sprites/buildings/testing_building.png" id="3_oq4sh"]
+[ext_resource type="Texture2D" uid="uid://28d0ajnp2uby" path="res://game/resources/sprites/buildings/testing_building_color.png" id="4_lc6d7"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_mxwxb"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_oq4sh")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ggcxe"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_lc6d7")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="TestingBuilding" type="StaticBody2D"]
+position = Vector2(48, 32)
+script = ExtResource("1_ymmw5")
+size = Vector2i(3, 2)
+base_health = 1000.0
+building_id = 1
+building_name = "Testing Building"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="BaseBuildingSprite" parent="." instance=ExtResource("2_1pqp8")]
+sprite_frames = SubResource("SpriteFrames_mxwxb")
+color_sprite = SubResource("SpriteFrames_ggcxe")

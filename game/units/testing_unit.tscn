@@ -262,11 +262,13 @@ animations = [{
 
 [node name="TestingUnit" type="CharacterBody2D" groups=["unit"]]
 script = SubResource("GDScript_4vpni")
+unit_name = "Testing Unit"
 base_speed = 100
 base_health = 100.0
 attack_cooldown = 1.0
 damage = 10.0
 detect_radius = 100
+unit_id = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_gcpxn")
