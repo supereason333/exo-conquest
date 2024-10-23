@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://hivohb7mbcwr"]
+[gd_scene load_steps=5 format=3 uid="uid://hivohb7mbcwr"]
 
 [ext_resource type="Script" path="res://game/game_environment.gd" id="1_lm007"]
 [ext_resource type="PackedScene" uid="uid://c4vu28w7nfnwt" path="res://game/player/player_control.tscn" id="3_vgnbn"]
@@ -9,6 +9,8 @@ script/source = "extends Node2D
 @onready var buildable_color := $ColorRect
 @onready var material_label := $VBoxContainer/MaterialLabel
 "
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c3ruu"]
 
 [node name="GameEnvironment" type="Node2D"]
 script = ExtResource("1_lm007")
@@ -41,3 +43,8 @@ mouse_filter = 2
 [node name="MaterialLabel" type="Label" parent="TileDataViewer/VBoxContainer"]
 layout_mode = 2
 text = "Material"
+
+[node name="BuildingDetector" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BuildingDetector"]
+shape = SubResource("RectangleShape2D_c3ruu")
