@@ -256,6 +256,8 @@ base_health = 200.0
 attack_cooldown = 3.0
 damage = 40.0
 detect_radius = 50
+vision_radius = 300
+agression_distance = 200
 unit_id = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

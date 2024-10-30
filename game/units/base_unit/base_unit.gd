@@ -4,9 +4,12 @@ var Unit_vision := preload("res://game/units/base_unit/unit_vision.tscn")
 
 @onready var collision_shape := $CollisionShape2D
 @onready var base_sprite := $Base
-var vision
+var detect
 var health_bar:ProgressBar
 var attack_timer:Timer
+var unit_vision
+var search_vision_timer:Timer
+var chase_cooldown_timer:Timer
 
 @export var unit_name:String
 @export var base_speed:int
@@ -14,13 +17,18 @@ var attack_timer:Timer
 @export var attack_cooldown:float
 @export var damage:float
 @export var team_id:int
-@export var detect_radius:int
+@export var detect_radius:int		# Actually attack radius i cant be bothered to change name
+@export var vision_radius:int
+@export var agression_distance:int	# Agression distance
 @export var unit_id:int
 
 var peer_id:int
 var path_list:Array[Vector2]
 var targets:Array[Node2D]
+var in_vision:Array[Node2D]
 var target:Node2D
+var chase_target:Node2D
+var chase_time:float
 
 var health:float:
 	get():
@@ -30,22 +38,44 @@ var health:float:
 		health_bar.value = health / base_health * 100
 		#health_bar.value = 100
 
-enum states {STANDBY, ATTACKING, HOLD}
+enum states {STANDBY, ATTACKING, ATTACK_CHASE, HOLD}
 var cur_state:int = states.STANDBY
 
 enum TAGS {NONE, NOAI, UNDETECTABLE, INVINCIBLE, UNSELECTABLE}
 var tags:Array = [TAGS.NONE]
 
+const MAX_CHASE_TIME := 4.0
+
 func _ready() -> void:
 	y_sort_enabled = true
-	var unit_vision := Unit_vision.instantiate()
+	var uv := Unit_vision.instantiate()
+	uv.name = "UnitAttack"
+	add_child(uv)
+	uv.get_child(0).shape = CircleShape2D.new()
+	uv.get_child(0).shape.radius = detect_radius
+	detect = uv
+	detect.body_entered.connect(on_body_entered)
+	detect.body_exited.connect(on_body_exited)
+	
+	search_vision_timer = Timer.new()
+	search_vision_timer.one_shot = false
+	search_vision_timer.autostart = true
+	search_vision_timer.wait_time = 1
+	search_vision_timer.timeout.connect(search_vision)
+	add_child(search_vision_timer)
+	
+	chase_cooldown_timer = Timer.new()
+	chase_cooldown_timer.one_shot = true
+	chase_cooldown_timer.wait_time = 3
+	add_child(chase_cooldown_timer)
+	
+	unit_vision = Unit_vision.instantiate()
 	unit_vision.name = "UnitVision"
 	add_child(unit_vision)
 	unit_vision.get_child(0).shape = CircleShape2D.new()
-	unit_vision.get_child(0).shape.radius = detect_radius
-	vision = unit_vision
-	vision.body_entered.connect(on_body_entered)
-	vision.body_exited.connect(on_body_exited)
+	unit_vision.get_child(0).shape.radius = vision_radius
+	unit_vision.body_entered.connect(on_body_enter_vision)
+	unit_vision.body_exited.connect(on_body_exit_vision)
 	
 	attack_timer = Timer.new()
 	attack_timer.wait_time = attack_cooldown
@@ -84,21 +114,34 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	velocity = Vector2.ZERO
 	
-	if path_list:
-		movement()
-		move_and_slide()
+	
+	movement(delta)
+	move_and_slide()
 
-func movement():
+func movement(delta:float):
 	if tags.has(TAGS.NOAI): return
 	
-	var dist_to_target:Vector2 = path_list[0] - position
-	
-	velocity += dist_to_target.normalized() * base_speed
-	
-	base_sprite.frame = get_sprite_frame_from_rotation(dist_to_target.angle() + PI)
-	
-	if dist_to_target.length_squared() <= 1000:
-		path_list.remove_at(0)
+	if path_list:
+		var dist_to_target:Vector2 = path_list[0] - position
+		
+		velocity += dist_to_target.normalized() * base_speed
+		
+		base_sprite.frame = get_sprite_frame_from_rotation(dist_to_target.angle() + PI)
+		
+		if dist_to_target.length_squared() <= 1000:
+			path_list.remove_at(0)
+		
+	else:
+		if chase_target:	# move towards chase target
+			var dist_to_target:Vector2 = chase_target.position - position
+			if dist_to_target.length() <= detect_radius or chase_time >= MAX_CHASE_TIME:
+				chase_target = null
+				chase_cooldown_timer.start()
+				cur_state = states.STANDBY
+				return
+			chase_time += delta
+			base_sprite.frame = get_sprite_frame_from_rotation(dist_to_target.angle() + PI)
+			velocity += dist_to_target.normalized() * base_speed
 
 func add_path_point(pos:Vector2, replace_list:bool = false):
 	if replace_list:
@@ -108,6 +151,19 @@ func add_path_point(pos:Vector2, replace_list:bool = false):
 		path_list.append(pos)
 
 
+
+func on_body_enter_vision(body:Node2D):
+	if tags.has(TAGS.NOAI): return
+	
+	if body.is_in_group("unit") or body.is_in_group("building"):
+		if body.team_id != team_id:
+			in_vision.append(body)
+
+func on_body_exit_vision(body:Node2D):
+	if tags.has(TAGS.NOAI): return
+	
+	if in_vision.has(body):
+		in_vision.remove_at(in_vision.find(body))
 
 func on_body_entered(body:Node2D):
 	if tags.has(TAGS.NOAI): return
@@ -146,16 +202,29 @@ func attack_ai():
 		_:
 			pass
 
+func search_vision():
+	if path_list: return
+	
+	if !chase_target and chase_cooldown_timer.is_stopped():
+		for unit in in_vision:
+			if (unit.position - position).length() <= agression_distance:
+				if cur_state != states.ATTACKING or states.HOLD:
+					cur_state = states.ATTACK_CHASE
+					chase_target = unit
+					chase_time = 0
+
 var draw_attack := false
 func attack_target():
 	if tags.has(TAGS.NOAI): return
 	
 	target.on_attack(damage)
+	chase_target = null
 	draw_attack = true
 
 func on_attack(damage:float):
 	if tags.has(TAGS.INVINCIBLE): return
-	
+	cur_state = states.STANDBY
+	chase_target = null
 	health -= damage
 	if health <= 0:
 		killed()
