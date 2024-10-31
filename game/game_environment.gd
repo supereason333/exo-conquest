@@ -153,6 +153,13 @@ func _unhandled_input(event: InputEvent) -> void:
 					print("BOX SELECT")
 					
 				box_select = false
+		elif event.button_index == 2:
+			var point_select_list:Array[Node2D]
+			get_tree().call_group("unit", "point_select", event.position + player.position, point_select_list)
+			if point_select_list:
+				RTS.on_right_click(event.position, point_select_list[0])
+			else:
+				RTS.on_right_click(event.position + player.position)
 	elif event is InputEventMouseMotion:
 		if mouse_down:
 			box.end = event.position + player.position

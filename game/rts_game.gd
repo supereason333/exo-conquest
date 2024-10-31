@@ -83,6 +83,10 @@ func handle_point_select(unit, add:bool = false):
 	
 	emit_signal("select_list_changed")
 
+func on_right_click(pos:Vector2, unit:Node2D = null):
+	for _unit in selected_list:
+		_unit.on_right_click(pos, unit)
+
 func clear_selected():
 	for i in selected_list:
 		i.deselected()

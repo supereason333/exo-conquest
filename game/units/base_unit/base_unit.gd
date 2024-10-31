@@ -103,13 +103,13 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	attack_ai()
-	if Input.is_action_just_pressed("unit_move") and is_in_group("selected_unit"):
-		if Input.is_action_pressed("shift"):
-			add_path_point(get_global_mouse_position())
-		else:
-			add_path_point(get_global_mouse_position(), true)
-	
 	queue_redraw()
+
+func on_right_click(pos:Vector2, clicked_obj:Node2D = null):
+	if Input.is_action_pressed("shift"):
+		add_path_point(pos)
+	else:
+		add_path_point(pos, true)
 
 func _physics_process(delta: float) -> void:
 	velocity = Vector2.ZERO

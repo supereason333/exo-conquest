@@ -27,7 +27,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Core" type="StaticBody2D"]
+[node name="Core" type="StaticBody2D" groups=["building", "core"]]
 script = ExtResource("1_vn618")
 size = Vector2i(4, 3)
 base_health = 8000.0

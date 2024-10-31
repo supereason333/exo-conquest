@@ -12,11 +12,13 @@ var building_id:int
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	var building = BuildingLoader.load_building_from_id(building_id)
+	var building:Node2D = BuildingLoader.load_building_from_id(building_id)
 	if !building: return
 	
 	building.collision_mask = 0 << 0
 	building.collision_layer = 0 << 0
+	building.remove_from_group(\"building\")
+	building.remove_from_group(\"core\")
 	building_node.custom_minimum_size = building.size * 32
 	building_node.add_child(building)
 	

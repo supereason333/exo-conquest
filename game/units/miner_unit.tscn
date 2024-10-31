@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bpd8h3qk12wyl" path="res://game/resources/sprites/miner_unit_color_layer.png" id="4_wvomt"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rdt7w"]
-size = Vector2(32, 32)
+size = Vector2(22, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_a3ct5"]
 atlas = ExtResource("3_55ojm")
