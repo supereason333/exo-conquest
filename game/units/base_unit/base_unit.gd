@@ -257,7 +257,7 @@ func point_select(point: Vector2, list:Array):
 		list.append(self)
 
 func get_sprite_frame_from_rotation(rotation:float, frames:int = 16) -> float:
-	return snapped(rotation / TAU * (frames - 1), 1)
+	return snapped(rotation / TAU * (frames), 1)
 
 func selected():
 	if !is_owned_by_user(): return

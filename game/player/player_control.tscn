@@ -21,7 +21,6 @@ func _on_unit_selector_value_changed(value: float) -> void:
 	var unit = RTS.unit_loader.load_unit_from_id(unit_sb.value) as CharacterBody2D
 	if unit:
 		unit.tags = [unit.TAGS.NOAI, unit.TAGS.UNDETECTABLE, unit.TAGS.INVINCIBLE, unit.TAGS.UNSELECTABLE]
-		unit.collision_layer
 		unit.position.y += 50
 		unit.collision_layer = 0 << 0
 		unit.collision_mask = 0 << 0
@@ -34,7 +33,7 @@ func _on_pressed() -> void:
 	if !unit: return
 	unit.team_id = RTS.player.team_id
 	unit.position = $\"../../../..\".position + Vector2(320, 240)
-	game_env.add_unit(unit)
+	game_env.add_unit(unit)			# THIS is truely terrible and needs to be changed (Use a signal to communicate up the tree)
 "
 
 [sub_resource type="GDScript" id="GDScript_ak6jj"]
