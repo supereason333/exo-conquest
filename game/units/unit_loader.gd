@@ -3,7 +3,8 @@ extends Node
 var unit_list := [
 	preload("res://game/units/testing_unit.tscn"),
 	preload("res://game/units/testing_2_unit.tscn"),
-	preload("res://game/units/sniper_unit.tscn")
+	preload("res://game/units/sniper_unit.tscn"),
+	preload("res://game/units/miner_unit.tscn")
 ]
 
 const MAX_UNITS := 100

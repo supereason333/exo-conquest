@@ -1,7 +1,8 @@
 extends Node
 
 var building_list := [
-	preload("res://game/buildings/testing_building.tscn")
+	preload("res://game/buildings/testing_building.tscn"),
+	preload("res://game/buildings/core.tscn")
 ]
 var ins_building_list:Array[Node2D]
 

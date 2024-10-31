@@ -86,7 +86,7 @@ func _ready() -> void:
 	health_bar.name = "HealthBar"
 	health_bar.show_percentage = false
 	health_bar.size = Vector2(50, 6)
-	#health_bar.position = Vector2(-health_bar.size.x / 2, collision_shape.shape.size.y / 2 + 10)
+	health_bar.position = Vector2(-health_bar.size.x / 2, collision_shape.shape.size.y / 2 + 10)
 	var style_box = StyleBoxFlat.new()
 	style_box.bg_color = Color.RED
 	health_bar.add_theme_stylebox_override("background", style_box)
@@ -164,6 +164,8 @@ func on_body_exit_vision(body:Node2D):
 	
 	if in_vision.has(body):
 		in_vision.remove_at(in_vision.find(body))
+	if chase_target == body:
+		chase_target = null
 
 func on_body_entered(body:Node2D):
 	if tags.has(TAGS.NOAI): return

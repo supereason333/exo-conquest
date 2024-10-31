@@ -28,7 +28,6 @@ animations = [{
 }]
 
 [node name="TestingBuilding" type="StaticBody2D"]
-position = Vector2(48, 32)
 script = ExtResource("1_ymmw5")
 size = Vector2i(3, 2)
 base_health = 1000.0

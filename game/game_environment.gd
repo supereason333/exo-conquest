@@ -85,28 +85,30 @@ func _draw():
 	if box_select:
 		draw_rect(box, Color.GREEN, false, 2)
 	if build_draw_rects and placing_building:
-		var b := true
+		var detector_build_check := true
+		var build_check := true
+		building_detector.position = Vector2i(get_global_mouse_position() / 32) * 32 + building.size * 32 / 2
+		var 𝓬𝓾𝓻𝓼𝓮_𝓸𝓯_𝓽𝓱𝓮_𝓷𝓲𝓵𝓮 = building_detector.get_overlapping_bodies()
+		for 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰 in 𝓬𝓾𝓻𝓼𝓮_𝓸𝓯_𝓽𝓱𝓮_𝓷𝓲𝓵𝓮:
+			if 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰.is_in_group("building"):
+				detector_build_check = false
+				build_check = false
+		
 		for rect in build_draw_rects:
-			var bb := true
+			var tile_build_check := true
 			rect.position += Vector2(data_tile_map.local_to_map(get_global_mouse_position())) * 32
 			var tile = data_tile_map.get_cell_tile_data(data_tile_map.local_to_map(rect.position))
 			if tile:
 				if tile.get_custom_data("Not buildable"):
-					bb = false
+					tile_build_check = false
 			
-			building_detector.position = rect.position - Vector2(16, 0)
-			var 𝓬𝓾𝓻𝓼𝓮_𝓸𝓯_𝓽𝓱𝓮_𝓷𝓲𝓵𝓮 = building_detector.get_overlapping_bodies()
-			for 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰 in 𝓬𝓾𝓻𝓼𝓮_𝓸𝓯_𝓽𝓱𝓮_𝓷𝓲𝓵𝓮:
-				if 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰.is_in_group("building"):
-					bb = false
-			
-			if bb:
+			if tile_build_check and detector_build_check:
 				draw_rect(rect, Color.LIGHT_GREEN * Color(1, 1, 1, 0.5))
 			else:
 				draw_rect(rect, Color.LIGHT_CORAL * Color(1, 1, 1, 0.5))
-				b = false
+				build_check = false
 		
-		if b:
+		if build_check:
 			can_build = true
 		else:
 			can_build = false
