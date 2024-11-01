@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://bujlagwci5a1f"]
+
+[ext_resource type="FontFile" uid="uid://t16xvynp6x2d" path="res://menu/menu_resources/themes/fonts/RobotoMono-VariableFont_wght.ttf" id="1_br83m"]
+
+[resource]
+default_font = ExtResource("1_br83m")
+default_font_size = 12
+Label/constants/shadow_outline_size = 1

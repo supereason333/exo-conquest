@@ -8,7 +8,7 @@ signal box_select(box:Rect2)
 @export var player:PlayerData
 
 # Materials
-@export var material_list:Array[int]
+@export var material_list := [0, 0, 0, 0]	# Selnite, Luminite, Plainium, Xenite
 
 var deselect_queue:Array
 var called_deselect := false
