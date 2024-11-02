@@ -157,7 +157,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			var point_select_list:Array[Node2D]
 			get_tree().call_group("unit", "point_select", event.position + player.position, point_select_list)
 			if point_select_list:
-				RTS.on_right_click(event.position, point_select_list[0])
+				RTS.on_right_click(event.position + player.position, point_select_list[0])
 			else:
 				RTS.on_right_click(event.position + player.position)
 	elif event is InputEventMouseMotion:
