@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="GameSettings" load_steps=2 format=3 uid="uid://btbjk43yg606x"]
+
+[ext_resource type="Script" path="res://menu/settings/settings.gd" id="1_5nsro"]
+
+[resource]
+script = ExtResource("1_5nsro")
+select_color = Color(0, 1, 0, 1)
+enemy_color = Color(1, 0, 0, 1)

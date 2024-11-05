@@ -15,6 +15,12 @@ var building
 var cam_mov_zone := 2
 const MOVE_SPEED := 1000.0
 
+var select_box:Rect2:
+	set(value):
+		value.position -= position
+		select_box = value
+		queue_redraw()
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	RTS.select_list_changed.connect(select_list_changed)
@@ -108,3 +114,6 @@ func on_add_building(building_id:int):
 func _on_unit_select_value_changed(value: float) -> void:
 	unit_sb.max_value = len(RTS.selected_list) - 1
 	update_selected_data()
+
+func _draw():
+	draw_rect(select_box, RTS.game_settings.select_color, false, 2)

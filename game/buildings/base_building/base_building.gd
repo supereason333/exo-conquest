@@ -1,9 +1,20 @@
 extends StaticBody2D
+class_name BaseBuilding
 
 @export var size:Vector2i	# Size of the building in tiles
 @export var base_health:float
 @export var building_id:int
 @export var building_name:String
+
+@export_group("Costs")
+@export var cost_selnite:int
+@export var cost_luminite:int
+@export var cost_plainium:int
+@export var cost_xenite:int
+
+@export_group("Other")
+@export var dummy := false
+
 var collision_shape:CollisionShape2D
 var health_bar := ProgressBar.new()
 
@@ -20,7 +31,12 @@ var health := base_health:
 @onready var building_sprite := $BaseBuildingSprite
 
 func _ready() -> void:
+	if dummy:
+		set_collision_layer_value(1, false)
+		set_collision_mask_value(1, false)
+	
 	add_to_group("building")
+	set_collision_layer_value(2, true)
 	y_sort_enabled = true
 	collision_shape = CollisionShape2D.new()
 	collision_shape.shape = RectangleShape2D.new()
@@ -30,7 +46,7 @@ func _ready() -> void:
 	health_bar.name = "HealthBar"
 	health_bar.show_percentage = false
 	health_bar.size = Vector2(50, 6)
-	#health_bar.position = Vector2(-health_bar.size.x / 2, collision_shape.shape.size.y / 2 + 10)
+	health_bar.position = Vector2(-health_bar.size.x / 2, collision_shape.shape.size.y / 2 + 10)
 	var style_box = StyleBoxFlat.new()
 	style_box.bg_color = Color.RED
 	health_bar.add_theme_stylebox_override("background", style_box)
@@ -66,7 +82,10 @@ func deselected():
 
 func _draw() -> void:
 	if is_in_group("selected_building"):
-		draw_rect(collision_shape.shape.get_rect(), Color.GREEN, false, 2)
+		if team_id == RTS.player.team_id:
+			draw_rect(collision_shape.shape.get_rect(), Color.GREEN, false, 2)
+		else:
+			draw_rect(collision_shape.shape.get_rect(), Color.RED, false, 2)
 
 func on_attack(damage:float):
 	health -= damage

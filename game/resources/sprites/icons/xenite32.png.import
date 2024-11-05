@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dios26iq5tfip"
-path="res://.godot/imported/plainium16.png-cc75bc5a50b3361bc9500736276b2bbc.ctex"
+uid="uid://cagoft68exi34"
+path="res://.godot/imported/xenite32.png-8ab0d6c25ae2c23454cf063ae206cdf0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://game/resources/sprites/materials/plainium16.png"
-dest_files=["res://.godot/imported/plainium16.png-cc75bc5a50b3361bc9500736276b2bbc.ctex"]
+source_file="res://game/resources/sprites/icons/xenite32.png"
+dest_files=["res://.godot/imported/xenite32.png-8ab0d6c25ae2c23454cf063ae206cdf0.ctex"]
 
 [params]
 

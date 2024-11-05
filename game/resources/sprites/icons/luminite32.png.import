@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://yqgemwb72ssh"
-path="res://.godot/imported/selnite16.png-3f024022199c919b591bb4c7474c7270.ctex"
+uid="uid://dna0vfavtigrj"
+path="res://.godot/imported/luminite32.png-4d18c2024333a37e1d66a7c10dd49e7d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://game/resources/sprites/materials/selnite16.png"
-dest_files=["res://.godot/imported/selnite16.png-3f024022199c919b591bb4c7474c7270.ctex"]
+source_file="res://game/resources/sprites/icons/luminite32.png"
+dest_files=["res://.godot/imported/luminite32.png-4d18c2024333a37e1d66a7c10dd49e7d.ctex"]
 
 [params]
 

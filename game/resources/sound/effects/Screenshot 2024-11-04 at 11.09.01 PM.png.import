@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d084h7ki66smp"
-path="res://.godot/imported/luminite16.png-ed56ca5c04a516f275afcaa64b96f8e2.ctex"
+uid="uid://dl8j7nai3xtjn"
+path="res://.godot/imported/Screenshot 2024-11-04 at 11.09.01 PM.png-3f7988a9523f55d217e33d82e7e61da4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://game/resources/sprites/materials/luminite16.png"
-dest_files=["res://.godot/imported/luminite16.png-ed56ca5c04a516f275afcaa64b96f8e2.ctex"]
+source_file="res://game/resources/sound/effects/Screenshot 2024-11-04 at 11.09.01 PM.png"
+dest_files=["res://.godot/imported/Screenshot 2024-11-04 at 11.09.01 PM.png-3f7988a9523f55d217e33d82e7e61da4.ctex"]
 
 [params]
 

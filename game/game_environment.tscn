@@ -16,6 +16,8 @@ script/source = "extends Node2D
 script = ExtResource("1_lm007")
 
 [node name="PlayerControl" parent="." groups=["buildings"] instance=ExtResource("3_vgnbn")]
+z_index = 1
+z_as_relative = false
 
 [node name="TileDataViewer" type="Node2D" parent="."]
 visible = false

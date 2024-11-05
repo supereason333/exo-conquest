@@ -5,4 +5,7 @@
 [resource]
 default_font = ExtResource("1_br83m")
 default_font_size = 12
-Label/constants/shadow_outline_size = 1
+MarginContainer/constants/margin_bottom = 2
+MarginContainer/constants/margin_left = 2
+MarginContainer/constants/margin_right = 2
+MarginContainer/constants/margin_top = 2

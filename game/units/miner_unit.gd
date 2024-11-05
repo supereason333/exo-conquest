@@ -25,7 +25,7 @@ func gather_resource():
 	pass
 
 func get_close_core() -> Node2D:
-	if tags.has(TAGS.NOAI): return
+	if dummy: return
 	
 	var team_cores:Array[Node2D]
 	for core in get_tree().get_nodes_in_group("core"):

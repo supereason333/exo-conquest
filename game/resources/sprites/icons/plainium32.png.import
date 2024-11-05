@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dna0vfavtigrj"
-path="res://.godot/imported/luminite32.png-b0fe2fe2f85819924bdd015a85ade4ba.ctex"
+uid="uid://cvqqq0vmqf5cu"
+path="res://.godot/imported/plainium32.png-5cbbc2ee9d6e2b76b51adaaa8434647c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://game/resources/sprites/materials/luminite32.png"
-dest_files=["res://.godot/imported/luminite32.png-b0fe2fe2f85819924bdd015a85ade4ba.ctex"]
+source_file="res://game/resources/sprites/icons/plainium32.png"
+dest_files=["res://.godot/imported/plainium32.png-5cbbc2ee9d6e2b76b51adaaa8434647c.ctex"]
 
 [params]
 

@@ -1,11 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://c4vu28w7nfnwt"]
+[gd_scene load_steps=14 format=3 uid="uid://c4vu28w7nfnwt"]
 
 [ext_resource type="Script" path="res://game/player/player_control.gd" id="1_83dnc"]
 [ext_resource type="Theme" uid="uid://bujlagwci5a1f" path="res://menu/menu_resources/themes/default_gui.tres" id="2_kekrh"]
-[ext_resource type="Texture2D" uid="uid://yqgemwb72ssh" path="res://game/resources/sprites/materials/selnite16.png" id="3_wdp7i"]
-[ext_resource type="Texture2D" uid="uid://d084h7ki66smp" path="res://game/resources/sprites/materials/luminite16.png" id="4_7hewy"]
-[ext_resource type="Texture2D" uid="uid://dios26iq5tfip" path="res://game/resources/sprites/materials/plainium16.png" id="5_0h180"]
-[ext_resource type="Texture2D" uid="uid://clj7m8yhuu874" path="res://game/resources/sprites/materials/xenite16.png" id="6_gx6lu"]
+[ext_resource type="Texture2D" uid="uid://yqgemwb72ssh" path="res://game/resources/sprites/icons/selnite16.png" id="3_wdp7i"]
+[ext_resource type="Texture2D" uid="uid://d084h7ki66smp" path="res://game/resources/sprites/icons/luminite16.png" id="4_7hewy"]
+[ext_resource type="Texture2D" uid="uid://dios26iq5tfip" path="res://game/resources/sprites/icons/plainium16.png" id="5_0h180"]
+[ext_resource type="Texture2D" uid="uid://clj7m8yhuu874" path="res://game/resources/sprites/icons/xenite16.png" id="6_gx6lu"]
+[ext_resource type="Texture2D" uid="uid://dqnaqp2s37d0d" path="res://game/resources/sprites/placeholder/32x.png" id="7_5p51g"]
 
 [sub_resource type="GDScript" id="GDScript_oivxw"]
 script/source = "extends Button
@@ -14,7 +15,7 @@ script/source = "extends Button
 @onready var game_env = $\"../../../../..\"
 
 func _ready() -> void:
-	unit_sb.max_value = RTS.unit_loader.MAX_UNITS
+	unit_sb.max_value = UnitLoader.MAX_UNITS
 
 func _process(delta: float) -> void:
 	pass
@@ -23,18 +24,16 @@ func _on_unit_selector_value_changed(value: float) -> void:
 	for child in unit_sb.get_children():
 		child.queue_free()
 	
-	var unit = RTS.unit_loader.load_unit_from_id(unit_sb.value) as CharacterBody2D
+	var unit:CharacterBody2D = UnitLoader.load_unit_from_id(unit_sb.value)
 	if unit:
-		unit.tags = [unit.TAGS.NOAI, unit.TAGS.UNDETECTABLE, unit.TAGS.INVINCIBLE, unit.TAGS.UNSELECTABLE]
 		unit.position.y += 50
-		unit.collision_layer = 0 << 0
-		unit.collision_mask = 0 << 0
+		unit.dummy = true
 		#print(unit)
 		#print(type_string(typeof(unit.tags)))
 		unit_sb.add_child(unit)
 
 func _on_pressed() -> void:
-	var unit = RTS.unit_loader.load_unit_from_id(unit_sb.value)
+	var unit = UnitLoader.load_unit_from_id(unit_sb.value)
 	if !unit: return
 	unit.team_id = RTS.player.team_id
 	unit.position = $\"../../../..\".position + Vector2(320, 240)
@@ -65,8 +64,8 @@ func _process(delta: float) -> void:
 	pass
 "
 
-[sub_resource type="GDScript" id="GDScript_vk6gs"]
-script/source = "extends VBoxContainer
+[sub_resource type="GDScript" id="GDScript_nl0vn"]
+script/source = "extends Label
 
 
 # Called when the node enters the scene tree for the first time.
@@ -75,6 +74,89 @@ func _ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	text = \"FPS: \" + str(Engine.get_frames_per_second())
+"
+
+[sub_resource type="GDScript" id="GDScript_vk6gs"]
+script/source = "extends VBoxContainer
+
+@onready var selnite := $Selnite/AmountLabel
+@onready var luminite := $Luminite/AmountLabel
+@onready var plainium := $Plainium/AmountLabel
+@onready var xenite := $Xenite/AmountLabel
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	RTS.material_changed.connect(update_display)
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+func update_display():
+	selnite.text = str(RTS.material_selnite)
+	luminite.text = str(RTS.material_luminite)
+	plainium.text = str(RTS.material_plainium)
+	xenite.text = str(RTS.material_xenite)
+
+func _on_add_button_pressed() -> void:
+	RTS.material_selnite += 100
+	RTS.material_luminite += 100
+	RTS.material_plainium += 100
+	RTS.material_xenite += 100
+"
+
+[sub_resource type="GDScript" id="GDScript_yql6u"]
+script/source = "extends GridContainer
+
+var Placeholder32 := preload(\"res://game/resources/sprites/placeholder/32x.png\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	RTS.select_list_changed.connect(update_display)
+	var label := Label.new()
+	label.text = \"None\"
+	add_child(label)
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+func update_display():
+	for child in get_children():
+		child.queue_free()
+	
+	for unit in RTS.selected_list:
+		var rect := TextureRect.new()
+		rect.texture = unit.display_icon
+		if !RTS.selected_controllable: rect.modulate = Color.RED
+		add_child(rect)
+	
+	if RTS.selected_list.size() == 0:
+		var label := Label.new()
+		label.text = \"None\"
+		add_child(label)
+"
+
+[sub_resource type="GDScript" id="GDScript_t6nkp"]
+script/source = "extends GridContainer
+
+@onready var buttons:Array[TextureButton] = [
+	$\"1/TextureButton\",
+	$\"2/TextureButton\",
+	$\"3/TextureButton\",
+	$\"4/TextureButton\",
+	$\"5/TextureButton\",
+	$\"6/TextureButton\",
+	$\"7/TextureButton\",
+	$\"8/TextureButton\",
+	$\"9/TextureButton\"
+]
+func _ready() -> void:
+	pass
+
 func _process(delta: float) -> void:
 	pass
 "
@@ -97,12 +179,6 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("2_kekrh")
 
-[node name="Label" type="Label" parent="UI/Control"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-text = "PlayerGUI"
-
 [node name="DebugMenu" type="Control" parent="UI/Control"]
 visible = false
 anchors_preset = 0
@@ -111,10 +187,10 @@ offset_bottom = 40.0
 
 [node name="TeamSelector" type="VBoxContainer" parent="UI/Control/DebugMenu"]
 layout_mode = 0
-offset_left = -1.0
-offset_top = 30.0
-offset_right = 39.0
-offset_bottom = 70.0
+offset_left = 71.0
+offset_top = 5.0
+offset_right = 111.0
+offset_bottom = 45.0
 
 [node name="SelectedData" type="VBoxContainer" parent="UI/Control/DebugMenu"]
 layout_mode = 0
@@ -154,60 +230,217 @@ script = SubResource("GDScript_ak6jj")
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/DebugMenu/BuildingSelector"]
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="UI/Control"]
-layout_mode = 0
-offset_top = 28.0
-offset_right = 60.0
-offset_bottom = 108.0
+[node name="MarginContainer" type="MarginContainer" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
 
-[node name="MaterialDisplay" type="VBoxContainer" parent="UI/Control/PanelContainer"]
+[node name="LeftBox" type="VBoxContainer" parent="UI/Control/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="FPSLabel" type="Label" parent="UI/Control/MarginContainer/LeftBox"]
+layout_mode = 2
+text = "FPS"
+script = SubResource("GDScript_nl0vn")
+
+[node name="MaterialDisplay" type="PanelContainer" parent="UI/Control/MarginContainer/LeftBox"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay"]
+layout_mode = 2
+
+[node name="MaterialDisplay" type="VBoxContainer" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer"]
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 script = SubResource("GDScript_vk6gs")
 
-[node name="Selnite" type="HBoxContainer" parent="UI/Control/PanelContainer/MaterialDisplay"]
+[node name="Selnite" type="HBoxContainer" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay"]
 layout_mode = 2
 
-[node name="Texture" type="TextureRect" parent="UI/Control/PanelContainer/MaterialDisplay/Selnite"]
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/Selnite"]
 layout_mode = 2
 texture = ExtResource("3_wdp7i")
 
-[node name="AmountLabel" type="Label" parent="UI/Control/PanelContainer/MaterialDisplay/Selnite"]
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/Selnite"]
 layout_mode = 2
 text = "0"
 
-[node name="Luminite" type="HBoxContainer" parent="UI/Control/PanelContainer/MaterialDisplay"]
+[node name="Luminite" type="HBoxContainer" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay"]
 layout_mode = 2
 
-[node name="Texture" type="TextureRect" parent="UI/Control/PanelContainer/MaterialDisplay/Luminite"]
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/Luminite"]
 layout_mode = 2
 texture = ExtResource("4_7hewy")
 
-[node name="AmountLabel" type="Label" parent="UI/Control/PanelContainer/MaterialDisplay/Luminite"]
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/Luminite"]
 layout_mode = 2
 text = "0"
 
-[node name="Plainium" type="HBoxContainer" parent="UI/Control/PanelContainer/MaterialDisplay"]
+[node name="Plainium" type="HBoxContainer" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay"]
 layout_mode = 2
 
-[node name="Texture" type="TextureRect" parent="UI/Control/PanelContainer/MaterialDisplay/Plainium"]
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/Plainium"]
 layout_mode = 2
 texture = ExtResource("5_0h180")
 
-[node name="AmountLabel" type="Label" parent="UI/Control/PanelContainer/MaterialDisplay/Plainium"]
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/Plainium"]
 layout_mode = 2
 text = "0"
 
-[node name="Xenite" type="HBoxContainer" parent="UI/Control/PanelContainer/MaterialDisplay"]
+[node name="Xenite" type="HBoxContainer" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay"]
 layout_mode = 2
 
-[node name="Texture" type="TextureRect" parent="UI/Control/PanelContainer/MaterialDisplay/Xenite"]
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/Xenite"]
 layout_mode = 2
 texture = ExtResource("6_gx6lu")
 
-[node name="AmountLabel" type="Label" parent="UI/Control/PanelContainer/MaterialDisplay/Xenite"]
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/Xenite"]
 layout_mode = 2
 text = "0"
+
+[node name="AddButton" type="Button" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay"]
+layout_mode = 2
+
+[node name="PanelContainer2" type="PanelContainer" parent="UI/Control/MarginContainer/LeftBox"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Control/MarginContainer/LeftBox/PanelContainer2"]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="UI/Control/MarginContainer/LeftBox/PanelContainer2/MarginContainer"]
+layout_mode = 2
+
+[node name="SelectedUnits" type="GridContainer" parent="UI/Control/MarginContainer/LeftBox/PanelContainer2/MarginContainer/CenterContainer"]
+layout_mode = 2
+columns = 2
+script = SubResource("GDScript_yql6u")
+
+[node name="ControlContainer" type="GridContainer" parent="UI/Control/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+columns = 3
+script = SubResource("GDScript_t6nkp")
+
+[node name="1" type="PanelContainer" parent="UI/Control/MarginContainer/ControlContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="UI/Control/MarginContainer/ControlContainer/1"]
+layout_mode = 2
+texture_normal = ExtResource("7_5p51g")
+texture_pressed = ExtResource("7_5p51g")
+texture_hover = ExtResource("7_5p51g")
+texture_disabled = ExtResource("7_5p51g")
+texture_focused = ExtResource("7_5p51g")
+
+[node name="2" type="PanelContainer" parent="UI/Control/MarginContainer/ControlContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="UI/Control/MarginContainer/ControlContainer/2"]
+layout_mode = 2
+texture_normal = ExtResource("7_5p51g")
+texture_pressed = ExtResource("7_5p51g")
+texture_hover = ExtResource("7_5p51g")
+texture_disabled = ExtResource("7_5p51g")
+texture_focused = ExtResource("7_5p51g")
+
+[node name="3" type="PanelContainer" parent="UI/Control/MarginContainer/ControlContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="UI/Control/MarginContainer/ControlContainer/3"]
+layout_mode = 2
+texture_normal = ExtResource("7_5p51g")
+texture_pressed = ExtResource("7_5p51g")
+texture_hover = ExtResource("7_5p51g")
+texture_disabled = ExtResource("7_5p51g")
+texture_focused = ExtResource("7_5p51g")
+
+[node name="4" type="PanelContainer" parent="UI/Control/MarginContainer/ControlContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="UI/Control/MarginContainer/ControlContainer/4"]
+layout_mode = 2
+texture_normal = ExtResource("7_5p51g")
+texture_pressed = ExtResource("7_5p51g")
+texture_hover = ExtResource("7_5p51g")
+texture_disabled = ExtResource("7_5p51g")
+texture_focused = ExtResource("7_5p51g")
+
+[node name="5" type="PanelContainer" parent="UI/Control/MarginContainer/ControlContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="UI/Control/MarginContainer/ControlContainer/5"]
+layout_mode = 2
+texture_normal = ExtResource("7_5p51g")
+texture_pressed = ExtResource("7_5p51g")
+texture_hover = ExtResource("7_5p51g")
+texture_disabled = ExtResource("7_5p51g")
+texture_focused = ExtResource("7_5p51g")
+
+[node name="6" type="PanelContainer" parent="UI/Control/MarginContainer/ControlContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="UI/Control/MarginContainer/ControlContainer/6"]
+layout_mode = 2
+texture_normal = ExtResource("7_5p51g")
+texture_pressed = ExtResource("7_5p51g")
+texture_hover = ExtResource("7_5p51g")
+texture_disabled = ExtResource("7_5p51g")
+texture_focused = ExtResource("7_5p51g")
+
+[node name="7" type="PanelContainer" parent="UI/Control/MarginContainer/ControlContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="UI/Control/MarginContainer/ControlContainer/7"]
+layout_mode = 2
+texture_normal = ExtResource("7_5p51g")
+texture_pressed = ExtResource("7_5p51g")
+texture_hover = ExtResource("7_5p51g")
+texture_disabled = ExtResource("7_5p51g")
+texture_focused = ExtResource("7_5p51g")
+
+[node name="8" type="PanelContainer" parent="UI/Control/MarginContainer/ControlContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="UI/Control/MarginContainer/ControlContainer/8"]
+layout_mode = 2
+texture_normal = ExtResource("7_5p51g")
+texture_pressed = ExtResource("7_5p51g")
+texture_hover = ExtResource("7_5p51g")
+texture_disabled = ExtResource("7_5p51g")
+texture_focused = ExtResource("7_5p51g")
+
+[node name="9" type="PanelContainer" parent="UI/Control/MarginContainer/ControlContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TextureButton" type="TextureButton" parent="UI/Control/MarginContainer/ControlContainer/9"]
+layout_mode = 2
+texture_normal = ExtResource("7_5p51g")
+texture_pressed = ExtResource("7_5p51g")
+texture_hover = ExtResource("7_5p51g")
+texture_disabled = ExtResource("7_5p51g")
+texture_focused = ExtResource("7_5p51g")
 
 [connection signal="value_changed" from="UI/Control/DebugMenu/SelectedData/UnitSelect" to="." method="_on_unit_select_value_changed"]
 [connection signal="pressed" from="UI/Control/DebugMenu/AddUnit" to="UI/Control/DebugMenu/AddUnit" method="_on_pressed"]
 [connection signal="value_changed" from="UI/Control/DebugMenu/UnitSelector" to="UI/Control/DebugMenu/AddUnit" method="_on_unit_selector_value_changed"]
+[connection signal="pressed" from="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/AddButton" to="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay" method="_on_add_button_pressed"]

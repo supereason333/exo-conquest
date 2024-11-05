@@ -39,12 +39,22 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	queue_redraw()
 	data_viewer_code()
+	if Input.is_action_just_pressed("unit_move"):
+		var point_select_list:Array[Node2D]
+		get_tree().call_group("unit", "on_point_select", get_global_mouse_position(), point_select_list)
+		get_tree().call_group("building", "point_select", get_global_mouse_position(), point_select_list)
+		if point_select_list:
+			RTS.on_right_click(get_global_mouse_position(), point_select_list[0])
+		else:
+			RTS.on_right_click(get_global_mouse_position())
 	if placing_building:
-		if Input.is_action_just_pressed("mouse_click"):
+		if Input.is_action_just_pressed("place"):
 			if can_build:
 				building.position = Vector2i(get_global_mouse_position() / 32) * 32 + building.size * 32 / 2
 				add_child(building)
 				placing_building = false
+		elif Input.is_action_just_pressed("cancel"):
+			placing_building = false
 
 func data_viewer_code():
 	var viewer_tile:Vector2i = data_tile_map.local_to_map(data_tile_map.get_local_mouse_position())
@@ -82,15 +92,13 @@ func add_building(build):
 	placing_building = true
 
 func _draw():
-	if box_select:
-		draw_rect(box, Color.GREEN, false, 2)
 	if build_draw_rects and placing_building:
 		var detector_build_check := true
 		var build_check := true
 		building_detector.position = Vector2i(get_global_mouse_position() / 32) * 32 + building.size * 32 / 2
 		var 𝓬𝓾𝓻𝓼𝓮_𝓸𝓯_𝓽𝓱𝓮_𝓷𝓲𝓵𝓮 = building_detector.get_overlapping_bodies()
 		for 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰 in 𝓬𝓾𝓻𝓼𝓮_𝓸𝓯_𝓽𝓱𝓮_𝓷𝓲𝓵𝓮:
-			if 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰.is_in_group("building"):
+			if 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰.is_in_group("building") or 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰.is_in_group("unit"):
 				detector_build_check = false
 				build_check = false
 		
@@ -117,53 +125,51 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == 1:
 			mouse_down = event.pressed
-			
-			if mouse_down:
+			if event.pressed:
 				box.position = event.position + player.position
 				box_select = false
 			else:		# When user lets go of mouse
+				player.select_box = Rect2(0, 0, 0, 0)
 				box = box.abs()
-				
 				if !box_select:		# A click ( Where the selection code should be executed from )
-					RTS.emit_signal("point_select", event.position + player.position)
-					var point_select_list:Array
-					var building_point_select_list:Array
-					get_tree().call_group("unit", "point_select", event.position + player.position, point_select_list)
-					if point_select_list:
-						RTS.handle_point_select(point_select_list[0], Input.is_action_pressed("shift"))
-						RTS.clear_selected_building()
-					else:
-						RTS.clear_selected()
-						get_tree().call_group("building", "point_select", event.position + player.position, building_point_select_list)
-						if building_point_select_list:
-							RTS.handle_building_point_select(building_point_select_list[0])
-						else:
-							RTS.clear_selected_building()
+					RTS.do_point_select(event.position + player.position)
+					#RTS.emit_signal("point_select", event.position + player.position)
+					#var point_select_list:Array[BaseUnit]
+					#var building_point_select_list:Array
+					#get_tree().call_group("unit", "on_point_select", event.position + player.position, point_select_list)
+					#if point_select_list:
+						#RTS.handle_point_select(point_select_list[0], Input.is_action_pressed("shift"))
+						#RTS.clear_selected_building()
+					#else:
+						#RTS.clear_selected(true)
+						#get_tree().call_group("building", "point_select", event.position + player.position, building_point_select_list)
+						#if building_point_select_list:
+						#	RTS.handle_building_point_select(building_point_select_list[0])
+						#else:
+						#	RTS.clear_selected_building()
 					
 					print("CLICK")
 				else:				# A box select
-					RTS.emit_signal("box_select", box)
-					var box_select_list:Array
-					get_tree().call_group("unit", "box_select", box, box_select_list)
-					if box_select_list:
-						RTS.handle_box_select(box_select_list, Input.is_action_pressed("shift"))
-					else:
-						RTS.clear_selected()
+					RTS.do_box_select(box)
+					#RTS.emit_signal("box_select", box)
+					#var box_select_list:Array
+					#get_tree().call_group("unit", "box_select", box, box_select_list)
+					#if box_select_list:
+					#	RTS.handle_box_select(box_select_list, Input.is_action_pressed("shift"))
+					#	RTS.clear_selected_building()
+					#else:
+					#	RTS.clear_selected(true)
+					#	RTS.clear_selected_building()
 					
+					#player.select_box = Rect2(0, 0, 0, 0)
 					print("BOX SELECT")
 					
 				box_select = false
-		elif event.button_index == 2:
-			var point_select_list:Array[Node2D]
-			get_tree().call_group("unit", "point_select", event.position + player.position, point_select_list)
-			if point_select_list:
-				RTS.on_right_click(event.position + player.position, point_select_list[0])
-			else:
-				RTS.on_right_click(event.position + player.position)
 	elif event is InputEventMouseMotion:
-		if mouse_down:
+		if mouse_down:	#mouse_down
 			box.end = event.position + player.position
 			if box.size.length_squared() >= 50:		# Not a click (box select)
 				box_select = true
+			player.select_box = box
 
 # literaly spaghetti code
