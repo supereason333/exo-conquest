@@ -40,13 +40,7 @@ func _process(delta: float) -> void:
 	queue_redraw()
 	data_viewer_code()
 	if Input.is_action_just_pressed("unit_move"):
-		var point_select_list:Array[Node2D]
-		get_tree().call_group("unit", "on_point_select", get_global_mouse_position(), point_select_list)
-		get_tree().call_group("building", "point_select", get_global_mouse_position(), point_select_list)
-		if point_select_list:
-			RTS.on_right_click(get_global_mouse_position(), point_select_list[0])
-		else:
-			RTS.on_right_click(get_global_mouse_position())
+		RTS.on_right_click(get_global_mouse_position())
 	if placing_building:
 		if Input.is_action_just_pressed("place"):
 			if can_build:

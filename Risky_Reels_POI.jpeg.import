@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dl8j7nai3xtjn"
-path="res://.godot/imported/Screenshot 2024-11-04 at 11.09.01 PM.png-3f7988a9523f55d217e33d82e7e61da4.ctex"
+uid="uid://cjbjm7c8blps6"
+path="res://.godot/imported/Risky_Reels_POI.jpeg-efd837e531af100757d0a22ef3e46f29.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://game/resources/sound/effects/Screenshot 2024-11-04 at 11.09.01 PM.png"
-dest_files=["res://.godot/imported/Screenshot 2024-11-04 at 11.09.01 PM.png-3f7988a9523f55d217e33d82e7e61da4.ctex"]
+source_file="res://Risky_Reels_POI.jpeg"
+dest_files=["res://.godot/imported/Risky_Reels_POI.jpeg-efd837e531af100757d0a22ef3e46f29.ctex"]
 
 [params]
 

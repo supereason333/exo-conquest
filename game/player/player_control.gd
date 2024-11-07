@@ -29,6 +29,9 @@ func _ready() -> void:
 	update_selected_data()
 
 func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("map_key"):
+		$"UI/Control/TextureRect".visible = !$"UI/Control/TextureRect".visible
+	
 	handle_camera_move(delta)
 	if Input.is_action_just_pressed("debug_gui"):
 		debug_menu.visible = !debug_menu.visible

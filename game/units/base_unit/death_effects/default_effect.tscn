@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3 uid="uid://thyfuxewotp6"]
+
+[ext_resource type="Texture2D" uid="uid://dli3c0ske1vu7" path="res://game/resources/particles/explosion.png" id="1_u5ms7"]
+[ext_resource type="Texture2D" uid="uid://cjd4wtjsw3qyf" path="res://game/resources/particles/explosion2.png" id="2_kuh4p"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5g7q6"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_u5ms7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_kuh4p")
+}],
+"loop": false,
+"name": &"default",
+"speed": 1.0
+}]
+
+[sub_resource type="GDScript" id="GDScript_tao06"]
+script/source = "extends DeathEffect
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[node name="DefaultEffect" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_5g7q6")
+autoplay = "default"
+frame = 1
+frame_progress = 1.0
+script = SubResource("GDScript_tao06")

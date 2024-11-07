@@ -58,8 +58,9 @@ func set_default_player():
 	player.team_id = 0
 	player.username = "DEFAULT PLAYER"
 
-func on_right_click(position:Vector2, clicked:Node2D = null):
+func on_right_click(position:Vector2):
 	if !selected_controllable: return
+	var clicked := get_point_select(position)
 	
 	for unit in selected_list:
 		unit.waypoint(position, clicked)
@@ -68,8 +69,7 @@ func do_point_select(point:Vector2):
 	var list:Array[BaseUnit]
 	get_tree().call_group("unit", "on_point_select", point, list)
 	if !list:
-		clear_selection()
-		emit_signal("select_list_changed")
+		clear_selection(true)
 		return
 	
 	selected_controllable = true
@@ -85,6 +85,16 @@ func do_point_select(point:Vector2):
 		set_selection([list[0]])
 	
 	emit_signal("select_list_changed")
+
+func get_point_select(point:Vector2) -> Node2D:
+	var list:Array[Node2D]
+	get_tree().call_group("unit", "on_point_select", point, list)					# THIS DOSENT WORK FIX THIS
+	#get_tree().call_group("building", "on_point_select", point, list)
+	
+	if list:
+		return list[0]
+	else:
+		return null
 
 func do_box_select(box:Rect2):
 	var list:Array[BaseUnit]
@@ -126,10 +136,12 @@ func set_selection(list:Array[BaseUnit]):
 	for i in selected_list:
 		i.selected = true
 
-func clear_selection():
+func clear_selection(_signal:bool = false):
 	for i in selected_list:
 		i.selected = false
 	selected_list = []
+	
+	if _signal: emit_signal("select_list_changed")
 
 
 
@@ -231,5 +243,5 @@ func change_team(team_id:int):
 	if !has: return false
 	
 	player.team_id = team_id
-	#clear_selected(true)
-	#clear_selected_building()
+	clear_selection()
+	#clear_building_selection()

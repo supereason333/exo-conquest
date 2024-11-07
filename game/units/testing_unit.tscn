@@ -265,11 +265,14 @@ unit_name = "Testing Unit"
 unit_id = 1
 base_speed = 100
 base_health = 100.0
+attack_damage = 10.0
 attack_cooldown = 1.0
-vision_radius = 400
-agression_distance = 300
+attack_range = 150
+vision_radius = 300
+agression_distance = 200
 color_sprite_frames = SubResource("SpriteFrames_whmar")
 base_sprite_frames = SubResource("SpriteFrames_purao")
+attack_animation_time = 0.2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_gcpxn")

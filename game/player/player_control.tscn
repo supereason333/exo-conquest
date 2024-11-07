@@ -1,7 +1,8 @@
-[gd_scene load_steps=14 format=3 uid="uid://c4vu28w7nfnwt"]
+[gd_scene load_steps=15 format=3 uid="uid://c4vu28w7nfnwt"]
 
 [ext_resource type="Script" path="res://game/player/player_control.gd" id="1_83dnc"]
 [ext_resource type="Theme" uid="uid://bujlagwci5a1f" path="res://menu/menu_resources/themes/default_gui.tres" id="2_kekrh"]
+[ext_resource type="Texture2D" uid="uid://cjbjm7c8blps6" path="res://Risky_Reels_POI.jpeg" id="3_3s602"]
 [ext_resource type="Texture2D" uid="uid://yqgemwb72ssh" path="res://game/resources/sprites/icons/selnite16.png" id="3_wdp7i"]
 [ext_resource type="Texture2D" uid="uid://d084h7ki66smp" path="res://game/resources/sprites/icons/luminite16.png" id="4_7hewy"]
 [ext_resource type="Texture2D" uid="uid://dios26iq5tfip" path="res://game/resources/sprites/icons/plainium16.png" id="5_0h180"]
@@ -179,6 +180,17 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("2_kekrh")
 
+[node name="TextureRect" type="TextureRect" parent="UI/Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_3s602")
+expand_mode = 1
+
 [node name="DebugMenu" type="Control" parent="UI/Control"]
 visible = false
 anchors_preset = 0
@@ -326,6 +338,7 @@ columns = 2
 script = SubResource("GDScript_yql6u")
 
 [node name="ControlContainer" type="GridContainer" parent="UI/Control/MarginContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8

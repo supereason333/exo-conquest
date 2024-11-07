@@ -1,11 +1,11 @@
 extends CharacterBody2D
 class_name BaseUnit
 
-signal death
+signal death(unit:Node2D)
 
 var Unit_vision := preload("res://game/units/base_unit/unit_vision.tscn")
-var Explosion := preload("res://game/resources/particles/explosion.png")
-var Explosion_sound := preload("res://game/resources/sound/effects/explosion.wav")
+#var Explosion := preload("res://game/resources/particles/explosion.png")
+#var Explosion_sound := preload("res://game/resources/sound/effects/explosion.wav")
 
 var team_id:int
 var waypoints:Array[Vector2]
@@ -17,7 +17,19 @@ var selected := false:
 	get:
 		return selected
 var vision_list:Array[Node2D]
+var attackable_list:Array[Node2D]
 var dying := false
+var override_target := false
+var attacking := false
+
+var attack_target:Node2D:
+	set(value):
+		if attack_target:
+			attack_target.death.disconnect(target_death)
+		if value:
+			value.death.connect(target_death)
+		
+		attack_target = value
 
 @export var unit_name:String
 @export var unit_id:int
@@ -37,8 +49,12 @@ var dying := false
 @export var color_sprite_frames:SpriteFrames
 @export var base_sprite_frames:SpriteFrames
 @export var display_icon:CompressedTexture2D = preload("res://game/resources/sprites/placeholder/32x.png")
+@export var attack_animation_time:float
+@export var death_sound := preload("res://game/resources/audio/effects/explosion.wav")
+@export var death_effect := preload("res://game/units/base_unit/death_effects/default_effect.tscn")
+@export var attack_sound := preload("res://game/resources/audio/effects/gunshot.wav")
 
-@export_group("Other")
+@export_group("Other") 
 @export var dummy:bool = false
 
 var health:float:
@@ -47,16 +63,21 @@ var health:float:
 	set(value):
 		if value <= 0:
 			kill()
-			emit_signal("death")
+			emit_signal("death", self)
 		health = value
 		health_bar.value = health / base_health * 100
 
 @onready var collision_shape := $CollisionShape2D
 var vision_area:Area2D = Area2D.new()
+var attack_area:Area2D = Area2D.new()
 var health_bar:ProgressBar = ProgressBar.new()
 var attack_timer:Timer = Timer.new()
+var attack_tick_timer:Timer = Timer.new()
+var attack_anim_timer:Timer = Timer.new()
+#var unit_finder_timer:Timer = Timer.new()
 var base_sprite := AnimatedSprite2D.new()
 var color_sprite := AnimatedSprite2D.new()
+var sound_player:AudioStreamPlayer2D = AudioStreamPlayer2D.new()
 
 enum states {STANDBY, ATTACKING, ATTACK_CHASE, HOLD}
 var cur_state:int = states.STANDBY
@@ -76,15 +97,32 @@ func _ready() -> void:
 	set_collision_layer_value(2, true)
 	add_to_group("unit")
 	
+	sound_player.stream = attack_sound
+	sound_player.autoplay = false
+	add_child(sound_player)
+	
 	var vision_area_shape := CollisionShape2D.new()
 	vision_area_shape.shape = CircleShape2D.new()
 	vision_area_shape.shape.radius = vision_radius
 	vision_area.add_child(vision_area_shape)
 	vision_area.set_collision_mask_value(1, false)
+	vision_area.set_collision_layer_value(1, false)
 	vision_area.set_collision_mask_value(2, true)
 	vision_area.body_entered.connect(on_body_enter_vision)
 	vision_area.body_exited.connect(on_body_exit_vision)
 	add_child(vision_area)
+	
+	var attack_area_shape := CollisionShape2D.new()
+	attack_area_shape.shape = CircleShape2D.new()
+	attack_area_shape.shape.radius = attack_range
+	attack_area.add_child(attack_area_shape)
+	attack_area.set_collision_mask_value(1, false)
+	attack_area.set_collision_layer_value(1, false)
+	attack_area.set_collision_mask_value(2, true)
+	#attack_area.set_collision_mask_value(2, false)
+	attack_area.body_entered.connect(on_body_enter_attack)
+	attack_area.body_exited.connect(on_body_exit_attack)
+	add_child(attack_area)
 	
 	health_bar.name = "HealthBar"
 	health_bar.show_percentage = false
@@ -102,16 +140,36 @@ func _ready() -> void:
 	
 	attack_timer.wait_time = attack_cooldown
 	attack_timer.one_shot = true
+	attack_timer.timeout.connect(attack_ai)
 	add_child(attack_timer)
+	
+	attack_tick_timer.wait_time = 0.05
+	attack_tick_timer.autostart = false
+	attack_tick_timer.timeout.connect(attack_tick)
+	add_child(attack_tick_timer)
+	
+	attack_anim_timer.wait_time = attack_animation_time
+	attack_anim_timer.autostart = false
+	attack_anim_timer.timeout.connect(attack_end)
+	add_child(attack_anim_timer)
+	
+	"""unit_finder_timer.wait_time = 1
+	unit_finder_timer.autostart = false
+	unit_finder_timer.timeout.connect(target_search)
+	add_child(unit_finder_timer)"""
 	
 	set_team(team_id)
 
 func _process(delta: float) -> void:
 	if dummy: return
+	if dying: return
 	
-	if vision_list:
-		attack_ai()
-	
+	if Input.is_action_just_pressed("get_data"):
+		if selected:
+			print("UNIT")
+			print(vision_list)
+			print(attackable_list)
+			print(attack_target)
 	pass
 
 func _physics_process(delta: float) -> void:
@@ -129,7 +187,7 @@ func _draw():
 		else: draw_rect(collision_shape.shape.get_rect().grow(4), RTS.game_settings.enemy_color, false)
 
 func movement(delta:float):
-	if waypoints:
+	if waypoints and !attacking:
 		if position.distance_squared_to(waypoints[0]) <= 100:
 			waypoints.remove_at(0)
 			if !waypoints: return
@@ -179,6 +237,8 @@ func waypoint(position:Vector2, clicked_unit:Node2D):
 	if dummy: return
 	if dying: return
 	
+	if clicked_unit:
+		pass
 	if Input.is_action_pressed("shift"):
 		waypoints.append(position)
 	else:
@@ -187,28 +247,129 @@ func waypoint(position:Vector2, clicked_unit:Node2D):
 func on_body_enter_vision(body:Node2D):
 	if body == self: return
 	if body.is_in_group("unit") or body.is_in_group("building"):
-		vision_list.append(body)
+		if body.team_id != team_id: 
+			vision_list.append(body)
+			#enable_attack_area()
+			if attack_tick_timer.is_stopped(): 
+				attack_tick_timer.start()
 
 func on_body_exit_vision(body:Node2D):
 	if vision_list.has(body):
 		vision_list.remove_at(vision_list.find(body))
+		if !vision_list:
+			attack_tick_timer.stop()
+			#disable_attack_area()
+	if body == attack_target: attack_target = null
+
+func on_body_enter_attack(body:Node2D):
+	if vision_list.has(body):
+		attackable_list.append(body)
+
+func on_body_exit_attack(body:Node2D):
+	if attackable_list.has(body):
+		attackable_list.remove_at(attackable_list.find(body))
+		if attack_target == body and !override_target:
+			attack_timer.stop()
+			attack_target = null
 
 ###################################################################################
 # ATTACK / FIGHTING CODE
 ###################################################################################
 
 func attack_ai():
-	pass
+	if dying: return
+	
+	if attack_target:
+		attack_start()
+	else:
+		print_debug("ATTACKED NULL")
+
+func attack_start():
+	attacking = true
+	attack_animation()
+	attack_target.damage(attack_damage)
+
+func attack_end():
+	attacking = false
+
+func attack_animation():
+	sound_player.play()
+	#base_sprite.frame = get_sprite_frame_from_rotation(position.direction_to(attack_target.position).angle())
+	attack_anim_timer.start()
+
+func attack_tick():
+	if dying: return
+	
+	if !attack_target:
+		#var bodies = attack_area.get_overlapping_bodies()
+		if attackable_list:
+			attack_target = attackable_list[0]
+	else:
+		if attack_timer.is_stopped():
+			attack_timer.start()
+
+"""func target_search():
+	#print("Target search")
+	if !attack_target:
+		var target = find_target()
+		if target: 
+			#print("Found target")
+			attack_target = target
+			unit_finder_timer.stop()
+
+func find_target(in_attack_distance:bool = true) -> Node2D:
+	if !vision_list: return null
+	
+	var closest_dist:float = INF
+	var closest_unit:Node2D
+	for unit in vision_list:
+		var dist = position.distance_squared_to(unit.position)
+		if dist < closest_dist:
+			closest_dist = dist
+			closest_unit = unit
+	
+	if in_attack_distance:
+		if closest_dist <= pow(attack_range, 2):
+			return closest_unit
+		else:
+			return null
+	else:
+		return closest_unit
+
+func target_in_range() -> bool:
+	if position.distance_squared_to(attack_target.position) <= pow(attack_range, 2): return true
+	else: return false"""
+
+func target_death(unit:Node2D):
+	attack_target = null
+	if vision_list.has(unit):
+		vision_list.remove_at(vision_list.find(unit))
+		#attackable_list.remove_at(attackable_list.find(unit))
+	attack_timer.stop()
 
 func damage(_damage:int):
 	health -= _damage
 
+"""func enable_attack_area():
+	if !attack_area.get_collision_mask_value(2):
+		attack_area.set_collision_mask_value(2, true)
+
+func disable_attack_area():
+	if attack_area.get_collision_mask_value(2):
+		attack_area.set_collision_mask_value(2, false)"""
+
 func kill():
+	if dying: return
+	
 	dying = true
+	emit_signal("death", self)
 	if selected: RTS.call_deferred("remove_selection", self, true)
+	collision_shape.queue_free()
+	vision_area.queue_free()
+	attack_area.queue_free()
 	
 	var sound_player := AudioStreamPlayer2D.new()
-	sound_player.stream = Explosion_sound
+	sound_player.stream = death_sound
 	sound_player.autoplay = true
 	sound_player.finished.connect(queue_free)
 	add_child(sound_player)
@@ -219,9 +380,8 @@ func kill():
 	#death_timer.timeout.connect(queue_free)
 	#add_child(death_timer)
 	
-	var explosion = Sprite2D.new()
-	explosion.texture = Explosion
-	add_child(explosion)
+	var _death_effect := death_effect.instantiate()
+	add_child(_death_effect)
 
 """
 var peer_id:int
