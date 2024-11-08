@@ -1,14 +1,23 @@
-[gd_scene load_steps=4 format=3 uid="uid://bb6o5c0opmh0b"]
+[gd_scene load_steps=5 format=3 uid="uid://mi7evcpsqrjn"]
 
 [ext_resource type="Script" path="res://game/buildings/base_building/base_building.gd" id="1_mo4da"]
-[ext_resource type="PackedScene" uid="uid://hanc83gq25q3" path="res://game/buildings/base_building/base_building_sprite.tscn" id="2_1jb0x"]
+[ext_resource type="Texture2D" uid="uid://b7r1vmcxjtovp" path="res://game/resources/sprites/buildings/testing_building.png" id="3_0ch78"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_lvl4v"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_a2w5u"]
+atlas = ExtResource("3_0ch78")
+region = Rect2(0, 0, 96, 64)
 
-[node name="BaseBuilding" type="StaticBody2D"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_ptkcc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a2w5u")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="BaseBuilding" type="CharacterBody2D"]
 script = ExtResource("1_mo4da")
-
-[node name="BaseBuildingSprite" parent="." instance=ExtResource("2_1jb0x")]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_lvl4v")
+base_sprite_frames = SubResource("SpriteFrames_ptkcc")

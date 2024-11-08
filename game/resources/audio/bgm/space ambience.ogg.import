@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://bsxn07ac0224x"
+path="res://.godot/imported/space ambience.ogg-7a9d8d005b762d585478977f49894e7f.oggvorbisstr"
+
+[deps]
+
+source_file="res://game/resources/audio/bgm/space ambience.ogg"
+dest_files=["res://.godot/imported/space ambience.ogg-7a9d8d005b762d585478977f49894e7f.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -50,12 +50,17 @@ var attack_target:Node2D:
 @export var base_sprite_frames:SpriteFrames
 @export var display_icon:CompressedTexture2D = preload("res://game/resources/sprites/placeholder/32x.png")
 @export var attack_animation_time:float
-@export var death_sound := preload("res://game/resources/audio/effects/explosion.wav")
+@export var death_sound := AudioManager.SFX.explosion
 @export var death_effect := preload("res://game/units/base_unit/death_effects/default_effect.tscn")
-@export var attack_sound := preload("res://game/resources/audio/effects/gunshot.wav")
+@export var attack_sound := AudioManager.SFX.gunshot
 
 @export_group("Other") 
 @export var dummy:bool = false
+@export var frozen:bool = false:
+	set(value):
+		frozen = value
+		if frozen:
+			waypoints = []
 
 var health:float:
 	get():
@@ -67,7 +72,7 @@ var health:float:
 		health = value
 		health_bar.value = health / base_health * 100
 
-@onready var collision_shape := $CollisionShape2D
+var collision_shape:CollisionShape2D
 var vision_area:Area2D = Area2D.new()
 var attack_area:Area2D = Area2D.new()
 var health_bar:ProgressBar = ProgressBar.new()
@@ -83,6 +88,9 @@ enum states {STANDBY, ATTACKING, ATTACK_CHASE, HOLD}
 var cur_state:int = states.STANDBY
 
 func _ready() -> void:
+	if !collision_shape:
+		collision_shape = $CollisionShape2D
+	
 	base_sprite.sprite_frames = base_sprite_frames
 	color_sprite.sprite_frames = color_sprite_frames
 	base_sprite.frame_changed.connect(sprite_frame_changed)
@@ -99,6 +107,7 @@ func _ready() -> void:
 	
 	sound_player.stream = attack_sound
 	sound_player.autoplay = false
+	sound_player.bus = "SFX"
 	add_child(sound_player)
 	
 	var vision_area_shape := CollisionShape2D.new()
@@ -138,20 +147,22 @@ func _ready() -> void:
 	health = base_health
 	add_child(health_bar)
 	
-	attack_timer.wait_time = attack_cooldown
-	attack_timer.one_shot = true
-	attack_timer.timeout.connect(attack_ai)
-	add_child(attack_timer)
+	if attack_cooldown != 0:
+		attack_timer.wait_time = attack_cooldown
+		attack_timer.one_shot = true
+		attack_timer.timeout.connect(attack_ai)
+		add_child(attack_timer)
 	
 	attack_tick_timer.wait_time = 0.05
 	attack_tick_timer.autostart = false
 	attack_tick_timer.timeout.connect(attack_tick)
 	add_child(attack_tick_timer)
 	
-	attack_anim_timer.wait_time = attack_animation_time
-	attack_anim_timer.autostart = false
-	attack_anim_timer.timeout.connect(attack_end)
-	add_child(attack_anim_timer)
+	if attack_animation_time != 0:
+		attack_anim_timer.wait_time = attack_animation_time
+		attack_anim_timer.autostart = false
+		attack_anim_timer.timeout.connect(attack_end)
+		add_child(attack_anim_timer)
 	
 	"""unit_finder_timer.wait_time = 1
 	unit_finder_timer.autostart = false
@@ -187,6 +198,8 @@ func _draw():
 		else: draw_rect(collision_shape.shape.get_rect().grow(4), RTS.game_settings.enemy_color, false)
 
 func movement(delta:float):
+	if frozen: return
+	
 	if waypoints and !attacking:
 		if position.distance_squared_to(waypoints[0]) <= 100:
 			waypoints.remove_at(0)
@@ -221,6 +234,8 @@ func on_point_select(point:Vector2, list:Array[BaseUnit]):
 	if dummy: return
 	if dying: return
 	
+	print("POINT SELECT")
+	
 	if collision_shape.shape.get_rect().has_point(point - position):
 		list.append(self)
 
@@ -234,6 +249,7 @@ func on_box_select(box:Rect2, list:Array[BaseUnit]):
 		list.append(self)
 
 func waypoint(position:Vector2, clicked_unit:Node2D):
+	if frozen: return
 	if dummy: return
 	if dying: return
 	

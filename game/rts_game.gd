@@ -27,7 +27,13 @@ var material_xenite := 0:
 		emit_signal("material_changed")
 
 var selected_list:Array[BaseUnit]
-var selected_building:Node2D
+var selected_building:BaseBuilding:
+	set(value):
+		if selected_building:
+			selected_building.selected = false
+		selected_building = value
+		if selected_building:
+			selected_building.selected = true
 
 var selected_controllable := true
 
@@ -67,22 +73,34 @@ func on_right_click(position:Vector2):
 
 func do_point_select(point:Vector2):
 	var list:Array[BaseUnit]
+	var list_building:Array[BaseUnit]
 	get_tree().call_group("unit", "on_point_select", point, list)
-	if !list:
+	get_tree().call_group("building", "on_point_select", point, list_building)
+	if !list and !list_building:
 		clear_selection(true)
+		selected_building = null
 		return
 	
 	selected_controllable = true
-	if !list[0].is_owned_by_user():
-		set_selection([list[0]])
-		selected_controllable = false
-	elif Input.is_action_pressed("shift"):
-		if selected_list.has(list[0]):
-			remove_selection(list[0])
+	if list_building:
+		selected_building = list_building[0]
+		clear_selection(true)
+		selected_controllable = list_building[0].is_owned_by_user()
+		return
+	
+	if list:
+		if !list[0].is_owned_by_user():
+			set_selection([list[0]])
+			selected_controllable = false
+		elif Input.is_action_pressed("shift"):
+			if selected_list.has(list[0]):
+				remove_selection(list[0])
+			else:
+				add_selection(list[0])
 		else:
-			add_selection(list[0])
-	else:
-		set_selection([list[0]])
+			set_selection([list[0]])
+		
+		selected_building = null
 	
 	emit_signal("select_list_changed")
 
@@ -114,12 +132,14 @@ func do_box_select(box:Rect2):
 	else:
 		set_selection(list)
 	
+	selected_building = null
 	emit_signal("select_list_changed")
 
 func add_selection(unit:BaseUnit):
 	if selected_list.size() < MAX_SELECT_AMOUNT:
-		unit.selected = true
-		selected_list.append(unit)
+		if !selected_list.has(unit):
+			unit.selected = true
+			selected_list.append(unit)
 
 func remove_selection(unit:BaseUnit, _signal:bool = false):
 	if selected_list.has(unit):
@@ -244,4 +264,4 @@ func change_team(team_id:int):
 	
 	player.team_id = team_id
 	clear_selection()
-	#clear_building_selection()
+	selected_building = null

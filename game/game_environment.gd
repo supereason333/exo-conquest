@@ -12,6 +12,7 @@ var data_tile_map
 @onready var player := $PlayerControl
 @onready var data_viewer := $TileDataViewer
 @onready var building_detector := $BuildingDetector
+@onready var bgm_player := $BGM
 
 var placing_building := false
 var building
@@ -35,6 +36,8 @@ func _ready() -> void:
 	player.limit_bottom = limit.y
 	
 	player.add_new_building.connect(add_building)
+	
+	_on_bgm_finished()
 
 func _process(delta: float) -> void:
 	queue_redraw()
@@ -44,7 +47,7 @@ func _process(delta: float) -> void:
 	if placing_building:
 		if Input.is_action_just_pressed("place"):
 			if can_build:
-				building.position = Vector2i(get_global_mouse_position() / 32) * 32 + building.size * 32 / 2
+				building.position = Vector2i(get_global_mouse_position() / 32) * 32 + building.building_size * 32 / 2
 				add_child(building)
 				placing_building = false
 		elif Input.is_action_just_pressed("cancel"):
@@ -73,13 +76,13 @@ func add_building(build):
 	if !build: return
 	building = build
 	build_draw_rects = []
-	building_detector.get_child(0).shape.size = build.size * 32
+	building_detector.get_child(0).shape.size = build.building_size * 32
 	var rec_shape := RectangleShape2D.new()
 	rec_shape.size = building_detector.get_child(0).shape.get_rect().grow(-1).size
 	building_detector.get_child(0).shape = rec_shape
 	
-	for x in build.size.x:
-		for y in build.size.y:
+	for x in build.building_size.x:
+		for y in build.building_size.y:
 			var rect = Rect2(Vector2(x, y) * 32, Vector2(32, 32))
 			build_draw_rects.append(rect)
 		
@@ -89,7 +92,7 @@ func _draw():
 	if build_draw_rects and placing_building:
 		var detector_build_check := true
 		var build_check := true
-		building_detector.position = Vector2i(get_global_mouse_position() / 32) * 32 + building.size * 32 / 2
+		building_detector.position = Vector2i(get_global_mouse_position() / 32) * 32 + building.building_size * 32 / 2
 		var 𝓬𝓾𝓻𝓼𝓮_𝓸𝓯_𝓽𝓱𝓮_𝓷𝓲𝓵𝓮 = building_detector.get_overlapping_bodies()
 		for 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰 in 𝓬𝓾𝓻𝓼𝓮_𝓸𝓯_𝓽𝓱𝓮_𝓷𝓲𝓵𝓮:
 			if 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰.is_in_group("building") or 𓀔𓀇𓀅𓀋𓀡𓀡𓀕𓀠𓀧𓀨𓀣𓀷𓀷𓀿𓀿𓁀𓁶𓁰.is_in_group("unit"):
@@ -167,3 +170,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			player.select_box = box
 
 # literaly spaghetti code
+
+func _on_bgm_finished() -> void:
+	bgm_player.stream = AudioManager.BGM.get_random()
+	bgm_player.play()

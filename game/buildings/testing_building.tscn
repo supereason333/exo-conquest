@@ -1,41 +1,45 @@
-[gd_scene load_steps=7 format=3 uid="uid://bvpj8t50h2n76"]
+[gd_scene load_steps=8 format=3 uid="uid://dhom3cx8olyqj"]
 
 [ext_resource type="Script" path="res://game/buildings/testing_building.gd" id="1_ymmw5"]
-[ext_resource type="PackedScene" uid="uid://hanc83gq25q3" path="res://game/buildings/base_building/base_building_sprite.tscn" id="2_1pqp8"]
 [ext_resource type="Texture2D" uid="uid://b7r1vmcxjtovp" path="res://game/resources/sprites/buildings/testing_building.png" id="3_oq4sh"]
 [ext_resource type="Texture2D" uid="uid://28d0ajnp2uby" path="res://game/resources/sprites/buildings/testing_building_color.png" id="4_lc6d7"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_mxwxb"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_ocu4w"]
+atlas = ExtResource("4_lc6d7")
+region = Rect2(0, 0, 96, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2lovg"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("3_oq4sh")
+"texture": SubResource("AtlasTexture_ocu4w")
 }],
 "loop": true,
 "name": &"default",
 "speed": 5.0
 }]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_ggcxe"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_a2w5u"]
+atlas = ExtResource("3_oq4sh")
+region = Rect2(0, 0, 96, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_y2iug"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("4_lc6d7")
+"texture": SubResource("AtlasTexture_a2w5u")
 }],
 "loop": true,
 "name": &"default",
 "speed": 5.0
 }]
 
-[node name="TestingBuilding" type="StaticBody2D" groups=["building"]]
+[node name="TestingBuilding" type="CharacterBody2D"]
 script = ExtResource("1_ymmw5")
-size = Vector2i(3, 2)
+building_size = Vector2i(3, 2)
+unit_name = "Testing Building"
 base_health = 1000.0
-building_id = 1
-building_name = "Testing Building"
+color_sprite_frames = SubResource("SpriteFrames_2lovg")
+base_sprite_frames = SubResource("SpriteFrames_y2iug")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-
-[node name="BaseBuildingSprite" parent="." instance=ExtResource("2_1pqp8")]
-sprite_frames = SubResource("SpriteFrames_mxwxb")
-color_sprite = SubResource("SpriteFrames_ggcxe")

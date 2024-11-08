@@ -50,3 +50,8 @@ text = "Material"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BuildingDetector"]
 shape = SubResource("RectangleShape2D_c3ruu")
+
+[node name="BGM" type="AudioStreamPlayer" parent="."]
+bus = &"BGM"
+
+[connection signal="finished" from="BGM" to="." method="_on_bgm_finished"]

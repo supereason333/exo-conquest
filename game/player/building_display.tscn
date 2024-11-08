@@ -12,14 +12,14 @@ var building_id:int
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	var building:Node2D = BuildingLoader.load_building_from_id(building_id)
+	var building:BaseBuilding = BuildingLoader.load_building_from_id(building_id)
 	if !building: return
 	
 	building.dummy = true
-	building_node.custom_minimum_size = building.size * 32
+	building_node.custom_minimum_size = building.building_size * 32
 	building_node.add_child(building)
 	
-	button.text = building.building_name
+	button.text = building.unit_name
 
 func _on_button_pressed() -> void:
 	emit_signal(\"building_selected\", building_id)
