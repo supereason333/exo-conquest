@@ -77,15 +77,15 @@ func do_point_select(point:Vector2):
 	get_tree().call_group("unit", "on_point_select", point, list)
 	get_tree().call_group("building", "on_point_select", point, list_building)
 	if !list and !list_building:
-		clear_selection(true)
 		selected_building = null
+		clear_selection(true)
 		return
 	
 	selected_controllable = true
 	if list_building:
 		selected_building = list_building[0]
-		clear_selection(true)
 		selected_controllable = list_building[0].is_owned_by_user()
+		clear_selection(true)
 		return
 	
 	if list:
@@ -265,3 +265,4 @@ func change_team(team_id:int):
 	player.team_id = team_id
 	clear_selection()
 	selected_building = null
+	emit_signal("select_list_changed")

@@ -272,7 +272,6 @@ vision_radius = 300
 agression_distance = 200
 color_sprite_frames = SubResource("SpriteFrames_whmar")
 base_sprite_frames = SubResource("SpriteFrames_purao")
-attack_animation_time = 0.2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_gcpxn")

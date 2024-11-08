@@ -18,8 +18,12 @@ class BGM:
 		return tracks[num]
 
 class SFX:
-	static var gunshot := preload("res://game/resources/audio/effects/gunshot.wav")
-	static var explosion := preload("res://game/resources/audio/effects/explosion.wav")
+	class Unit:
+		class Attack:
+			static var gunshot := preload("res://game/resources/audio/effects/gunshot.wav")
+			static var tank_shot := preload("res://game/resources/audio/effects/tank.wav")
+		class Death:
+			static var explosion := preload("res://game/resources/audio/effects/explosion.wav")
 	
 	class Menu:
 		pass

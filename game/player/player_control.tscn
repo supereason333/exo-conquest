@@ -129,13 +129,21 @@ func update_display():
 	for child in get_children():
 		child.queue_free()
 	
-	for unit in RTS.selected_list:
+	if RTS.selected_building:
+		var _label := Label.new()
+		_label.text = \"Building\"
+		add_child(_label)
 		var rect := TextureRect.new()
-		rect.texture = unit.display_icon
+		rect.texture = RTS.selected_building.display_icon
 		if !RTS.selected_controllable: rect.modulate = Color.RED
 		add_child(rect)
-	
-	if RTS.selected_list.size() == 0:
+	elif RTS.selected_list:
+		for unit in RTS.selected_list:
+			var rect := TextureRect.new()
+			rect.texture = unit.display_icon
+			if !RTS.selected_controllable: rect.modulate = Color.RED
+			add_child(rect)
+	else:
 		var label := Label.new()
 		label.text = \"None\"
 		add_child(label)

@@ -2,6 +2,7 @@ extends BaseUnit
 class_name BaseBuilding
 
 @export var building_size:Vector2i
+@export var actions:Array[Callable]
 
 var map_position:Vector2i
 
@@ -16,6 +17,7 @@ func _ready() -> void:
 	
 	remove_from_group("unit")
 	add_to_group("building")
+	frozen = true
 
 func on_box_select(box:Rect2, list:Array[BaseUnit]):
 	pass

@@ -1,10 +1,6 @@
-extends "res://game/units/base_unit/base_unit.gd"
+extends BaseUnit
 
 func _ready() -> void:
+	attack_sound = AudioManager.SFX.Unit.Attack.tank_shot
+	
 	super()
-
-func _process(delta: float) -> void:
-	super(delta)
-
-func _physics_process(delta: float) -> void:
-	super(delta)

@@ -16,8 +16,8 @@ var selected := false:
 		queue_redraw()
 	get:
 		return selected
-var vision_list:Array[Node2D]
-var attackable_list:Array[Node2D]
+var vision_list:Array[BaseUnit]
+var attackable_list:Array[BaseUnit]
 var dying := false
 var override_target := false
 var attacking := false
@@ -49,10 +49,10 @@ var attack_target:Node2D:
 @export var color_sprite_frames:SpriteFrames
 @export var base_sprite_frames:SpriteFrames
 @export var display_icon:CompressedTexture2D = preload("res://game/resources/sprites/placeholder/32x.png")
-@export var attack_animation_time:float
-@export var death_sound := AudioManager.SFX.explosion
+@export var attack_animation_time:float = 0.2
+@export var death_sound := AudioManager.SFX.Unit.Death.explosion
 @export var death_effect := preload("res://game/units/base_unit/death_effects/default_effect.tscn")
-@export var attack_sound := AudioManager.SFX.gunshot
+@export var attack_sound := AudioManager.SFX.Unit.Attack.gunshot
 
 @export_group("Other") 
 @export var dummy:bool = false
