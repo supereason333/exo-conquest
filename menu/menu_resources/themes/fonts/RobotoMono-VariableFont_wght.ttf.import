@@ -28,7 +28,16 @@ Fallbacks=null
 fallbacks=[]
 Compress=null
 compress=true
-preload=[]
+preload=[{
+"chars": [],
+"glyphs": [],
+"name": "New Configuration",
+"size": Vector2i(16, 0),
+"variation_embolden": 0.0,
+"variation_opentype": {
+2003265652: 400
+}
+}]
 language_support={}
 script_support={}
 opentype_features={}

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://yyc0750ak52d"]
+
+[ext_resource type="Script" path="res://game/units/components/production_component.gd" id="1_wghow"]
+
+[node name="ProductionComponent" type="Node2D"]
+script = ExtResource("1_wghow")

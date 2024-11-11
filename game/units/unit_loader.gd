@@ -10,7 +10,7 @@ var unit_list := [
 
 const MAX_UNITS := 100
 
-var ins_unit_list:Array[CharacterBody2D]
+var ins_unit_list:Array[BaseUnit]
 
 func _ready() -> void:
 	var id_list:Array[int]
@@ -23,7 +23,7 @@ func _ready() -> void:
 		
 		print("UNIT LOADED " + str(ins_unit_list[i].unit_id) + " " + ins_unit_list[i].unit_name)
 
-func load_unit_from_id(id:int):
+func load_unit_from_id(id:int) -> BaseUnit:
 	for i in len(ins_unit_list):
 		
 		if ins_unit_list[i].unit_id == id: 

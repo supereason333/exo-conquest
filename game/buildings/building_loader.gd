@@ -2,7 +2,8 @@ extends Node
 
 var building_list := [
 	preload("res://game/buildings/testing_building.tscn"),
-	preload("res://game/buildings/core_building.tscn")
+	preload("res://game/buildings/core_building.tscn"),
+	preload("res://game/buildings/military_base.tscn")
 ]
 var ins_building_list:Array[BaseBuilding]
 
@@ -25,7 +26,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
-func load_building_from_id(id:int):
+func load_building_from_id(id:int) -> BaseBuilding:
 	for i in len(ins_building_list):
 		
 		if ins_building_list[i].unit_id == id: 

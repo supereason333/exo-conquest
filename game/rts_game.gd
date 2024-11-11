@@ -54,6 +54,8 @@ func _process(delta: float) -> void:
 		if selected_controllable:
 			for unit in selected_list:
 				unit.kill()
+			if selected_building:
+				selected_building.kill()
 
 func load_settings():			# CHANGE THIS TO ACTUALLY LOAD SETTINGS
 	game_settings = ResourceLoader.load("res://menu/settings/default_settings.tres")
@@ -145,6 +147,9 @@ func remove_selection(unit:BaseUnit, _signal:bool = false):
 	if selected_list.has(unit):
 		unit.selected = false
 		selected_list.remove_at(selected_list.find(unit))
+	
+	if selected_building == unit:
+		selected_building = null
 	
 	if _signal: emit_signal("select_list_changed")
 

@@ -9,13 +9,11 @@ var Unit_vision := preload("res://game/units/base_unit/unit_vision.tscn")
 
 var team_id:int
 var waypoints:Array[Vector2]
-var selected := false:
-	set(value):
-		health_bar.visible = value
-		selected = value
-		queue_redraw()
-	get:
-		return selected
+var selected := false: set = set_selected
+func set_selected(value):
+	health_bar.visible = value
+	selected = value
+	queue_redraw()
 var vision_list:Array[BaseUnit]
 var attackable_list:Array[BaseUnit]
 var dying := false
@@ -181,7 +179,7 @@ func _process(delta: float) -> void:
 			print(vision_list)
 			print(attackable_list)
 			print(attack_target)
-	pass
+	
 
 func _physics_process(delta: float) -> void:
 	if dummy: return
@@ -207,7 +205,8 @@ func movement(delta:float):
 		velocity = Vector2.ZERO
 		var direction := (waypoints[0] - position).normalized()
 		velocity += direction * base_speed
-		base_sprite.frame = get_sprite_frame_from_rotation(direction.angle())
+		#base_sprite.frame = get_sprite_frame_from_rotation(direction.angle())
+		set_sprite_rotation(direction.angle())
 		move_and_slide()
 
 func set_team(_team_id:int):
@@ -224,6 +223,9 @@ func sprite_frame_changed():
 
 func get_sprite_frame_from_rotation(rotation:float, frames:int = 16) -> float:
 	return snapped((rotation + PI) / TAU * (frames), 1)
+
+func set_sprite_rotation(rotation:float):
+	base_sprite.frame = get_sprite_frame_from_rotation(rotation)
 
 func is_owned_by_user() -> bool:
 	if team_id == RTS.player.team_id:
