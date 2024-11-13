@@ -98,16 +98,13 @@ func _process(delta: float) -> void:
 	pass
 
 func update_display():
-	selnite.text = str(RTS.material_selnite)
-	luminite.text = str(RTS.material_luminite)
-	plainium.text = str(RTS.material_plainium)
-	xenite.text = str(RTS.material_xenite)
+	selnite.text = str(RTS.materials.selnite)
+	luminite.text = str(RTS.materials.luminite)
+	plainium.text = str(RTS.materials.plainium)
+	xenite.text = str(RTS.materials.xenite)
 
 func _on_add_button_pressed() -> void:
-	RTS.material_selnite += 100
-	RTS.material_luminite += 100
-	RTS.material_plainium += 100
-	RTS.material_xenite += 100
+	RTS.materials = RTS.materials.add(MaterialCost.new(100, 100, 100, 100))
 "
 
 [sub_resource type="GDScript" id="GDScript_t6nkp"]
@@ -242,7 +239,6 @@ func on_unit_button_pressed(number:int):
 	if !RTS.selected_building: return
 	if !RTS.selected_building.production_component: return
 	
-	print(number)
 	RTS.selected_building.production_component.queue_unit(number)
 	update_list()
 

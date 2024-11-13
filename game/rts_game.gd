@@ -8,22 +8,9 @@ signal box_select(box:Rect2)
 var player:PlayerData
 var game_settings:GameSettings
 
-# Materials
-var material_selnite := 0:
+var materials := MaterialCost.new(0, 0, 0, 0):
 	set(value):
-		material_selnite = value
-		emit_signal("material_changed")
-var material_luminite := 0:
-	set(value):
-		material_luminite = value
-		emit_signal("material_changed")
-var material_plainium := 0:
-	set(value):
-		material_plainium = value
-		emit_signal("material_changed")
-var material_xenite := 0:
-	set(value):
-		material_xenite = value
+		materials = value
 		emit_signal("material_changed")
 
 var selected_list:Array[BaseUnit]

@@ -53,6 +53,9 @@ func _process(delta: float) -> void:
 		elif Input.is_action_just_pressed("cancel"):
 			placing_building = false
 
+func game_init():
+	pass
+
 func data_viewer_code():
 	var viewer_tile:Vector2i = data_tile_map.local_to_map(data_tile_map.get_local_mouse_position())
 	var viewer_pos:Vector2 = viewer_tile * data_tile_map.tile_set.tile_size

@@ -23,9 +23,12 @@ func _ready():
 func queue_unit(list_index: int):
 	if unit.dummy: return
 	if production_queue.size() < MAX_QUEUE_SIZE and list_index < produce_list.size():
-		production_queue.append(list_index)
-		if timer.is_stopped():
-			timer.start()
+		var inst_unit := produce_list[list_index].instantiate()
+		if RTS.materials.can_afford(inst_unit.unit_cost):
+			RTS.materials = RTS.materials.subtract(inst_unit.unit_cost)
+			production_queue.append(list_index)
+			if timer.is_stopped():
+				timer.start()
 
 func _on_timer_timeout() -> void:
 	if production_queue:

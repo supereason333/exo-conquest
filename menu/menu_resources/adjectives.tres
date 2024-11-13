@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="WordList" load_steps=2 format=3 uid="uid://0n78noudm5lw"]
+
+[ext_resource type="Script" path="res://classes/word_list.gd" id="1_evm4o"]
+
+[resource]
+script = ExtResource("1_evm4o")
+list = Array[String](["crafty", "proud", "kind", "jovial", "innovative", "peaceful", "adaptable", "effervescent", "wise", "sincere", "thoughtful", "unique", "zany", "upbeat", "lively", "youthful", "glorious", "fierce", "charming", "vast", "keen", "radiant", "jolly", "brave", "light", "joyful", "quick", "bright", "intense", "nice", "genuine", "mighty", "vibrant", "humble", "witty", "happy", "fearless", "bold", "mysterious", "quirky", "daring", "elegant", "zealous", "noble", "gentle", "eager", "fancy", "hopeful", "calm", "silly"])

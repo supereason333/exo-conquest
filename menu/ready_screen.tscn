@@ -1,6 +1,49 @@
-[gd_scene load_steps=2 format=3 uid="uid://dddxikrbmtg7e"]
+[gd_scene load_steps=7 format=3 uid="uid://dddxikrbmtg7e"]
 
+[ext_resource type="Theme" uid="uid://dk83qmx0ytnuw" path="res://menu/menu_resources/themes/default_theme.tres" id="1_gt87f"]
 [ext_resource type="Script" path="res://menu/ready_screen.gd" id="1_uhy5k"]
+[ext_resource type="Script" path="res://menu/player_list.gd" id="3_ngwdu"]
+[ext_resource type="Texture2D" uid="uid://cvwhr7nkrey7h" path="res://menu/menu_resources/backgrounds/planet1.png" id="3_ry3qk"]
+[ext_resource type="Script" path="res://menu/team_container.gd" id="5_hpb2t"]
+
+[sub_resource type="GDScript" id="GDScript_n81er"]
+script/source = "extends Window
+
+@onready var name_entry := $MarginContainer/VBoxContainer/NameEntry
+@onready var slogan_entry := $MarginContainer/VBoxContainer/SloganEntry
+@onready var color_picker := $MarginContainer/VBoxContainer/ColorPicker
+@onready var error_label := $MarginContainer/VBoxContainer/ErrorLabel
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+func _on_new_team_button_pressed() -> void:
+	if !visible:
+		popup()
+
+func _on_close_requested() -> void:
+	hide()
+
+func _on_about_to_popup() -> void:
+	name_entry.text = MultiplayerScript.random_team_name()
+	slogan_entry.text = \"\"
+	color_picker.color = MultiplayerScript.random_color()
+	error_label.text = \"\"
+
+func _on_create_button_pressed() -> void:
+	var err = MultiplayerScript.new_team(name_entry.text, slogan_entry.text, color_picker.color)
+	if err:
+		error_label.text = err
+		return
+	hide()
+"
 
 [node name="ReadyScreen" type="Control"]
 layout_mode = 3
@@ -9,14 +52,179 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_gt87f")
 script = ExtResource("1_uhy5k")
 
-[node name="StartButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 148.0
-offset_top = 99.0
-offset_right = 483.0
-offset_bottom = 343.0
-text = "Start game"
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_ry3qk")
 
-[connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="LeftBox" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/LeftBox"]
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="MarginContainer/HBoxContainer/LeftBox/HBoxContainer"]
+custom_minimum_size = Vector2(5, 0)
+layout_mode = 2
+color = Color(1, 0, 0, 1)
+
+[node name="ReadyButton" type="Button" parent="MarginContainer/HBoxContainer/LeftBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ready! (0/15)"
+
+[node name="PlayerList" type="PanelContainer" parent="MarginContainer/HBoxContainer/LeftBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/LeftBox/PlayerList"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/LeftBox/PlayerList/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/LeftBox/PlayerList/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Players"
+
+[node name="PlayerList" type="ScrollContainer" parent="MarginContainer/HBoxContainer/LeftBox/PlayerList/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("3_ngwdu")
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/HBoxContainer/LeftBox/PlayerList/MarginContainer/VBoxContainer/PlayerList"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="MarginContainer/HBoxContainer/LeftBox/PlayerList/MarginContainer/VBoxContainer/PlayerList/PanelContainer"]
+layout_mode = 2
+
+[node name="Chat" type="PanelContainer" parent="MarginContainer/HBoxContainer/LeftBox"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/LeftBox/Chat"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/LeftBox/Chat/MarginContainer"]
+layout_mode = 2
+text = "Chat"
+
+[node name="Control" type="Control" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightBox" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+alignment = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/HBoxContainer/RightBox"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/RightBox/PanelContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Teams"
+
+[node name="NewTeamButton" type="Button" parent="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "New"
+
+[node name="TeamContainer" type="ScrollContainer" parent="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+script = ExtResource("5_hpb2t")
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer/VBoxContainer/TeamContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer/VBoxContainer/TeamContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="List" type="VBoxContainer" parent="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer/VBoxContainer/TeamContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="NewTeamWindow" type="Window" parent="."]
+title = "New team"
+initial_position = 1
+size = Vector2i(300, 200)
+visible = false
+unresizable = true
+always_on_top = true
+theme = ExtResource("1_gt87f")
+script = SubResource("GDScript_n81er")
+
+[node name="MarginContainer" type="MarginContainer" parent="NewTeamWindow"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NewTeamWindow/MarginContainer"]
+layout_mode = 2
+
+[node name="NameEntry" type="LineEdit" parent="NewTeamWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Name"
+alignment = 1
+
+[node name="SloganEntry" type="LineEdit" parent="NewTeamWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Slogan"
+alignment = 1
+
+[node name="ColorPicker" type="ColorPickerButton" parent="NewTeamWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Team color"
+edit_alpha = false
+
+[node name="Control" type="Control" parent="NewTeamWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ErrorLabel" type="Label" parent="NewTeamWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CreateButton" type="Button" parent="NewTeamWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Create team"
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/NewTeamButton" to="NewTeamWindow" method="_on_new_team_button_pressed"]
+[connection signal="about_to_popup" from="NewTeamWindow" to="NewTeamWindow" method="_on_about_to_popup"]
+[connection signal="close_requested" from="NewTeamWindow" to="NewTeamWindow" method="_on_close_requested"]
+[connection signal="pressed" from="NewTeamWindow/MarginContainer/VBoxContainer/CreateButton" to="NewTeamWindow" method="_on_create_button_pressed"]

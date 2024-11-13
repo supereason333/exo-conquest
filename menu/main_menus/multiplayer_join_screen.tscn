@@ -1,0 +1,140 @@
+[gd_scene load_steps=5 format=3 uid="uid://cu4wfb3wg2xfq"]
+
+[ext_resource type="Theme" uid="uid://dk83qmx0ytnuw" path="res://menu/menu_resources/themes/default_theme.tres" id="1_uttkt"]
+[ext_resource type="Script" path="res://menu/main_menus/multiplayer_join_screen.gd" id="2_s8o26"]
+[ext_resource type="Texture2D" uid="uid://cvwhr7nkrey7h" path="res://menu/menu_resources/backgrounds/planet1.png" id="3_4dma1"]
+[ext_resource type="PackedScene" uid="uid://yiqeeod0dgy" path="res://menu/player_data_editor.tscn" id="4_gngac"]
+
+[node name="MultiplayerMainScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_uttkt")
+script = ExtResource("2_s8o26")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_4dma1")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Back"
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PlayerDataEditor" parent="MarginContainer/VBoxContainer/HBoxContainer" instance=ExtResource("4_gngac")]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="ManualType" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/ManualType"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Enter manually"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AddressEntry" type="LineEdit" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Address"
+
+[node name="PortEntry" type="LineEdit" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Port"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="JoinButton" type="Button" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Join"
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ErrorLabel" type="Label" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="ServerBrowser" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/ServerBrowser"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Server browser
+"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer/VBoxContainer/ScrollContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="ServerList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer/VBoxContainer/ScrollContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer/VBoxContainer/ScrollContainer/PanelContainer/MarginContainer/ServerList"]
+layout_mode = 2
+text = "This feature doesnt work yet!"
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer/VBoxContainer/ScrollContainer/PanelContainer/MarginContainer/ServerList"]
+custom_minimum_size = Vector2(0, 1000)
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/ServerBrowser/MarginContainer/VBoxContainer/ScrollContainer/PanelContainer/MarginContainer/ServerList"]
+layout_mode = 2
+text = "Hello!"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer/HBoxContainer2/JoinButton" to="." method="_on_join_button_pressed"]

@@ -71,4 +71,5 @@ text = "Exit"
 
 [connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HostButton" to="." method="_on_singleplayer_pressed"]
 [connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/JoinButton" to="." method="_on_multiplayer_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]

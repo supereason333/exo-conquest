@@ -28,6 +28,7 @@ var attack_target:Node2D:
 
 @export var unit_name:String
 @export var unit_id:int
+@export var unit_cost:MaterialCost
 
 @export_group("Movement")
 @export var base_speed:int

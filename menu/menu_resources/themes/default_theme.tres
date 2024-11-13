@@ -6,7 +6,7 @@
 default_font_size = 0
 Button/fonts/font = ExtResource("1_0gi78")
 Label/fonts/font = ExtResource("1_0gi78")
-MarginContainer/constants/margin_bottom = 15
-MarginContainer/constants/margin_left = 15
-MarginContainer/constants/margin_right = 15
-MarginContainer/constants/margin_top = 15
+MarginContainer/constants/margin_bottom = 5
+MarginContainer/constants/margin_left = 5
+MarginContainer/constants/margin_right = 5
+MarginContainer/constants/margin_top = 5

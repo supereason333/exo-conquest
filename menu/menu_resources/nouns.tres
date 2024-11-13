@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="WordList" load_steps=2 format=3 uid="uid://xa4rg262aclq"]
+
+[ext_resource type="Script" path="res://classes/word_list.gd" id="1_q53pg"]
+
+[resource]
+script = ExtResource("1_q53pg")
+list = Array[String](["bottles", "ships", "cities", "islands", "trains", "bridges", "buildings", "waves", "buses", "libraries", "forests", "moons", "factories", "stars", "mountains", "villages", "lakes", "statues", "caves", "markets", "castles", "houses", "flowers", "rocks", "trees", "meadows", "parks", "animals", "clouds", "trails", "towns", "valleys", "schools", "jungles", "gardens", "books", "fences", "cats", "fields", "deserts", "oceans", "roads", "towers", "rivers", "candles", "dogs", "planes", "birds", "cars", "forests"])
