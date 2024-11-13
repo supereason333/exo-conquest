@@ -4,55 +4,64 @@
 [ext_resource type="Texture2D" uid="uid://6j56xd2ew0l3" path="res://game/resources/sprites/buildings/core_color_sprite.png" id="2_0nx1a"]
 [ext_resource type="Texture2D" uid="uid://ngn3ewhjsani" path="res://game/resources/sprites/buildings/core_base.png" id="3_wng6h"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_q84x6"]
-atlas = ExtResource("2_0nx1a")
-region = Rect2(0, 0, 136, 102)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_dafjs"]
-atlas = ExtResource("2_0nx1a")
-region = Rect2(0, 102, 136, 102)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_5gtf4"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_q84x6")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_dafjs")
-}],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_62wwr"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_8t216"]
 atlas = ExtResource("3_wng6h")
 region = Rect2(0, 0, 136, 102)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_r0jij"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_s02a3"]
 atlas = ExtResource("3_wng6h")
 region = Rect2(0, 102, 136, 102)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_wofbc"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_fo4vh"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_62wwr")
+"texture": SubResource("AtlasTexture_8t216")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_r0jij")
+"texture": SubResource("AtlasTexture_s02a3")
 }],
 "loop": true,
 "name": &"default",
 "speed": 1.0
 }]
 
-[node name="CoreBuilding" type="CharacterBody2D"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_frm5u"]
+atlas = ExtResource("2_0nx1a")
+region = Rect2(0, 0, 136, 102)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0kriw"]
+atlas = ExtResource("2_0nx1a")
+region = Rect2(0, 102, 136, 102)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_73253"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_frm5u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0kriw")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="CoreBuilding" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite")]
 script = ExtResource("1_b103j")
 building_size = Vector2i(4, 3)
 unit_name = "Core"
 unit_id = 1
 base_health = 5000.0
-color_sprite_frames = SubResource("SpriteFrames_5gtf4")
-base_sprite_frames = SubResource("SpriteFrames_wofbc")
+base_sprite = NodePath("BaseSprite")
+color_sprite = NodePath("BaseSprite/ColorSprite")
+
+[node name="BaseSprite" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_fo4vh")
+autoplay = "default"
+frame = 1
+frame_progress = 0.330569
+
+[node name="ColorSprite" type="AnimatedSprite2D" parent="BaseSprite"]
+sprite_frames = SubResource("SpriteFrames_73253")

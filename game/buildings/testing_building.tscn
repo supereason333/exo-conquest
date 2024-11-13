@@ -1,45 +1,63 @@
-[gd_scene load_steps=8 format=3 uid="uid://dhom3cx8olyqj"]
+[gd_scene load_steps=14 format=3 uid="uid://dhom3cx8olyqj"]
 
 [ext_resource type="Script" path="res://game/buildings/testing_building.gd" id="1_ymmw5"]
 [ext_resource type="Texture2D" uid="uid://b7r1vmcxjtovp" path="res://game/resources/sprites/buildings/testing_building.png" id="3_oq4sh"]
 [ext_resource type="Texture2D" uid="uid://28d0ajnp2uby" path="res://game/resources/sprites/buildings/testing_building_color.png" id="4_lc6d7"]
+[ext_resource type="Script" path="res://game/units/components/production_component.gd" id="4_ryyjg"]
+[ext_resource type="PackedScene" uid="uid://ca4mnvogpcna" path="res://game/units/marine_unit.tscn" id="5_3qc0x"]
+[ext_resource type="PackedScene" uid="uid://detxmk1f7bbba" path="res://game/units/miner_unit.tscn" id="6_p1ibf"]
+[ext_resource type="PackedScene" uid="uid://h3f0rypervaa" path="res://game/units/sniper_unit.tscn" id="7_gaoqr"]
+[ext_resource type="PackedScene" uid="uid://dfxirn8flxfio" path="res://game/units/tank_unit.tscn" id="8_isdfv"]
+[ext_resource type="PackedScene" uid="uid://drqqxt68xirk5" path="res://game/units/testing_unit.tscn" id="9_3mhxh"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ocu4w"]
-atlas = ExtResource("4_lc6d7")
-region = Rect2(0, 0, 96, 64)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_2lovg"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ocu4w")
-}],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_a2w5u"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_k0vj1"]
 atlas = ExtResource("3_oq4sh")
 region = Rect2(0, 0, 96, 64)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_y2iug"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_xot4k"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_a2w5u")
+"texture": SubResource("AtlasTexture_k0vj1")
+}],
+"loop": true,
+"name": &"default",
+"speed": 1.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sxw6i"]
+atlas = ExtResource("4_lc6d7")
+region = Rect2(0, 0, 96, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qwde1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sxw6i")
 }],
 "loop": true,
 "name": &"default",
 "speed": 5.0
 }]
 
-[node name="TestingBuilding" type="CharacterBody2D"]
+[node name="TestingBuilding" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite", "production_component")]
 script = ExtResource("1_ymmw5")
 building_size = Vector2i(3, 2)
 unit_name = "Testing Building"
 base_health = 1000.0
-color_sprite_frames = SubResource("SpriteFrames_2lovg")
-base_sprite_frames = SubResource("SpriteFrames_y2iug")
+base_sprite = NodePath("BaseSprite")
+color_sprite = NodePath("BaseSprite/ColorSprite")
+production_component = NodePath("ProductionComponent")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="BaseSprite" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_xot4k")
+
+[node name="ColorSprite" type="AnimatedSprite2D" parent="BaseSprite"]
+sprite_frames = SubResource("SpriteFrames_qwde1")
+
+[node name="ProductionComponent" type="Node2D" parent="."]
+script = ExtResource("4_ryyjg")
+produce_list = Array[PackedScene]([ExtResource("5_3qc0x"), ExtResource("6_p1ibf"), ExtResource("7_gaoqr"), ExtResource("8_isdfv"), ExtResource("9_3mhxh")])
+production_time = 0.1
+
+[connection signal="produced_unit" from="ProductionComponent" to="." method="_on_production_component_produced_unit"]

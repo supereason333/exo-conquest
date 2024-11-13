@@ -3,10 +3,10 @@
 [ext_resource type="FontFile" uid="uid://t16xvynp6x2d" path="res://menu/menu_resources/themes/fonts/RobotoMono-VariableFont_wght.ttf" id="1_br83m"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_irdkr"]
-bg_color = Color(1, 1, 1, 1)
+bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hl570"]
-bg_color = Color(0, 0, 0, 1)
+bg_color = Color(0.214103, 0.214103, 0.214103, 1)
 
 [resource]
 default_font = ExtResource("1_br83m")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://c4vu28w7nfnwt"]
+[gd_scene load_steps=19 format=3 uid="uid://c4vu28w7nfnwt"]
 
 [ext_resource type="Script" path="res://game/player/player_control.gd" id="1_83dnc"]
 [ext_resource type="Theme" uid="uid://bujlagwci5a1f" path="res://menu/menu_resources/themes/default_gui.tres" id="2_kekrh"]
@@ -110,6 +110,33 @@ func _on_add_button_pressed() -> void:
 	RTS.material_xenite += 100
 "
 
+[sub_resource type="GDScript" id="GDScript_t6nkp"]
+script/source = "extends GridContainer
+
+@onready var buttons:Array[TextureButton] = [
+	$\"1/TextureButton\",
+	$\"2/TextureButton\",
+	$\"3/TextureButton\",
+	$\"4/TextureButton\",
+	$\"5/TextureButton\",
+	$\"6/TextureButton\",
+	$\"7/TextureButton\",
+	$\"8/TextureButton\",
+	$\"9/TextureButton\"
+]
+func _ready() -> void:
+	pass
+
+func _process(delta: float) -> void:
+	pass
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dr2s1"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m2nf7"]
+bg_color = Color(0, 1, 0, 1)
+
 [sub_resource type="GDScript" id="GDScript_yql6u"]
 script/source = "extends GridContainer
 
@@ -150,45 +177,91 @@ func update_display():
 		add_child(label)
 "
 
-[sub_resource type="GDScript" id="GDScript_t6nkp"]
-script/source = "extends GridContainer
-
-@onready var buttons:Array[TextureButton] = [
-	$\"1/TextureButton\",
-	$\"2/TextureButton\",
-	$\"3/TextureButton\",
-	$\"4/TextureButton\",
-	$\"5/TextureButton\",
-	$\"6/TextureButton\",
-	$\"7/TextureButton\",
-	$\"8/TextureButton\",
-	$\"9/TextureButton\"
-]
-func _ready() -> void:
-	pass
-
-func _process(delta: float) -> void:
-	pass
-"
-
-[sub_resource type="GDScript" id="GDScript_mucgx"]
+[sub_resource type="GDScript" id="GDScript_qdv8l"]
 script/source = "extends Control
 
-@onready var button_box := $VBoxContainer/HBoxContainer
+var Numbered_button := preload(\"res://menu/menu_resources/numbered_button.tscn\")
 
+@onready var progress_bar := $VBoxContainer/ProgressBar
+@onready var queue_list := $VBoxContainer/Queue
+@onready var button_box := $VBoxContainer/Buttons
 
-func queue_unit(unit:int):
+var last_building:BaseBuilding
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	visibility_changed.connect(on_visibility_changed)
+	RTS.select_list_changed.connect(selected_building_changed)
+
+func on_visibility_changed():
+	if visible:
+		pass
+
+func selected_building_changed():
+	if !visible: return
+	
+	if !is_instance_valid(last_building):
+		last_building = null
+	
+	if last_building != RTS.selected_building:
+		if last_building:
+			if last_building.production_component:
+				last_building.production_component.produced_unit.disconnect(update_list)
+		last_building = RTS.selected_building
+		if RTS.selected_building:
+			if RTS.selected_building.production_component:
+				RTS.selected_building.production_component.produced_unit.connect(update_list)
+				progress_bar.max_value = RTS.selected_building.production_component.timer.wait_time
+				
+				for child in button_box.get_children(): 
+					child.queue_free()
+				var i := 0
+				for _product in RTS.selected_building.production_component.produce_list:
+					var numbered_button:TextureButton= Numbered_button.instantiate()
+					var product := _product.instantiate()
+					numbered_button.number = i
+					numbered_button.pressed_n.connect(on_unit_button_pressed)
+					numbered_button.texture_normal = product.display_icon
+					numbered_button.texture_pressed = product.display_icon
+					numbered_button.texture_hover = product.display_icon
+					numbered_button.texture_disabled = product.display_icon
+					numbered_button.texture_focused = product.display_icon
+					numbered_button.tooltip_text = product.unit_name
+					
+					button_box.add_child(numbered_button)
+					
+					i += 1
+			
+	else:
+		pass
+	
+	update_list()
+
+func on_unit_button_pressed(number:int):
+	if !visible: return
+	if !RTS.selected_building: return
+	if !RTS.selected_building.production_component: return
+	
+	print(number)
+	RTS.selected_building.production_component.queue_unit(number)
+	update_list()
+
+func update_list(_unit:PackedScene = PackedScene.new()):
 	if RTS.selected_building:
-		if RTS.selected_building.has_method(\"queue_unit\"):
-			var unit_resource_index = RTS.selected_unit.production_list.find(unit)
-			if unit_resource_index == -1: return
+		if RTS.selected_building.production_component:
+			for child in queue_list.get_children(): child.queue_free()
+			for queue_unit in RTS.selected_building.production_component.production_queue:
+				#if RTS.selected_building.production_component.produce_list[queue_unit] != _unit:
+				var texture_rect := TextureRect.new()
+				texture_rect.texture = RTS.selected_building.production_component.produce_list[queue_unit].instantiate().display_icon
+				queue_list.add_child(texture_rect)
 
-func _on_marine_pressed() -> void:
-	queue_unit(5)
-
-
-func _on_sniper_pressed() -> void:
-	queue_unit(3)
+func _process(delta: float) -> void:
+	if !visible: return
+	if !RTS.selected_building: return
+	
+	if RTS.selected_building.production_component.production_queue:
+		progress_bar.value = RTS.selected_building.production_component.timer.time_left
 "
 
 [node name="PlayerControl" type="Camera2D"]
@@ -351,20 +424,6 @@ text = "0"
 [node name="AddButton" type="Button" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay"]
 layout_mode = 2
 
-[node name="PanelContainer2" type="PanelContainer" parent="UI/Control/MarginContainer/LeftBox"]
-layout_mode = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="UI/Control/MarginContainer/LeftBox/PanelContainer2"]
-layout_mode = 2
-
-[node name="CenterContainer" type="CenterContainer" parent="UI/Control/MarginContainer/LeftBox/PanelContainer2/MarginContainer"]
-layout_mode = 2
-
-[node name="SelectedUnits" type="GridContainer" parent="UI/Control/MarginContainer/LeftBox/PanelContainer2/MarginContainer/CenterContainer"]
-layout_mode = 2
-columns = 2
-script = SubResource("GDScript_yql6u")
-
 [node name="ControlContainer" type="GridContainer" parent="UI/Control/MarginContainer"]
 visible = false
 layout_mode = 2
@@ -494,49 +553,65 @@ layout_mode = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer"]
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 text = "Building Name"
+
+[node name="Control" type="Control" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "HP:"
+
+[node name="ProgressBar" type="ProgressBar" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/background = SubResource("StyleBoxFlat_dr2s1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_m2nf7")
+show_percentage = false
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BuildingActions" type="TabContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-current_tab = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="SelectedUnits" type="GridContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/CenterContainer"]
+layout_mode = 2
+columns = 5
+script = SubResource("GDScript_yql6u")
+
+[node name="TabContainer" type="TabContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+current_tab = 1
 clip_tabs = false
 tabs_visible = false
-use_hidden_tabs_for_min_size = true
 
-[node name="TestingBuilding" type="Control" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions"]
+[node name="Default" type="Control" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="Label" type="Label" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/TestingBuilding"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 17.0
-text = "testing building"
-
-[node name="Core" type="Control" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions"]
-visible = false
+[node name="Production" type="Control" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer"]
 layout_mode = 2
+script = SubResource("GDScript_qdv8l")
 metadata/_tab_index = 1
 
-[node name="Label" type="Label" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/Core"]
-offset_right = 40.0
-offset_bottom = 17.0
-text = "Core"
-
-[node name="MilitaryBase" type="Control" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions"]
-layout_mode = 2
-script = SubResource("GDScript_mucgx")
-metadata/_tab_index = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -544,51 +619,29 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="QueueContainer" type="VBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase/VBoxContainer"]
-custom_minimum_size = Vector2(32, 32)
+[node name="Queue" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/VBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
-theme = ExtResource("2_kekrh")
 
-[node name="ProgressBar" type="ProgressBar" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase/VBoxContainer/QueueContainer"]
+[node name="ProgressBar" type="ProgressBar" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/VBoxContainer"]
+custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
 show_percentage = false
 
-[node name="QueueDisplay" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase/VBoxContainer/QueueContainer"]
-layout_mode = 2
-
-[node name="Control" type="Control" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase/VBoxContainer"]
+[node name="Buttons" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ButtonBox" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase/VBoxContainer"]
+[node name="Upgrades" type="Control" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer"]
+visible = false
 layout_mode = 2
-
-[node name="5" type="TextureButton" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase/VBoxContainer/ButtonBox"]
-layout_mode = 2
-tooltip_text = "Marine"
-texture_normal = ExtResource("7_5p51g")
-texture_pressed = ExtResource("7_5p51g")
-texture_hover = ExtResource("7_5p51g")
-texture_disabled = ExtResource("7_5p51g")
-texture_focused = ExtResource("7_5p51g")
-
-[node name="3" type="TextureButton" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase/VBoxContainer/ButtonBox"]
-layout_mode = 2
-tooltip_text = "Sniper"
-texture_normal = ExtResource("7_5p51g")
-texture_pressed = ExtResource("7_5p51g")
-texture_hover = ExtResource("7_5p51g")
-texture_disabled = ExtResource("7_5p51g")
-texture_focused = ExtResource("7_5p51g")
+metadata/_tab_index = 2
 
 [node name="BuildingIcon" type="TextureRect" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-texture = ExtResource("7_5p51g")
 stretch_mode = 2
 
 [connection signal="value_changed" from="UI/Control/DebugMenu/SelectedData/UnitSelect" to="." method="_on_unit_select_value_changed"]
 [connection signal="pressed" from="UI/Control/DebugMenu/AddUnit" to="UI/Control/DebugMenu/AddUnit" method="_on_pressed"]
 [connection signal="value_changed" from="UI/Control/DebugMenu/UnitSelector" to="UI/Control/DebugMenu/AddUnit" method="_on_unit_selector_value_changed"]
 [connection signal="pressed" from="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/AddButton" to="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay" method="_on_add_button_pressed"]
-[connection signal="pressed" from="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase/VBoxContainer/ButtonBox/5" to="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase" method="_on_marine_pressed"]
-[connection signal="pressed" from="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase/VBoxContainer/ButtonBox/3" to="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/BuildingActions/MilitaryBase" method="_on_sniper_pressed"]

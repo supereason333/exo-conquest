@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://du0itoj8i0lcv"]
+
+[sub_resource type="GDScript" id="GDScript_gnqgt"]
+script/source = "extends TextureButton
+
+signal pressed_n(number:int)
+
+@export var number:int
+
+func _on_pressed() -> void:
+	emit_signal(\"pressed_n\", number)
+"
+
+[node name="NumberedButton" type="TextureButton"]
+script = SubResource("GDScript_gnqgt")
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]

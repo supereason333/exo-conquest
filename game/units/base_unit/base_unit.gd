@@ -2,10 +2,7 @@ extends CharacterBody2D
 class_name BaseUnit
 
 signal death(unit:Node2D)
-
-var Unit_vision := preload("res://game/units/base_unit/unit_vision.tscn")
-#var Explosion := preload("res://game/resources/particles/explosion.png")
-#var Explosion_sound := preload("res://game/resources/sound/effects/explosion.wav")
+signal taken_damage()
 
 var team_id:int
 var waypoints:Array[Vector2]
@@ -44,13 +41,19 @@ var attack_target:Node2D:
 @export var agression_distance:int	# Agression distance
 
 @export_group("Sprite")
-@export var color_sprite_frames:SpriteFrames
-@export var base_sprite_frames:SpriteFrames
 @export var display_icon:CompressedTexture2D = preload("res://game/resources/sprites/placeholder/32x.png")
 @export var attack_animation_time:float = 0.2
 @export var death_sound := AudioManager.SFX.Unit.Death.explosion
 @export var death_effect := preload("res://game/units/base_unit/death_effects/default_effect.tscn")
 @export var attack_sound := AudioManager.SFX.Unit.Attack.gunshot
+
+@export_group("Components")
+@export var base_sprite:AnimatedSprite2D
+@export var color_sprite:AnimatedSprite2D
+@export var collision_shape:CollisionShape2D
+@export var production_component:ProductionComponent
+
+@export var other_components:Array[Component]
 
 @export_group("Other") 
 @export var dummy:bool = false
@@ -67,10 +70,11 @@ var health:float:
 		if value <= 0:
 			kill()
 			emit_signal("death", self)
+		emit_signal("taken_damage")
 		health = value
 		health_bar.value = health / base_health * 100
 
-var collision_shape:CollisionShape2D
+@onready var game_env := $".."
 var vision_area:Area2D = Area2D.new()
 var attack_area:Area2D = Area2D.new()
 var health_bar:ProgressBar = ProgressBar.new()
@@ -78,27 +82,22 @@ var attack_timer:Timer = Timer.new()
 var attack_tick_timer:Timer = Timer.new()
 var attack_anim_timer:Timer = Timer.new()
 #var unit_finder_timer:Timer = Timer.new()
-var base_sprite := AnimatedSprite2D.new()
-var color_sprite := AnimatedSprite2D.new()
 var sound_player:AudioStreamPlayer2D = AudioStreamPlayer2D.new()
 
 enum states {STANDBY, ATTACKING, ATTACK_CHASE, HOLD}
 var cur_state:int = states.STANDBY
 
 func _ready() -> void:
-	if !collision_shape:
-		collision_shape = $CollisionShape2D
-	
-	base_sprite.sprite_frames = base_sprite_frames
-	color_sprite.sprite_frames = color_sprite_frames
-	base_sprite.frame_changed.connect(sprite_frame_changed)
-	add_child(base_sprite)
-	base_sprite.add_child(color_sprite)
+	if base_sprite:
+		base_sprite.frame_changed.connect(sprite_frame_changed)
 	
 	if dummy: 
 		set_collision_layer_value(1, false)
 		set_collision_mask_value(1, false)
 		return
+	
+	if !collision_shape:
+		pass
 	
 	set_collision_layer_value(2, true)
 	add_to_group("unit")
@@ -235,8 +234,6 @@ func is_owned_by_user() -> bool:
 func on_point_select(point:Vector2, list:Array[BaseUnit]):
 	if dummy: return
 	if dying: return
-	
-	print("POINT SELECT")
 	
 	if collision_shape.shape.get_rect().has_point(point - position):
 		list.append(self)

@@ -1,6 +1,11 @@
 extends BaseBuilding
 
-const PRODUCTION_TIME := 10.0
+func _ready() -> void:
+	super()
+	#production_component.queue_unit(0)
+	#production_component.queue_unit(0)
+
+"""const PRODUCTION_TIME := 10.0
 const MAX_QUEUE_SIZE := 6
 
 var production_cost:Array[Array] = [
@@ -89,4 +94,4 @@ func production_finished():
 		if production_queue:
 			production_timer.start()
 	
-	update_queue_display()
+	update_queue_display()"""
