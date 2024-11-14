@@ -4,8 +4,9 @@ signal select_list_changed
 signal material_changed
 signal point_select(point:Vector2)
 signal box_select(box:Rect2)
+signal client_player_updated(_player:PlayerData)
 
-var player:PlayerData
+var player:PlayerData		# Data for self client what
 var game_settings:GameSettings
 
 var materials := MaterialCost.new(0, 0, 0, 0):
@@ -49,9 +50,11 @@ func load_settings():			# CHANGE THIS TO ACTUALLY LOAD SETTINGS
 
 func set_default_player():
 	player = PlayerData.new()
-	player.peer_id = 1
+	player.peer_id = -1
 	player.team_id = 0
 	player.username = "DEFAULT PLAYER"
+	
+	emit_signal("client_player_updated", player)
 
 func on_right_click(position:Vector2):
 	if !selected_controllable: return
@@ -248,13 +251,8 @@ func remove_from_select(unit):
 """
 
 func change_team(team_id:int):
-	var has := false
-	for t in MultiplayerScript.team_list: if t.id == team_id: 
-		has = true
-		break
-	if !has: return false
-	
 	player.team_id = team_id
 	clear_selection()
 	selected_building = null
+	emit_signal("client_player_updated", player)
 	emit_signal("select_list_changed")

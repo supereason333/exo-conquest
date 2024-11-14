@@ -9,7 +9,7 @@ script/source = "extends HBoxContainer
 
 var team:Team
 
-signal switch_team(team_id:int)
+#signal switch_team(team_id:int)
 
 func _ready() -> void:
 	name_label.text = team.name
@@ -22,7 +22,8 @@ func _process(delta: float) -> void:
 	pass
 
 func _on_button_pressed() -> void:
-	emit_signal(\"switch_team\", team.id)
+	RTS.change_team(team.id)
+	#emit_signal(\"switch_team\", team.id)
 "
 
 [node name="TeamDisplay" type="HBoxContainer"]

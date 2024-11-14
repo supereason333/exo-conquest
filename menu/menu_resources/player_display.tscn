@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3 uid="uid://ceobsecaw88dg"]
+
+[ext_resource type="Theme" uid="uid://dk83qmx0ytnuw" path="res://menu/menu_resources/themes/default_theme.tres" id="1_60yu8"]
+
+[sub_resource type="GDScript" id="GDScript_a07f3"]
+script/source = "extends HBoxContainer
+
+var peer_id:int
+
+@onready var color_rect := $ColorRect
+@onready var username_label := $UsernameLabel
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	MultiplayerScript.player_updated.connect(update)
+	update()
+
+func update(player:PlayerData = null):
+	if !player: player = MultiplayerScript.get_player_from_peer_id(peer_id)
+	if !player: 
+		username_label.text = str(peer_id) + \" NOT FOUND\"
+		return
+	
+	var team = MultiplayerScript.get_team_from_id(player.team_id)
+	if team:
+		color_rect.color = team.color
+	if player.username:
+		username_label.text = player.username
+	else:
+		username_label.text = \"[\" + str(peer_id) + \"]\"
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[node name="PlayerDisplay" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_60yu8")
+script = SubResource("GDScript_a07f3")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(5, 0)
+layout_mode = 2
+
+[node name="UsernameLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Username"
+text_overrun_behavior = 1
