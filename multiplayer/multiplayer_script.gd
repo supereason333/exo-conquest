@@ -44,28 +44,35 @@ func join_server(address:String = "localhost", port:int = 9998):
 
 func connected_successfully():
 	RTS.player.peer_id = multiplayer.get_unique_id()
+	rpc("recieve_player_data", RTS.player.peer_id, RTS.player.username, RTS.player.team_id)
 	get_tree().change_scene_to_file("res://menu/ready_screen.tscn")
 
 func connection_failed():
 	pass
 
-@rpc("any_peer")
+@rpc("any_peer")	# Server recieve player data
 func recieve_player_data(peer_id:int, username:String, team_id:int):#_player:PlayerData):
-	print("RECIEVED PLAYER DATA FROM " + str(peer_id))
+	print("SERVER RECIEVED PLAYER DATA FROM " + str(peer_id))
 	var _player = get_player_from_peer_id(peer_id)
 	if !_player: return #_player = PlayerData.new()
 	
 	#_player.peer_id = peer_id
-	_player.username = username
-	_player.team_id = team_id
+	if _player.username != username:
+		_player.username = username
+		rpc("update_player_username", peer_id, username)
+	if _player.team_id != team_id:
+		_player.team_id = team_id
+		rpc("update_player_team", peer_id, team_id)
+		
 	
 	update_player_data(_player)
+	print_plr_list()
 
 @rpc
 func ask_player_data():
 	rpc("recieve_player_data", RTS.player.peer_id, RTS.player.username, RTS.player.team_id)#RTS.player)
 
-@rpc
+@rpc	# Client recieves player list
 func recieve_player_list(usernames:PackedStringArray, peer_ids:PackedInt32Array, team_ids:PackedInt32Array):
 	var list:Array[PlayerData]
 	
@@ -76,24 +83,85 @@ func recieve_player_list(usernames:PackedStringArray, peer_ids:PackedInt32Array,
 		player.peer_id = peer_id
 		player.team_id = team_ids[i]
 		list.append(player)
+		i += 1
 	
 	player_list = list
+	
+	print_plr_list()
 	emit_signal("player_list_changed")
-	i += 1
+
+@rpc
+func update_player_username(peer_id:int, username:String):
+	print("UPDATED PLAYER " + str(peer_id) + " USERNAME")
+	for i in player_list.size():
+		if player_list[i].peer_id == peer_id:
+			player_list[i].username = username
+			#emit_signal("player_updated", player_list[i])
+			emit_signal("player_list_changed")
+			print_plr_list()
+			return
+
+@rpc
+func update_player_team(peer_id:int, team_id:int):
+	print("UPDATED PLAYER " + str(peer_id) + " TEAM")
+	for i in player_list.size():
+		if player_list[i].peer_id == peer_id:
+			player_list[i].team_id = team_id
+			#emit_signal("player_updated", player_list[i])
+			emit_signal("player_list_changed")
+			print_plr_list()
+			return
+
+func print_plr_list():
+	if multiplayer.is_server():
+		print("SERVER PLAYER LIST:")
+		for player in player_list:
+			print("")
+			print(" - USERNAME " + player.username)
+			print(" - PEER ID  " + str(player.peer_id))
+			print(" - TEAM ID  " + str(player.team_id))
+		return
+	
+	print("CLIENT " + str(multiplayer.get_unique_id()) + " PLAYER LIST")
+	for player in player_list:
+		print("")
+		print(" - USERNAME " + player.username)
+		print(" - PEER ID  " + str(player.peer_id))
+		print(" - TEAM ID  " + str(player.team_id))
+	
 
 ################################################################################
 
 func handle_connect(peer_id:int):
 	print("PLAYER " + str(peer_id) + " CONNECTED")
-	rpc_id(peer_id, "ask_player_data")
-	#send_player_list(peer_id)
 	
 	var player := PlayerData.new()
 	player.peer_id = peer_id
 	add_player_to_list(player)
+	
+	#rpc_id(peer_id, "ask_player_data")
+	send_team_list(peer_id)
+	send_player_list(peer_id)
 
 func handle_disconnect(peer_id:int):
 	print("PLAYER " + str(peer_id) + " DISCONNECTED")
+
+func send_team_list(peer_id:int):
+	for team in team_list:
+		rpc_id(peer_id, "client_recieve_new_team", team.name, team.slogan, team.color, team.id )
+	
+	return
+	var team_names:PackedStringArray
+	var team_ids:PackedInt32Array
+	var team_slogans:PackedStringArray
+	var team_colors:Array[Color]
+	for team in team_list:
+		team_names.append(team.name)
+		team_ids.append(team.id)
+		team_slogans.append(team.slogan)
+		team_colors.append(team.color)
+	
+	rpc_id(peer_id, "recieve_team_list", team_names, team_ids, team_slogans, team_colors)
 
 func send_player_list(peer_id:int):
 	var usernames:PackedStringArray
@@ -134,7 +202,9 @@ func update_player_data(_player:PlayerData):
 	for i in player_list.size():
 		if player_list[i].peer_id == _player.peer_id:
 			player_list[i] = _player
-			emit_signal("player_updated", null)#_player)
+			emit_signal("player_list_changed")
+			#emit_signal("player_updated", null)#_player)
+			rpc("update_player_team", RTS.player.peer_id, RTS.player.team_id)
 			return
 
 func get_team_from_id(team_id) -> Team:
@@ -170,7 +240,7 @@ func get_player_from_username(username:String) -> PlayerData:
 
 func _ready() -> void:
 	rand.randomize()
-	set_default_team()
+	#set_default_team()
 	RTS.client_player_updated.connect(update_player_data)
 
 func set_default_team() -> void:
@@ -188,7 +258,40 @@ func new_team(name:String, slogan:String, color:Color, id:int = -1):
 	team.name = name
 	team.color = color
 	team.id = id
+	if multiplayer.is_server():
+		team_list.append(team)
+		rpc("client_recieve_new_team", name, slogan, color, id)
+		emit_signal("team_list_changed")
+	else:
+		rpc("server_recieve_new_team", name, slogan, color, id)
+
+@rpc("any_peer")
+func server_recieve_new_team(name:String, slogan:String, color:Color, id:int = -1):
+	if !multiplayer.is_server(): return
+	
+	new_team(name, slogan, color, id)
+
+@rpc
+func client_recieve_new_team(name:String, slogan:String, color:Color, id:int = -1):
+	var team = Team.new()
+	team.name = name
+	team.color = color
+	team.id = id
 	team_list.append(team)
+	emit_signal("team_list_changed")
+
+@rpc
+func recieve_team_list(team_names:PackedStringArray, team_ids:PackedInt32Array, team_slogans:PackedStringArray, team_colors:Array[Color]):
+	var list:Array[Team]
+	
+	for i in team_names.size():
+		var team := Team.new()
+		team.name = team_names[i]
+		team.id = team_ids[i]
+		team.slogan = team_slogans[i]
+		team.color = team_colors[i]
+	
+	team_list = list
 	emit_signal("team_list_changed")
 
 ################################################################################

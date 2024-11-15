@@ -9,6 +9,7 @@ var peer_id:int
 
 @onready var color_rect := $ColorRect
 @onready var username_label := $UsernameLabel
+@onready var id_label := $PeerIDLabel
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -22,6 +23,7 @@ func update(player:PlayerData = null):
 		return
 	
 	var team = MultiplayerScript.get_team_from_id(player.team_id)
+	id_label.text = str(player.peer_id)
 	if team:
 		color_rect.color = team.color
 	if player.username:
@@ -48,6 +50,12 @@ custom_minimum_size = Vector2(5, 0)
 layout_mode = 2
 
 [node name="UsernameLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Username"
+text_overrun_behavior = 1
+
+[node name="PeerIDLabel" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Username"

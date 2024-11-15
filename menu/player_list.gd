@@ -6,7 +6,7 @@ var Player_display := preload("res://menu/menu_resources/player_display.tscn")
 
 func _ready() -> void:
 	MultiplayerScript.player_list_changed.connect(update_player_list)
-	#MultiplayerScript.player_updated.connect(update_player)
+	MultiplayerScript.player_updated.connect(update_player)
 	update_player_list()
 
 func _process(delta: float) -> void:
