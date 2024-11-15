@@ -90,7 +90,7 @@ color = Color(1, 0, 0, 1)
 [node name="ReadyButton" type="Button" parent="MarginContainer/HBoxContainer/LeftBox/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Ready! (0/15)"
+text = "Ready!"
 
 [node name="PlayerList" type="PanelContainer" parent="MarginContainer/HBoxContainer/LeftBox"]
 layout_mode = 2
@@ -224,6 +224,7 @@ layout_mode = 2
 layout_mode = 2
 text = "Create team"
 
+[connection signal="pressed" from="MarginContainer/HBoxContainer/LeftBox/HBoxContainer/ReadyButton" to="." method="_on_ready_button_pressed"]
 [connection signal="pressed" from="MarginContainer/HBoxContainer/RightBox/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/NewTeamButton" to="NewTeamWindow" method="_on_new_team_button_pressed"]
 [connection signal="about_to_popup" from="NewTeamWindow" to="NewTeamWindow" method="_on_about_to_popup"]
 [connection signal="close_requested" from="NewTeamWindow" to="NewTeamWindow" method="_on_close_requested"]

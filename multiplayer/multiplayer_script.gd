@@ -2,11 +2,21 @@
 extends Node
 
 signal team_list_changed
+signal ready_list_changed	# When the ready list changes
 signal player_list_changed	# A signal called when player list updates (client only)
 signal player_updated(player:PlayerData)
 
 var player_list:Array[PlayerData]	# An array of current players connected
 var team_list:Array[Team]			# An array of all teams that currently exist DOES NOT CONTAIN PLAYERS
+var ready_list:PackedInt32Array		# An array of all players that are ready
+var ready_status:bool:
+	set(value):
+		if multiplayer.is_server():
+			update_ready_status(multiplayer.get_unique_id(), value)
+			rpc("update_ready_status", multiplayer.get_unique_id(), value)
+		else:
+			rpc("server_update_ready_status", multiplayer.get_unique_id(), value)
+		ready_status = value
 
 var rand := RandomNumberGenerator.new()
 var adj_list:WordList = ResourceLoader.load("res://menu/menu_resources/adjectives.tres")
@@ -112,6 +122,27 @@ func update_player_team(peer_id:int, team_id:int):
 			print_plr_list()
 			return
 
+@rpc("any_peer")
+func server_update_ready_status(peer_id:int, status:bool):
+	rpc("update_ready_status", peer_id, status)
+	update_ready_status(peer_id, status)
+
+@rpc
+func update_ready_status(peer_id:int, status:bool):
+	if status:
+		if !ready_list.has(peer_id):
+			ready_list.append(peer_id)
+			emit_signal("ready_list_changed")
+	else:
+		if ready_list.find(peer_id) != -1:
+			ready_list.remove_at(ready_list.find(peer_id))
+			emit_signal("ready_list_changed")
+
+@rpc
+func send_ready_list(_ready_list:PackedInt32Array):
+	ready_list = _ready_list
+	emit_signal("ready_list_changed")
+
 func print_plr_list():
 	if multiplayer.is_server():
 		print("SERVER PLAYER LIST:")
@@ -142,6 +173,7 @@ func handle_connect(peer_id:int):
 	#rpc_id(peer_id, "ask_player_data")
 	send_team_list(peer_id)
 	send_player_list(peer_id)
+	rpc_id(peer_id, "send_ready_list", ready_list)
 
 func handle_disconnect(peer_id:int):
 	print("PLAYER " + str(peer_id) + " DISCONNECTED")

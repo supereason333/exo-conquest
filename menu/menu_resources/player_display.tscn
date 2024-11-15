@@ -8,12 +8,14 @@ script/source = "extends HBoxContainer
 var peer_id:int
 
 @onready var color_rect := $ColorRect
-@onready var username_label := $UsernameLabel
-@onready var id_label := $PeerIDLabel
+@onready var username_label := $VBoxContainer/UsernameLabel
+@onready var id_label := $VBoxContainer/PeerIDLabel
+@onready var ready_label := $VBoxContainer/ReadyLabel
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	MultiplayerScript.player_updated.connect(update)
+	MultiplayerScript.ready_list_changed.connect(update)
 	update()
 
 func update(player:PlayerData = null):
@@ -30,6 +32,10 @@ func update(player:PlayerData = null):
 		username_label.text = player.username
 	else:
 		username_label.text = \"[\" + str(peer_id) + \"]\"
+	if MultiplayerScript.ready_list.has(peer_id):
+		ready_label.text = \"Ready!\"
+	else:
+		ready_label.text = \"Not ready\"
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -49,14 +55,24 @@ script = SubResource("GDScript_a07f3")
 custom_minimum_size = Vector2(5, 0)
 layout_mode = 2
 
-[node name="UsernameLabel" type="Label" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="UsernameLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Username"
 text_overrun_behavior = 1
 
-[node name="PeerIDLabel" type="Label" parent="."]
+[node name="PeerIDLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Username"
+text = "Peer id"
+text_overrun_behavior = 1
+
+[node name="ReadyLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ready status"
 text_overrun_behavior = 1
