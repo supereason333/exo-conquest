@@ -2,9 +2,15 @@ extends Control
 
 @onready var ready_btn := $MarginContainer/HBoxContainer/LeftBox/HBoxContainer/ReadyButton
 @onready var ready_color_rect := $MarginContainer/HBoxContainer/LeftBox/HBoxContainer/ColorRect
+@onready var start_btn := $MarginContainer/HBoxContainer/LeftBox/StartButton
+
+func _ready() -> void:
+	if multiplayer.is_server(): start_btn.show()
 
 func _on_start_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://game/game_environment.tscn")
+	if !multiplayer.is_server(): return
+	if MultiplayerScript.check_can_start():
+		MultiplayerScript.start_game()
 
 func _on_ready_button_pressed() -> void:
 	MultiplayerScript.ready_status = !MultiplayerScript.ready_status

@@ -38,6 +38,9 @@ func _ready() -> void:
 	player.add_new_building.connect(add_building)
 	
 	_on_bgm_finished()
+	
+	if MultiplayerScript.is_game_running:
+		pre_game_init()
 
 func _process(delta: float) -> void:
 	queue_redraw()
@@ -177,3 +180,10 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_bgm_finished() -> void:
 	bgm_player.stream = AudioManager.BGM.get_random()
 	bgm_player.play()
+
+func pre_game_init():
+	for team in MultiplayerScript.team_list:
+		spawn_team_base(team)
+
+func spawn_team_base(team:Team):
+	pass

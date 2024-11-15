@@ -2,6 +2,7 @@ extends Control
 
 @onready var err_label := $MarginContainer/VBoxContainer/HBoxContainer/LeftBox/ServerInfo/MarginContainer/VBoxContainer/ErrorLabel
 @onready var port_entry := $MarginContainer/VBoxContainer/HBoxContainer/LeftBox/ServerInfo/MarginContainer/VBoxContainer/PortEntry
+@onready var spin_box := $MarginContainer/VBoxContainer/HBoxContainer/LeftBox/GameInfo/MarginContainer/VBoxContainer/HBoxContainer/SpinBox
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -17,7 +18,7 @@ func _on_back_button_pressed() -> void:
 
 
 func _on_host_button_pressed() -> void:
-	var err = MultiplayerScript.host_server(port_entry.text.to_int())
+	var err = MultiplayerScript.host_server(port_entry.text.to_int(), spin_box.value)
 	if err:
 		err_label.text = err
 	else:

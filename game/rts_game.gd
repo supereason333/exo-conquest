@@ -158,7 +158,8 @@ func clear_selection(_signal:bool = false):
 	
 	if _signal: emit_signal("select_list_changed")
 
-
+func pre_game_init():
+	get_tree().change_scene_to_file("res://game/game_environment.tscn")
 
 
 

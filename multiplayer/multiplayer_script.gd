@@ -4,7 +4,9 @@ extends Node
 signal team_list_changed
 signal ready_list_changed	# When the ready list changes
 signal player_list_changed	# A signal called when player list updates (client only)
-signal player_updated(player:PlayerData)
+signal player_updated(player:PlayerData)	# Not used but i cant be bothered to remove it
+signal can_start_changed(status:bool)
+signal game_started
 
 var player_list:Array[PlayerData]	# An array of current players connected
 var team_list:Array[Team]			# An array of all teams that currently exist DOES NOT CONTAIN PLAYERS
@@ -17,6 +19,8 @@ var ready_status:bool:
 		else:
 			rpc("server_update_ready_status", multiplayer.get_unique_id(), value)
 		ready_status = value
+var can_start := false
+var game_running := false
 
 var rand := RandomNumberGenerator.new()
 var adj_list:WordList = ResourceLoader.load("res://menu/menu_resources/adjectives.tres")
@@ -24,9 +28,9 @@ var noun_list:WordList = ResourceLoader.load("res://menu/menu_resources/nouns.tr
 
 var enet_peer:ENetMultiplayerPeer
 
-func host_server(port:int = 9998):
+func host_server(port:int = 9998, players:int = 2):
 	enet_peer = ENetMultiplayerPeer.new()
-	var error = enet_peer.create_server(port)
+	var error = enet_peer.create_server(port, players)
 	if error != OK:
 		printerr("Cannot host: " + str(error))
 		return "Cannot host: " + str(error)
@@ -62,6 +66,7 @@ func connection_failed():
 
 @rpc("any_peer")	# Server recieve player data
 func recieve_player_data(peer_id:int, username:String, team_id:int):#_player:PlayerData):
+	if !multiplayer.is_server(): return
 	print("SERVER RECIEVED PLAYER DATA FROM " + str(peer_id))
 	var _player = get_player_from_peer_id(peer_id)
 	if !_player: return #_player = PlayerData.new()
@@ -76,11 +81,11 @@ func recieve_player_data(peer_id:int, username:String, team_id:int):#_player:Pla
 		
 	
 	update_player_data(_player)
-	print_plr_list()
+	#print_plr_list()
 
-@rpc
+"""@rpc
 func ask_player_data():
-	rpc("recieve_player_data", RTS.player.peer_id, RTS.player.username, RTS.player.team_id)#RTS.player)
+	rpc("recieve_player_data", RTS.player.peer_id, RTS.player.username, RTS.player.team_id)#RTS.player)"""
 
 @rpc	# Client recieves player list
 func recieve_player_list(usernames:PackedStringArray, peer_ids:PackedInt32Array, team_ids:PackedInt32Array):
@@ -97,33 +102,45 @@ func recieve_player_list(usernames:PackedStringArray, peer_ids:PackedInt32Array,
 	
 	player_list = list
 	
-	print_plr_list()
+	#print_plr_list()
 	emit_signal("player_list_changed")
 
 @rpc
 func update_player_username(peer_id:int, username:String):
-	print("UPDATED PLAYER " + str(peer_id) + " USERNAME")
+	#print("UPDATED PLAYER " + str(peer_id) + " USERNAME")
 	for i in player_list.size():
 		if player_list[i].peer_id == peer_id:
 			player_list[i].username = username
 			#emit_signal("player_updated", player_list[i])
 			emit_signal("player_list_changed")
-			print_plr_list()
+			#print_plr_list()
 			return
 
 @rpc
 func update_player_team(peer_id:int, team_id:int):
-	print("UPDATED PLAYER " + str(peer_id) + " TEAM")
+	#print("UPDATED PLAYER " + str(peer_id) + " TEAM")
 	for i in player_list.size():
 		if player_list[i].peer_id == peer_id:
 			player_list[i].team_id = team_id
 			#emit_signal("player_updated", player_list[i])
 			emit_signal("player_list_changed")
-			print_plr_list()
+			#print_plr_list()
 			return
+
+@rpc
+func client_recieve_new_player(peer_id:int, team_id:int = -1, username:String = ""):
+	for p in player_list: if p.peer_id == peer_id: return
+	var player := PlayerData.new()
+	player.peer_id = peer_id
+	if team_id != -1 and username != "":
+		player.team_id = team_id
+		player.username = username
+	
+	add_player_to_list(player)
 
 @rpc("any_peer")
 func server_update_ready_status(peer_id:int, status:bool):
+	if !multiplayer.is_server(): return
 	rpc("update_ready_status", peer_id, status)
 	update_ready_status(peer_id, status)
 
@@ -144,6 +161,7 @@ func send_ready_list(_ready_list:PackedInt32Array):
 	emit_signal("ready_list_changed")
 
 func print_plr_list():
+	if !OS.is_debug_build(): return
 	if multiplayer.is_server():
 		print("SERVER PLAYER LIST:")
 		for player in player_list:
@@ -174,9 +192,16 @@ func handle_connect(peer_id:int):
 	send_team_list(peer_id)
 	send_player_list(peer_id)
 	rpc_id(peer_id, "send_ready_list", ready_list)
+	rpc("client_recieve_new_player", peer_id)
 
 func handle_disconnect(peer_id:int):
 	print("PLAYER " + str(peer_id) + " DISCONNECTED")
+	
+	for i in player_list.size():
+		if player_list[i].peer_id == peer_id:
+			player_list.remove_at(i)
+			emit_signal("player_list_changed")
+			return
 
 func send_team_list(peer_id:int):
 	for team in team_list:
@@ -274,6 +299,23 @@ func _ready() -> void:
 	rand.randomize()
 	#set_default_team()
 	RTS.client_player_updated.connect(update_player_data)
+	#player_list_changed.connect(check_can_start)
+
+func check_can_start() -> bool:
+	var used_teams:Array[int]
+	for player in player_list:
+		if !ready_list.has(player.peer_id): return false
+		if !get_team_from_id(player.team_id): return false
+		if !used_teams.has(player.team_id): used_teams.append(player.team_id)
+	if used_teams.size() > 4: return false
+	return true
+
+func get_all_used_teams() -> Array[int]:
+	var used_teams:Array[int]
+	for player in player_list:
+		if !used_teams.has(player.team_id): used_teams.append(player.team_id)
+	
+	return used_teams
 
 func set_default_team() -> void:
 	new_team("TEAM 0", "", Color.BLUE, 0)
@@ -326,6 +368,15 @@ func recieve_team_list(team_names:PackedStringArray, team_ids:PackedInt32Array, 
 	team_list = list
 	emit_signal("team_list_changed")
 
+func clear_unused_teams():
+	var list:Array[int]		# Clears team list of unused teams
+	var list2:Array[Team]
+	for player in player_list:
+		if !list.has(player.team_id): list.append(player.team_id)
+	for i in list:
+		list2.append(get_team_from_id(i))
+	team_list = list2
+
 ################################################################################
 # Multiplayer stuff above
 # Other functions below
@@ -356,3 +407,21 @@ func random_color(alpha:bool = false) -> Color:
 	if alpha:
 		return Color(rand.randf(), rand.randf(), rand.randf(), rand.randf())
 	return Color(rand.randf(), rand.randf(), rand.randf())
+
+@rpc("reliable")
+func start_game():
+	if multiplayer.is_server():
+		if !check_can_start(): return
+		game_running = true
+		print("GAME STARTED ON SERVER")
+		
+		clear_unused_teams()
+		
+		rpc("start_game")
+		RTS.pre_game_init()
+		emit_signal("game_started")
+	else:
+		game_running = true
+		print("GAME STARTED ON PEER " + str(multiplayer.get_unique_id()))
+		RTS.pre_game_init()
+		emit_signal("game_started")
