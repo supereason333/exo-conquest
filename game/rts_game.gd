@@ -25,6 +25,8 @@ var selected_building:BaseBuilding:
 
 var selected_controllable := true
 
+var start_position:int
+
 #var unit_loader := preload("res://game/units/unit_loader.tscn").instantiate()
 
 const MAX_SELECT_AMOUNT := 10
@@ -161,6 +163,9 @@ func clear_selection(_signal:bool = false):
 func pre_game_init():
 	get_tree().change_scene_to_file("res://game/game_environment.tscn")
 
+@rpc
+func set_start_pos(pos:int):
+	start_position = pos
 
 
 

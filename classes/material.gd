@@ -36,11 +36,13 @@ func subtract(other:MaterialCost) -> MaterialCost:
 
 func can_afford(cost:MaterialCost) -> bool:
 	var remaining := subtract(cost)
-	
-	if remaining.selnite < 0: return false
-	if remaining.luminite < 0: return false
-	if remaining.plainium < 0: return false
-	if remaining.xenite < 0: return false
+	if remaining:
+		if remaining.selnite < 0: return false
+		if remaining.luminite < 0: return false
+		if remaining.plainium < 0: return false
+		if remaining.xenite < 0: return false
+	else:
+		return false
 	return true
 
 func _to_string() -> String:

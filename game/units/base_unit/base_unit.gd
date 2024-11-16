@@ -53,6 +53,7 @@ var attack_target:Node2D:
 @export var color_sprite:AnimatedSprite2D
 @export var collision_shape:CollisionShape2D
 @export var production_component:ProductionComponent
+@export var multiplayer_sync:MultiplayerSynchronizer
 
 @export var other_components:Array[Component]
 

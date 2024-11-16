@@ -6,25 +6,25 @@ var box_select := false
 var mouse_down := false
 var box:Rect2
 
-var map
+@onready var map := $Map
 var tile_map
 var data_tile_map
 @onready var player := $PlayerControl
 @onready var data_viewer := $TileDataViewer
 @onready var building_detector := $BuildingDetector
 @onready var bgm_player := $BGM
+@onready var spawnpoints := $Map/Spawnpoints
 
 var placing_building := false
 var building
 var build_draw_rects:Array[Rect2]
 var can_build:bool
 
+var next_build_id := 0
+var next_unit_id := 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	add_child(Map)
-	map = get_child(-1)
-	move_child(map, 0)
-	map.name = "Map"
 	
 	tile_map = $Map/BaseTiles
 	data_tile_map = $Map/DataTiles
@@ -39,12 +39,12 @@ func _ready() -> void:
 	
 	_on_bgm_finished()
 	
-	if MultiplayerScript.is_game_running:
+	if MultiplayerScript.game_running:
 		pre_game_init()
 
 func _process(delta: float) -> void:
 	queue_redraw()
-	data_viewer_code()
+	#data_viewer_code()
 	if Input.is_action_just_pressed("unit_move"):
 		RTS.on_right_click(get_global_mouse_position())
 	if placing_building:
@@ -59,7 +59,7 @@ func _process(delta: float) -> void:
 func game_init():
 	pass
 
-func data_viewer_code():
+"""func data_viewer_code():
 	var viewer_tile:Vector2i = data_tile_map.local_to_map(data_tile_map.get_local_mouse_position())
 	var viewer_pos:Vector2 = viewer_tile * data_tile_map.tile_set.tile_size
 	var tile = data_tile_map.get_cell_tile_data(viewer_tile)
@@ -72,15 +72,19 @@ func data_viewer_code():
 		data_viewer.material_label.text = "material"
 		data_viewer.buildable_color.color = Color(0, 1, 0)
 	
-	data_viewer.position = viewer_pos
+	data_viewer.position = viewer_pos"""
 
 func add_unit(unit):
 	if !unit: return
+	unit.name = "unit_" + str(multiplayer.get_unique_id()) + "_" + str(next_unit_id)
+	next_unit_id += 1
 	add_child(unit)
 
 func add_building(build):
 	if !build: return
 	building = build
+	building.name = "building_" + str(multiplayer.get_unique_id()) + "_" + str(next_build_id)
+	next_build_id += 1
 	build_draw_rects = []
 	building_detector.get_child(0).shape.size = build.building_size * 32
 	var rec_shape := RectangleShape2D.new()
@@ -182,8 +186,14 @@ func _on_bgm_finished() -> void:
 	bgm_player.play()
 
 func pre_game_init():
-	for team in MultiplayerScript.team_list:
-		spawn_team_base(team)
+	spawn_team_base()
 
-func spawn_team_base(team:Team):
-	pass
+func spawn_team_base():
+	var core := BuildingLoader.load_building_from_id(1)
+	for point in spawnpoints.get_children():
+		if point.name.to_int() == RTS.start_position:
+			core.name = "core_" + str(multiplayer.get_unique_id())
+			core.position = snapped(point.position, Vector2(32, 32))
+			core.team_id = RTS.player.team_id
+			add_child(core)
+			return

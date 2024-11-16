@@ -41,7 +41,7 @@ func update_team_list():
 	for team in MultiplayerScript.team_list:
 		var disp = Disp.instantiate()
 		disp.team = team
-		disp.switch_team.connect(switch_team)
+		#disp.switch_team.connect(switch_team)
 		team_selector.add_child(disp)
 
 func select_list_changed():

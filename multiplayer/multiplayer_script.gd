@@ -416,6 +416,13 @@ func start_game():
 		print("GAME STARTED ON SERVER")
 		
 		clear_unused_teams()
+		var i := 1
+		for player in player_list:
+			if player.peer_id == multiplayer.get_unique_id():
+				RTS.set_start_pos(i)
+			else:
+				RTS.rpc_id(player.peer_id, "set_start_pos", i)
+			i += 1
 		
 		rpc("start_game")
 		RTS.pre_game_init()
