@@ -1,8 +1,16 @@
-[gd_scene load_steps=39 format=3 uid="uid://h3f0rypervaa"]
+[gd_scene load_steps=42 format=3 uid="uid://h3f0rypervaa"]
 
 [ext_resource type="Script" path="res://game/units/sniper_unit.gd" id="1_usqqt"]
+[ext_resource type="Script" path="res://classes/material.gd" id="2_0yqb6"]
 [ext_resource type="Texture2D" uid="uid://kbx4ndppguv8" path="res://game/resources/sprites/sniper_unit.png" id="3_1hbxx"]
 [ext_resource type="Texture2D" uid="uid://c8i2bwvcpypro" path="res://game/resources/sprites/testing_unit_color_layer.png" id="3_cu7km"]
+
+[sub_resource type="Resource" id="Resource_t8urh"]
+script = ExtResource("2_0yqb6")
+selnite = 0
+luminite = 0
+plainium = 0
+xenite = 0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1pcav"]
 size = Vector2(16, 32)
@@ -247,11 +255,23 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="SniperUnit" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite", "collision_shape") groups=["unit"]]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qi258"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:health")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:team_id")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+
+[node name="SniperUnit" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite", "collision_shape", "multiplayer_sync") groups=["unit"]]
 motion_mode = 1
 script = ExtResource("1_usqqt")
 unit_name = "Sniper"
 unit_id = 3
+unit_cost = SubResource("Resource_t8urh")
 base_speed = 50
 base_health = 70.0
 attack_damage = 40.0
@@ -262,6 +282,7 @@ agression_distance = 500
 base_sprite = NodePath("BaseSprite")
 color_sprite = NodePath("BaseSprite/ColorSprite")
 collision_shape = NodePath("CollisionShape2D")
+multiplayer_sync = NodePath("MultiplayerSynchronizer")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_1pcav")
@@ -271,3 +292,6 @@ sprite_frames = SubResource("SpriteFrames_883xd")
 
 [node name="ColorSprite" type="AnimatedSprite2D" parent="BaseSprite"]
 sprite_frames = SubResource("SpriteFrames_eppq2")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_qi258")

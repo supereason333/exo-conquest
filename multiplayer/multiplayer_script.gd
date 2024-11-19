@@ -44,8 +44,6 @@ func host_server(port:int = 9998, players:int = 2):
 	
 	add_player_to_list(RTS.player)
 
-################################################################################
-
 func join_server(address:String = "localhost", port:int = 9998):
 	enet_peer = ENetMultiplayerPeer.new()
 	var error := enet_peer.create_client(address, port)

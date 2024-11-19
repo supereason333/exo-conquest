@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://bsp7wroomlji5"]
+[gd_scene load_steps=25 format=3 uid="uid://bsp7wroomlji5"]
 
 [ext_resource type="Script" path="res://game/buildings/military_base.gd" id="1_jm5bs"]
 [ext_resource type="Texture2D" uid="uid://u3lgfvavso7g" path="res://game/resources/sprites/buildings/military_base_color_sprite.png" id="2_wu2fm"]
@@ -133,7 +133,18 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="MilitaryBase" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite", "production_component")]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_hkgey"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:health")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:team_id")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+
+[node name="MilitaryBase" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite", "production_component", "multiplayer_sync")]
 script = ExtResource("1_jm5bs")
 building_size = Vector2i(3, 2)
 unit_name = "Military Base"
@@ -142,6 +153,7 @@ base_health = 2000.0
 base_sprite = NodePath("BaseSprite")
 color_sprite = NodePath("BaseSprite/ColorSprite")
 production_component = NodePath("ProductionComponent")
+multiplayer_sync = NodePath("MultiplayerSynchronizer")
 
 [node name="BaseSprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_t5uw5")
@@ -155,4 +167,5 @@ sprite_frames = SubResource("SpriteFrames_rn5gx")
 script = ExtResource("5_ok207")
 produce_list = Array[PackedScene]([ExtResource("6_383yx"), ExtResource("7_v2qbs")])
 
-[connection signal="produced_unit" from="ProductionComponent" to="." method="_on_production_component_produced_unit"]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_hkgey")

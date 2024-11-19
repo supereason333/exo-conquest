@@ -4,7 +4,12 @@ class_name BaseUnit
 signal death(unit:Node2D)
 signal taken_damage()
 
-var team_id:int
+var team_id:int:
+	set(value):
+		var team := MultiplayerScript.get_team_from_id(team_id)
+		if team:
+			color_sprite.modulate = team.color
+		team_id = value
 var waypoints:Array[Vector2]
 var selected := false: set = set_selected
 func set_selected(value):
@@ -39,7 +44,7 @@ var attack_target:Node2D:
 @export var attack_cooldown:float
 @export var attack_range:int
 @export var vision_radius:int
-@export var agression_distance:int	# Agression distance
+@export var agression_distance:int
 
 @export_group("Sprite")
 @export var display_icon:CompressedTexture2D = preload("res://game/resources/sprites/placeholder/32x.png")
@@ -93,6 +98,25 @@ func _ready() -> void:
 	if base_sprite:
 		base_sprite.frame_changed.connect(sprite_frame_changed)
 	
+	health_bar.name = "HealthBar"
+	health_bar.show_percentage = false
+	health_bar.size = Vector2(50, 6)
+	health_bar.position = Vector2(-health_bar.size.x / 2, collision_shape.shape.size.y / 2 + 10)
+	var style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color.RED
+	health_bar.add_theme_stylebox_override("background", style_box)
+	style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color.GREEN
+	health_bar.add_theme_stylebox_override("fill", style_box)
+	health_bar.visible = false
+	health = base_health
+	add_child(health_bar)
+	
+	if !is_multiplayer_authority(): return
+	
+	if production_component:
+		production_component._produced_unit.connect(unit_produced)
+	
 	if dummy: 
 		set_collision_layer_value(1, false)
 		set_collision_mask_value(1, false)
@@ -131,20 +155,6 @@ func _ready() -> void:
 	attack_area.body_entered.connect(on_body_enter_attack)
 	attack_area.body_exited.connect(on_body_exit_attack)
 	add_child(attack_area)
-	
-	health_bar.name = "HealthBar"
-	health_bar.show_percentage = false
-	health_bar.size = Vector2(50, 6)
-	health_bar.position = Vector2(-health_bar.size.x / 2, collision_shape.shape.size.y / 2 + 10)
-	var style_box = StyleBoxFlat.new()
-	style_box.bg_color = Color.RED
-	health_bar.add_theme_stylebox_override("background", style_box)
-	style_box = StyleBoxFlat.new()
-	style_box.bg_color = Color.GREEN
-	health_bar.add_theme_stylebox_override("fill", style_box)
-	health_bar.visible = false
-	health = base_health
-	add_child(health_bar)
 	
 	if attack_cooldown != 0:
 		attack_timer.wait_time = attack_cooldown
@@ -196,8 +206,15 @@ func _draw():
 		if is_owned_by_user(): draw_rect(collision_shape.shape.get_rect().grow(4), RTS.game_settings.select_color, false)
 		else: draw_rect(collision_shape.shape.get_rect().grow(4), RTS.game_settings.enemy_color, false)
 
-func movement(delta:float):
+func unit_produced(_unit:PackedScene):
+	var unit := _unit.instantiate()
+	unit.team_id = RTS.player.team_id
+	unit.position = position + Vector2(0, 100)
+	game_env.add_unit(unit)
+
+func movement(_delta:float):
 	if frozen: return
+	if !is_multiplayer_authority(): return
 	
 	if waypoints and !attacking:
 		if position.distance_squared_to(waypoints[0]) <= 100:
@@ -215,9 +232,6 @@ func set_team(_team_id:int):
 	if dying: return
 	
 	team_id = _team_id
-	var team := MultiplayerScript.get_team_from_id(team_id)
-	if team:
-		color_sprite.modulate = team.color
 
 func sprite_frame_changed():
 	color_sprite.frame = base_sprite.frame
@@ -253,6 +267,7 @@ func waypoint(position:Vector2, clicked_unit:Node2D):
 	if frozen: return
 	if dummy: return
 	if dying: return
+	if !is_multiplayer_authority(): return
 	
 	if clicked_unit:
 		pass
@@ -262,8 +277,9 @@ func waypoint(position:Vector2, clicked_unit:Node2D):
 		waypoints = [position]
 
 func on_body_enter_vision(body:Node2D):
+	if !is_multiplayer_authority(): return
 	if body == self: return
-	if body.is_in_group("unit") or body.is_in_group("building"):
+	if body is BaseUnit: #body.is_in_group("unit") or body.is_in_group("building"):
 		if body.team_id != team_id: 
 			vision_list.append(body)
 			#enable_attack_area()
@@ -271,6 +287,7 @@ func on_body_enter_vision(body:Node2D):
 				attack_tick_timer.start()
 
 func on_body_exit_vision(body:Node2D):
+	if !is_multiplayer_authority(): return
 	if vision_list.has(body):
 		vision_list.remove_at(vision_list.find(body))
 		if !vision_list:
@@ -279,10 +296,12 @@ func on_body_exit_vision(body:Node2D):
 	if body == attack_target: attack_target = null
 
 func on_body_enter_attack(body:Node2D):
+	if !is_multiplayer_authority(): return
 	if vision_list.has(body):
 		attackable_list.append(body)
 
 func on_body_exit_attack(body:Node2D):
+	if !is_multiplayer_authority(): return
 	if attackable_list.has(body):
 		attackable_list.remove_at(attackable_list.find(body))
 		if attack_target == body and !override_target:
@@ -295,6 +314,7 @@ func on_body_exit_attack(body:Node2D):
 
 func attack_ai():
 	if dying: return
+	if !is_multiplayer_authority(): return
 	
 	if attack_target:
 		attack_start()
@@ -316,6 +336,7 @@ func attack_animation():
 
 func attack_tick():
 	if dying: return
+	if !is_multiplayer_authority(): return
 	
 	if !attack_target:
 		#var bodies = attack_area.get_overlapping_bodies()

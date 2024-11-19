@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://cpwygiqapx5gg"]
+[gd_scene load_steps=11 format=3 uid="uid://cpwygiqapx5gg"]
 
 [ext_resource type="Script" path="res://game/buildings/core_building.gd" id="1_b103j"]
 [ext_resource type="Texture2D" uid="uid://6j56xd2ew0l3" path="res://game/resources/sprites/buildings/core_color_sprite.png" id="2_0nx1a"]
@@ -48,7 +48,18 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="CoreBuilding" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite")]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_r0c8k"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:health")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:team_id")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+
+[node name="CoreBuilding" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite", "multiplayer_sync")]
 script = ExtResource("1_b103j")
 building_size = Vector2i(4, 3)
 unit_name = "Core"
@@ -56,6 +67,7 @@ unit_id = 1
 base_health = 5000.0
 base_sprite = NodePath("BaseSprite")
 color_sprite = NodePath("BaseSprite/ColorSprite")
+multiplayer_sync = NodePath("MultiplayerSynchronizer")
 
 [node name="BaseSprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_fo4vh")
@@ -65,3 +77,6 @@ frame_progress = 0.330569
 
 [node name="ColorSprite" type="AnimatedSprite2D" parent="BaseSprite"]
 sprite_frames = SubResource("SpriteFrames_73253")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_r0c8k")

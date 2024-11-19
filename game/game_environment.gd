@@ -74,7 +74,7 @@ func game_init():
 	
 	data_viewer.position = viewer_pos"""
 
-func add_unit(unit):
+func add_unit(unit:BaseUnit):
 	if !unit: return
 	unit.name = "unit_" + str(multiplayer.get_unique_id()) + "_" + str(next_unit_id)
 	next_unit_id += 1

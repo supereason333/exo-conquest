@@ -203,11 +203,11 @@ func selected_building_changed():
 	if last_building != RTS.selected_building:
 		if last_building:
 			if last_building.production_component:
-				last_building.production_component.produced_unit.disconnect(update_list)
+				last_building.production_component._produced_unit.disconnect(update_list)
 		last_building = RTS.selected_building
 		if RTS.selected_building:
 			if RTS.selected_building.production_component:
-				RTS.selected_building.production_component.produced_unit.connect(update_list)
+				RTS.selected_building.production_component._produced_unit.connect(update_list)
 				progress_bar.max_value = RTS.selected_building.production_component.timer.wait_time
 				
 				for child in button_box.get_children(): 

@@ -1,8 +1,16 @@
-[gd_scene load_steps=39 format=3 uid="uid://ca4mnvogpcna"]
+[gd_scene load_steps=42 format=3 uid="uid://ca4mnvogpcna"]
 
 [ext_resource type="Script" path="res://game/units/marine_unit.gd" id="1_qatu3"]
+[ext_resource type="Script" path="res://classes/material.gd" id="2_pcwxc"]
 [ext_resource type="Texture2D" uid="uid://cm0c8incrfbuc" path="res://game/resources/sprites/testing_unit.png" id="3_t5oxt"]
 [ext_resource type="Texture2D" uid="uid://c8i2bwvcpypro" path="res://game/resources/sprites/testing_unit_color_layer.png" id="4_gksvf"]
+
+[sub_resource type="Resource" id="Resource_b5yqc"]
+script = ExtResource("2_pcwxc")
+selnite = 0
+luminite = 0
+plainium = 0
+xenite = 0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xlo8r"]
 size = Vector2(16, 32)
@@ -247,10 +255,22 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="MarineUnit" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite", "collision_shape") groups=["unit"]]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_d2bi1"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:health")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:team_id")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+
+[node name="MarineUnit" type="CharacterBody2D" node_paths=PackedStringArray("base_sprite", "color_sprite", "collision_shape", "multiplayer_sync") groups=["unit"]]
 script = ExtResource("1_qatu3")
 unit_name = "Marine"
 unit_id = 5
+unit_cost = SubResource("Resource_b5yqc")
 base_speed = 80
 base_health = 100.0
 attack_damage = 8.0
@@ -261,6 +281,7 @@ agression_distance = 200
 base_sprite = NodePath("BaseSprite")
 color_sprite = NodePath("BaseSprite/ColorSprite")
 collision_shape = NodePath("CollisionShape2D")
+multiplayer_sync = NodePath("MultiplayerSynchronizer")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_xlo8r")
@@ -270,3 +291,6 @@ sprite_frames = SubResource("SpriteFrames_25w7o")
 
 [node name="ColorSprite" type="AnimatedSprite2D" parent="BaseSprite"]
 sprite_frames = SubResource("SpriteFrames_kfy1d")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_d2bi1")

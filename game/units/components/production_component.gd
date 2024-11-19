@@ -1,7 +1,7 @@
 extends Component
 class_name ProductionComponent
 
-signal produced_unit(unit:PackedScene)
+signal _produced_unit(unit:PackedScene)
 
 @export var produce_list:Array[PackedScene]
 @export var production_time:float = 10
@@ -34,7 +34,7 @@ func _on_timer_timeout() -> void:
 	if production_queue:
 		var last_produced = produce_list[production_queue[0]]
 		production_queue.remove_at(0)
-		produced_unit.emit(last_produced)
+		emit_signal("_produced_unit", last_produced)
 		if production_queue:
 			timer.start()
 			
