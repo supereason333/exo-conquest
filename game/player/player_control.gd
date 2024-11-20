@@ -109,10 +109,7 @@ func handle_camera_move(delta:float):
 		position.y = limit_top
 
 func on_add_building(building_id:int):
-	building = BuildingLoader.load_building_from_id(building_id)
-	if !building: return
-	building.team_id = RTS.player.team_id
-	emit_signal("add_new_building", building)
+	emit_signal("add_new_building", building_id)
 
 func _on_unit_select_value_changed(value: float) -> void:
 	unit_sb.max_value = len(RTS.selected_list) - 1

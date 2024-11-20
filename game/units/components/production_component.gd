@@ -11,7 +11,7 @@ var production_queue:Array[int]
 const MAX_QUEUE_SIZE := 6
 
 var timer:Timer = Timer.new()
-@onready var game_enviroment := $"../.."
+@onready var game_env := $"../.."
 @onready var unit := $".." as BaseUnit
 
 func _ready():
@@ -34,7 +34,10 @@ func _on_timer_timeout() -> void:
 	if production_queue:
 		var last_produced = produce_list[production_queue[0]]
 		production_queue.remove_at(0)
-		emit_signal("_produced_unit", last_produced)
+		var _unit := last_produced.instantiate()
+		_unit.position = unit.position + Vector2(0, 100)
+		game_env.add_unit(_unit)
+		#emit_signal("_produced_unit", last_produced)
 		if production_queue:
 			timer.start()
 			

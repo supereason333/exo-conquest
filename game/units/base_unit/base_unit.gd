@@ -112,6 +112,8 @@ func _ready() -> void:
 	health = base_health
 	add_child(health_bar)
 	
+	set_team(team_id)
+	
 	if !is_multiplayer_authority(): return
 	
 	if production_component:
@@ -178,7 +180,6 @@ func _ready() -> void:
 	unit_finder_timer.timeout.connect(target_search)
 	add_child(unit_finder_timer)"""
 	
-	set_team(team_id)
 
 func _process(delta: float) -> void:
 	if dummy: return
@@ -263,11 +264,13 @@ func on_box_select(box:Rect2, list:Array[BaseUnit]):
 	if collision_shape.shape.get_rect().intersection(box):
 		list.append(self)
 
+@rpc("any_peer")
 func waypoint(position:Vector2, clicked_unit:Node2D):
 	if frozen: return
 	if dummy: return
 	if dying: return
-	if !is_multiplayer_authority(): return
+	if !multiplayer.is_server(): 
+		rpc("waypoint", position, null)
 	
 	if clicked_unit:
 		pass

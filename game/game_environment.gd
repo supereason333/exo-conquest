@@ -16,7 +16,7 @@ var data_tile_map
 @onready var spawnpoints := $Map/Spawnpoints
 
 var placing_building := false
-var building
+var building:BaseBuilding
 var build_draw_rects:Array[Rect2]
 var can_build:bool
 
@@ -35,7 +35,7 @@ func _ready() -> void:
 	player.limit_right = limit.x
 	player.limit_bottom = limit.y
 	
-	player.add_new_building.connect(add_building)
+	player.add_new_building.connect(start_place_building)
 	
 	_on_bgm_finished()
 	
@@ -51,7 +51,8 @@ func _process(delta: float) -> void:
 		if Input.is_action_just_pressed("place"):
 			if can_build:
 				building.position = Vector2i(get_global_mouse_position() / 32) * 32 + building.building_size * 32 / 2
-				add_child(building)
+				add_building(building)
+				building = null
 				placing_building = false
 		elif Input.is_action_just_pressed("cancel"):
 			placing_building = false
@@ -76,23 +77,57 @@ func game_init():
 
 func add_unit(unit:BaseUnit):
 	if !unit: return
+	if !multiplayer.is_server():
+		rpc("rpc_add_unit", unit.unit_id, unit.position, multiplayer.get_unique_id())
+		return
 	unit.name = "unit_" + str(multiplayer.get_unique_id()) + "_" + str(next_unit_id)
 	next_unit_id += 1
+	if !unit.team_id:
+		unit.team_id = MultiplayerScript.get_player_from_peer_id(multiplayer.get_unique_id()).team_id
 	add_child(unit)
 
-func add_building(build):
+@rpc("any_peer")
+func rpc_add_unit(unit_id:int, _position:Vector2, peer_id:int):
+	if !multiplayer.is_server(): return
+	var unit := UnitLoader.load_unit_from_id(unit_id)
+	unit.position = _position
+	unit.team_id = MultiplayerScript.get_player_from_peer_id(peer_id).team_id
+	add_unit(unit)
+
+@rpc("any_peer")
+func rpc_add_building(building_id:int, _position:Vector2, peer_id:int):
+	if !multiplayer.is_server(): return
+	var building := BuildingLoader.load_building_from_id(building_id)
+	building.position = _position
+	building.team_id = MultiplayerScript.get_player_from_peer_id(peer_id).team_id
+	add_building(building)
+
+func add_building(build:BaseBuilding):
 	if !build: return
-	building = build
-	building.name = "building_" + str(multiplayer.get_unique_id()) + "_" + str(next_build_id)
+	if !multiplayer.is_server():
+		rpc("rpc_add_building", build.unit_id, build.position, multiplayer.get_unique_id())
+		return
+	#building = build
+	build.name = "building_" + str(multiplayer.get_unique_id()) + "_" + str(next_build_id)
 	next_build_id += 1
+	if !build.team_id:
+		build.team_id = MultiplayerScript.get_player_from_peer_id(multiplayer.get_unique_id()).team_id
+	add_child(build)
+	return
+	
+
+func start_place_building(building_id:int):
+	placing_building = true
+	building = BuildingLoader.load_building_from_id(building_id)
+	if !building: return
 	build_draw_rects = []
-	building_detector.get_child(0).shape.size = build.building_size * 32
+	building_detector.get_child(0).shape.size = building.building_size * 32
 	var rec_shape := RectangleShape2D.new()
 	rec_shape.size = building_detector.get_child(0).shape.get_rect().grow(-1).size
 	building_detector.get_child(0).shape = rec_shape
 	
-	for x in build.building_size.x:
-		for y in build.building_size.y:
+	for x in building.building_size.x:
+		for y in building.building_size.y:
 			var rect = Rect2(Vector2(x, y) * 32, Vector2(32, 32))
 			build_draw_rects.append(rect)
 		
@@ -186,14 +221,14 @@ func _on_bgm_finished() -> void:
 	bgm_player.play()
 
 func pre_game_init():
-	spawn_team_base()
-
-func spawn_team_base():
 	var core := BuildingLoader.load_building_from_id(1)
 	for point in spawnpoints.get_children():
 		if point.name.to_int() == RTS.start_position:
-			core.name = "core_" + str(multiplayer.get_unique_id())
-			core.position = snapped(point.position, Vector2(32, 32))
-			core.team_id = RTS.player.team_id
-			add_child(core)
-			return
+			if multiplayer.is_server():
+				core.name = "core_" + str(multiplayer.get_unique_id())
+				core.position = snapped(point.position, Vector2(32, 32))
+				player.position = core.position
+				core.team_id = RTS.player.team_id
+				add_child(core)
+			else:
+				rpc("rpc_add_building", 1, snapped(point.position, Vector2(32, 32)), multiplayer.get_unique_id())
