@@ -7,9 +7,9 @@
 
 [sub_resource type="Resource" id="Resource_t8urh"]
 script = ExtResource("2_0yqb6")
-selnite = 0
-luminite = 0
-plainium = 0
+selnite = 60
+luminite = 20
+plainium = 5
 xenite = 0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1pcav"]

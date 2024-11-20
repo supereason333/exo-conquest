@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://c4vu28w7nfnwt"]
+[gd_scene load_steps=20 format=3 uid="uid://c4vu28w7nfnwt"]
 
 [ext_resource type="Script" path="res://game/player/player_control.gd" id="1_83dnc"]
 [ext_resource type="Theme" uid="uid://bujlagwci5a1f" path="res://menu/menu_resources/themes/default_gui.tres" id="2_kekrh"]
@@ -179,9 +179,10 @@ script/source = "extends Control
 
 var Numbered_button := preload(\"res://menu/menu_resources/numbered_button.tscn\")
 
-@onready var progress_bar := $VBoxContainer/ProgressBar
-@onready var queue_list := $VBoxContainer/Queue
-@onready var button_box := $VBoxContainer/Buttons
+@onready var progress_bar := $HBoxContainer/VBoxContainer/ProgressBar
+@onready var queue_list := $HBoxContainer/VBoxContainer/Queue
+@onready var button_box := $HBoxContainer/VBoxContainer/Buttons
+@onready var material_display := $HBoxContainer/MaterialDisplay
 
 var last_building:BaseBuilding
 
@@ -218,6 +219,8 @@ func selected_building_changed():
 					var product := _product.instantiate()
 					numbered_button.number = i
 					numbered_button.pressed_n.connect(on_unit_button_pressed)
+					numbered_button.mouse_entered_n.connect(on_unit_button_mouse_entered)
+					numbered_button.mouse_exited_n.connect(on_unit_button_mouse_exited)
 					numbered_button.texture_normal = product.display_icon
 					numbered_button.texture_pressed = product.display_icon
 					numbered_button.texture_hover = product.display_icon
@@ -242,6 +245,18 @@ func on_unit_button_pressed(number:int):
 	RTS.selected_building.production_component.queue_unit(number)
 	update_list()
 
+func on_unit_button_mouse_entered(number:int):
+	update_costs(number)
+
+func on_unit_button_mouse_exited(number:int):
+	update_costs(-1)
+
+func update_costs(unit_number:int):
+	if unit_number < 0:
+		material_display.set_costs(MaterialCost.new(0, 0, 0, 0))
+		return
+	material_display.set_costs(RTS.selected_building.production_component.produce_list[unit_number].instantiate().unit_cost)
+
 func update_list(_unit:PackedScene = PackedScene.new()):
 	if RTS.selected_building:
 		if RTS.selected_building.production_component:
@@ -258,6 +273,21 @@ func _process(delta: float) -> void:
 	
 	if RTS.selected_building.production_component.production_queue:
 		progress_bar.value = RTS.selected_building.production_component.timer.time_left
+"
+
+[sub_resource type="GDScript" id="GDScript_aqbxq"]
+script/source = "extends VBoxContainer
+
+@onready var selnite := $Selnite/AmountLabel
+@onready var luminite := $Luminite/AmountLabel
+@onready var plainium := $Plainium/AmountLabel
+@onready var xenite := $Xenite/AmountLabel
+
+func set_costs(cost:MaterialCost):
+	selnite.text = str(cost.selnite)
+	luminite.text = str(cost.luminite)
+	plainium.text = str(cost.plainium)
+	xenite.text = str(cost.xenite)
 "
 
 [node name="PlayerControl" type="Camera2D"]
@@ -607,7 +637,7 @@ layout_mode = 2
 script = SubResource("GDScript_qdv8l")
 metadata/_tab_index = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production"]
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -615,16 +645,69 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Queue" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/VBoxContainer"]
+[node name="MaterialDisplay" type="VBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+script = SubResource("GDScript_aqbxq")
+
+[node name="Selnite" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay"]
+layout_mode = 2
+
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay/Selnite"]
+layout_mode = 2
+texture = ExtResource("3_wdp7i")
+
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay/Selnite"]
+layout_mode = 2
+text = "0"
+
+[node name="Luminite" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay"]
+layout_mode = 2
+
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay/Luminite"]
+layout_mode = 2
+texture = ExtResource("4_7hewy")
+
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay/Luminite"]
+layout_mode = 2
+text = "0"
+
+[node name="Plainium" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay"]
+layout_mode = 2
+
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay/Plainium"]
+layout_mode = 2
+texture = ExtResource("5_0h180")
+
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay/Plainium"]
+layout_mode = 2
+text = "0"
+
+[node name="Xenite" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay"]
+layout_mode = 2
+
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay/Xenite"]
+layout_mode = 2
+texture = ExtResource("6_gx6lu")
+
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/MaterialDisplay/Xenite"]
+layout_mode = 2
+text = "0"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Queue" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 
-[node name="ProgressBar" type="ProgressBar" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/VBoxContainer"]
+[node name="ProgressBar" type="ProgressBar" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
 show_percentage = false
 
-[node name="Buttons" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/VBoxContainer"]
+[node name="Buttons" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer/PanelContainer/MarginContainer/TabContainer/Production/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 

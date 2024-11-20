@@ -7,8 +7,8 @@ var mouse_down := false
 var box:Rect2
 
 @onready var map := $Map
-var tile_map
-var data_tile_map
+@onready var tile_map := $Map/BaseTiles
+@onready var data_tile_map := $Map/DataTiles
 @onready var player := $PlayerControl
 @onready var data_viewer := $TileDataViewer
 @onready var building_detector := $BuildingDetector
@@ -25,9 +25,6 @@ var next_unit_id := 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	
-	tile_map = $Map/BaseTiles
-	data_tile_map = $Map/DataTiles
 	
 	var limit:Vector2 = tile_map.get_used_rect().size
 	limit *= Vector2(tile_map.tile_set.tile_size)
@@ -78,7 +75,7 @@ func game_init():
 func add_unit(unit:BaseUnit):
 	if !unit: return
 	if !multiplayer.is_server():
-		rpc("rpc_add_unit", unit.unit_id, unit.position, multiplayer.get_unique_id())
+		rpc("rpc_add_unit", unit.unit_id, unit.position, multiplayer.get_unique_id(), unit.waypoints)
 		return
 	unit.name = "unit_" + str(multiplayer.get_unique_id()) + "_" + str(next_unit_id)
 	next_unit_id += 1
@@ -87,11 +84,12 @@ func add_unit(unit:BaseUnit):
 	add_child(unit)
 
 @rpc("any_peer")
-func rpc_add_unit(unit_id:int, _position:Vector2, peer_id:int):
+func rpc_add_unit(unit_id:int, _position:Vector2, peer_id:int, waypoints:Array):
 	if !multiplayer.is_server(): return
 	var unit := UnitLoader.load_unit_from_id(unit_id)
 	unit.position = _position
 	unit.team_id = MultiplayerScript.get_player_from_peer_id(peer_id).team_id
+	unit.waypoints = waypoints
 	add_unit(unit)
 
 @rpc("any_peer")
@@ -224,11 +222,16 @@ func pre_game_init():
 	var core := BuildingLoader.load_building_from_id(1)
 	for point in spawnpoints.get_children():
 		if point.name.to_int() == RTS.start_position:
-			if multiplayer.is_server():
+			if true: #multiplayer.is_server():
 				core.name = "core_" + str(multiplayer.get_unique_id())
 				core.position = snapped(point.position, Vector2(32, 32))
-				player.position = core.position
+				player.position = core.position - Vector2(320, 240)
 				core.team_id = RTS.player.team_id
 				add_child(core)
+				for i in 3:
+					var miner := UnitLoader.load_unit_from_id(4)
+					miner.position = core.position + Vector2(20 * i, 100)
+					add_unit(miner)
 			else:
 				rpc("rpc_add_building", 1, snapped(point.position, Vector2(32, 32)), multiplayer.get_unique_id())
+				player.position = snapped(point.position, Vector2(32, 32)) - Vector2(320, 240)

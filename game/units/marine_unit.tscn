@@ -7,8 +7,8 @@
 
 [sub_resource type="Resource" id="Resource_b5yqc"]
 script = ExtResource("2_pcwxc")
-selnite = 0
-luminite = 0
+selnite = 40
+luminite = 10
 plainium = 0
 xenite = 0
 

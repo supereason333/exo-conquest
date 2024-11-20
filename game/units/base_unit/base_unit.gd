@@ -21,7 +21,7 @@ var attackable_list:Array[BaseUnit]
 var dying := false
 var override_target := false
 var attacking := false
-
+var moving := false
 var attack_target:Node2D:
 	set(value):
 		if attack_target:
@@ -211,6 +211,7 @@ func unit_produced(_unit:PackedScene):
 	var unit := _unit.instantiate()
 	unit.team_id = RTS.player.team_id
 	unit.position = position + Vector2(0, 100)
+	unit.waypoints.append(position + Vector2(200, 0))
 	game_env.add_unit(unit)
 
 func movement(_delta:float):
@@ -220,7 +221,10 @@ func movement(_delta:float):
 	if waypoints and !attacking:
 		if position.distance_squared_to(waypoints[0]) <= 100:
 			waypoints.remove_at(0)
-			if !waypoints: return
+			if !waypoints: 
+				moving = false
+				return
+		moving = true
 		velocity = Vector2.ZERO
 		var direction := (waypoints[0] - position).normalized()
 		velocity += direction * base_speed
@@ -265,19 +269,20 @@ func on_box_select(box:Rect2, list:Array[BaseUnit]):
 		list.append(self)
 
 @rpc("any_peer")
-func waypoint(position:Vector2, clicked_unit:Node2D):
+func waypoint(_position:Vector2, clicked_unit:Node2D, hold:bool):
 	if frozen: return
 	if dummy: return
 	if dying: return
-	if !multiplayer.is_server(): 
-		rpc("waypoint", position, null)
+	if !is_multiplayer_authority(): 
+		rpc_id(1, "waypoint", _position, null, Input.is_action_pressed("shift"))
+		return
 	
 	if clicked_unit:
 		pass
-	if Input.is_action_pressed("shift"):
-		waypoints.append(position)
+	if hold:
+		waypoints.append(_position)
 	else:
-		waypoints = [position]
+		waypoints = [_position]
 
 func on_body_enter_vision(body:Node2D):
 	if !is_multiplayer_authority(): return

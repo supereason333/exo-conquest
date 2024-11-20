@@ -63,7 +63,7 @@ func on_right_click(position:Vector2):
 	var clicked := get_point_select(position)
 	
 	for unit in selected_list:
-		unit.waypoint(position, clicked)
+		unit.waypoint(position, clicked, Input.is_action_pressed("shift"))
 
 func do_point_select(point:Vector2):
 	var list:Array[BaseUnit]

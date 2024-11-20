@@ -37,7 +37,7 @@ func _on_timer_timeout() -> void:
 		var _unit := last_produced.instantiate()
 		_unit.position = unit.position + Vector2(0, 100)
 		game_env.add_unit(_unit)
-		#emit_signal("_produced_unit", last_produced)
+		emit_signal("_produced_unit", last_produced)
 		if production_queue:
 			timer.start()
 			
