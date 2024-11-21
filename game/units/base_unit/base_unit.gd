@@ -270,6 +270,7 @@ func on_box_select(box:Rect2, list:Array[BaseUnit]):
 
 @rpc("any_peer")
 func waypoint(_position:Vector2, clicked_unit:Node2D, hold:bool):
+	print(hold)
 	if frozen: return
 	if dummy: return
 	if dying: return
