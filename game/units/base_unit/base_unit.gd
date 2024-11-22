@@ -13,6 +13,7 @@ var team_id:int:
 			if unit_sprite:
 				unit_sprite.color = team.color
 		team_id = value
+var peer_id:int
 var waypoints:Array[Vector2]
 var selected := false: set = set_selected
 func set_selected(value):
@@ -101,6 +102,8 @@ var cur_state:int = states.STANDBY
 func _ready() -> void:
 	#if base_sprite:
 	#	base_sprite.frame_changed.connect(sprite_frame_changed)
+	started_move.connect(_on_started_move)
+	arrived.connect(_on_arrived)
 	
 	health_bar.name = "HealthBar"
 	health_bar.show_percentage = false
@@ -441,6 +444,12 @@ func kill():
 	
 	var _death_effect := death_effect.instantiate()
 	add_child(_death_effect)
+
+func _on_started_move() -> void:
+	unit_sprite.play_anim("walk")
+
+func _on_arrived() -> void:
+	unit_sprite.play_anim("idle")
 
 """
 var peer_id:int

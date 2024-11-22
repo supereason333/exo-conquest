@@ -6,6 +6,7 @@ var base_core:BaseBuilding
 
 var gathering := false:
 	set(value):
+		if peer_id != multiplayer.get_unique_id(): return
 		if value:
 			if gather_timer:
 				if gather_timer.is_stopped():
@@ -30,6 +31,7 @@ const GATHER_AMOUNT := 2
 func _ready() -> void:
 	super()
 	base_core = get_close_core()
+	if peer_id != multiplayer.get_unique_id(): gather_timer.queue_free()
 
 func _process(delta: float) -> void:
 	super(delta)
@@ -62,7 +64,7 @@ func search_vision():
 	pass
 
 func gather_resource():
-	
+	if peer_id != multiplayer.get_unique_id(): return
 	match target_material:
 		0:
 			RTS.materials = RTS.materials.add(MaterialCost.new(GATHER_AMOUNT, 0 ,0 ,0))

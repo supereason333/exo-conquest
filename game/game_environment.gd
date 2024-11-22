@@ -79,6 +79,7 @@ func add_unit(unit:BaseUnit):
 		return
 	unit.name = "unit_" + str(multiplayer.get_unique_id()) + "_" + str(next_unit_id)
 	next_unit_id += 1
+	unit.peer_id = multiplayer.get_unique_id()
 	if !unit.team_id:
 		unit.team_id = MultiplayerScript.get_player_from_peer_id(multiplayer.get_unique_id()).team_id
 	add_child(unit)
@@ -89,6 +90,7 @@ func rpc_add_unit(unit_id:int, _position:Vector2, peer_id:int, waypoints:Array):
 	var unit := UnitLoader.load_unit_from_id(unit_id)
 	unit.position = _position
 	unit.team_id = MultiplayerScript.get_player_from_peer_id(peer_id).team_id
+	unit.peer_id = peer_id
 	unit.waypoints = waypoints
 	add_unit(unit)
 
@@ -98,6 +100,7 @@ func rpc_add_building(building_id:int, _position:Vector2, peer_id:int):
 	var building := BuildingLoader.load_building_from_id(building_id)
 	building.position = _position
 	building.team_id = MultiplayerScript.get_player_from_peer_id(peer_id).team_id
+	building.peer_id = peer_id
 	add_building(building)
 
 func add_building(build:BaseBuilding):
@@ -107,6 +110,7 @@ func add_building(build:BaseBuilding):
 		return
 	#building = build
 	build.name = "building_" + str(multiplayer.get_unique_id()) + "_" + str(next_build_id)
+	build.peer_id = multiplayer.get_unique_id()
 	next_build_id += 1
 	if !build.team_id:
 		build.team_id = MultiplayerScript.get_player_from_peer_id(multiplayer.get_unique_id()).team_id
@@ -227,7 +231,7 @@ func pre_game_init():
 				core.position = snapped(point.position, Vector2(32, 32))
 				player.position = core.position - Vector2(320, 240)
 				core.team_id = RTS.player.team_id
-				add_child(core)
+				add_building(core)
 				for i in 3:
 					var miner := UnitLoader.load_unit_from_id(4)
 					miner.position = core.position + Vector2(20 * i, 100)

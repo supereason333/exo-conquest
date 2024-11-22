@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://b2b5jigitr8pp" path="res://game/resources/sprites/marine_unit.png" id="3_wmu7d"]
 [ext_resource type="Texture2D" uid="uid://c8i2bwvcpypro" path="res://game/resources/sprites/testing_unit_color_layer.png" id="4_gksvf"]
 [ext_resource type="PackedScene" uid="uid://vj5qlce8ssm1" path="res://game/units/base_unit/unit_sprite.tscn" id="5_rr74t"]
-[ext_resource type="Texture2D" uid="uid://duc3xe6tj515u" path="res://game/resources/sprites/marine_unit_color_layer.png" id="6_1tuvh"]
+[ext_resource type="Texture2D" uid="uid://bkcm5fay4o45n" path="res://game/resources/sprites/marine_unit_color_sprite.png" id="6_ighnc"]
 [ext_resource type="Script" path="res://game/units/base_unit/unit_sprite_animation.gd" id="7_ldux2"]
 
 [sub_resource type="Resource" id="Resource_b5yqc"]
@@ -1175,9 +1175,9 @@ properties/1/replication_mode = 2
 properties/2/path = NodePath(".:team_id")
 properties/2/spawn = true
 properties/2/replication_mode = 2
-properties/3/path = NodePath("BaseSprite:frame")
+properties/3/path = NodePath("UnitSprite:frame")
 properties/3/spawn = true
-properties/3/replication_mode = 1
+properties/3/replication_mode = 2
 
 [sub_resource type="Resource" id="Resource_abvbd"]
 script = ExtResource("7_ldux2")
@@ -1185,6 +1185,7 @@ animation_name = &"idle"
 one_shot = true
 speed = 0.2
 frames = Array[int]([5])
+frame_positions = Array[Vector2]([])
 
 [sub_resource type="Resource" id="Resource_escy6"]
 script = ExtResource("7_ldux2")
@@ -1192,6 +1193,7 @@ animation_name = &"walk"
 one_shot = false
 speed = 0.2
 frames = Array[int]([0, 1, 2, 3])
+frame_positions = Array[Vector2]([])
 
 [sub_resource type="Resource" id="Resource_6kena"]
 script = ExtResource("7_ldux2")
@@ -1199,6 +1201,7 @@ animation_name = &"attack"
 one_shot = true
 speed = 0.2
 frames = Array[int]([4, 5])
+frame_positions = Array[Vector2]([])
 
 [node name="MarineUnit" type="CharacterBody2D" node_paths=PackedStringArray("unit_sprite", "collision_shape", "multiplayer_sync") groups=["unit"]]
 script = ExtResource("1_qatu3")
@@ -1213,13 +1216,8 @@ attack_range = 150
 vision_radius = 300
 agression_distance = 200
 unit_sprite = NodePath("UnitSprite")
-display_icon = null
-attack_animation_time = null
-death_effect = null
 collision_shape = NodePath("CollisionShape2D")
 multiplayer_sync = NodePath("MultiplayerSynchronizer")
-dummy = null
-frozen = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 1)
@@ -1242,9 +1240,6 @@ replication_config = SubResource("SceneReplicationConfig_d2bi1")
 texture = ExtResource("3_wmu7d")
 hframes = 6
 vframes = 16
-color_texture = ExtResource("6_1tuvh")
+color_texture = ExtResource("6_ighnc")
 animations = Array[ExtResource("7_ldux2")]([SubResource("Resource_abvbd"), SubResource("Resource_escy6"), SubResource("Resource_6kena")])
 default_anim = &"idle"
-
-[connection signal="arrived" from="." to="." method="_on_arrived"]
-[connection signal="started_move" from="." to="." method="_on_started_move"]

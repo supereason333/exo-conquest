@@ -18,12 +18,17 @@ var current_visual_rotation_frame:int:
 		current_visual_rotation_frame = value
 var playing := false
 var animation_frame_index:int = 0
-var color:Color
+var color:Color:
+	set(value):
+		color_sprite.modulate = value
+		color = value
 
 @onready var color_sprite := $ColorSprite
 @onready var anim_timer := $AnimTimer
 
 func _ready() -> void:
+	color_sprite.texture = color_texture
+	color_sprite.modulate = color
 	color_sprite.hframes = hframes
 	color_sprite.vframes = vframes
 	if default_anim:
@@ -54,9 +59,23 @@ func get_sprite_frame_from_rotation(rotation:float) -> float:
 	return snapped((rotation + PI) / TAU * vframes, 1)
 
 func _on_frame_changed() -> void:
-	color_sprite.frame = frame
+	if color_sprite:
+		color_sprite.frame = frame
 
 func _on_anim_timer_timeout() -> void:
+	if animations[current_animation_index].frame_positions:
+		if animation_frame_index >= animations[current_animation_index].frame_positions.size():
+			animation_frame_index = 0
+		frame_coords = animations[current_animation_index].frame_positions[animation_frame_index]
+		
+		animation_frame_index += 1
+		if animation_frame_index >= animations[current_animation_index].frame_positions.size():
+			emit_signal("anim_finished")
+		if animations[current_animation_index].one_shot:
+			anim_timer.stop()
+			animation_frame_index = 0
+		return
+	
 	if animation_frame_index >= animations[current_animation_index].frames.size():
 		animation_frame_index = 0
 	frame_coords.x = animations[current_animation_index].frames[animation_frame_index]
