@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://d26mvpkcgqsue"]
+[gd_scene load_steps=3 format=3 uid="uid://d26mvpkcgqsue"]
 
 [ext_resource type="Script" path="res://game/units/base_unit/base_unit.gd" id="1_lxmgn"]
-[ext_resource type="PackedScene" uid="uid://od13t5sdilfi" path="res://game/units/base_unit/unit_sprite.tscn" id="2_6cse0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1pcav"]
 size = Vector2(16, 32)
@@ -13,5 +12,3 @@ script = ExtResource("1_lxmgn")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_1pcav")
-
-[node name="Base" parent="." instance=ExtResource("2_6cse0")]

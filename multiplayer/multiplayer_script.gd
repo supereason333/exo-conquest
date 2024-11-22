@@ -413,7 +413,7 @@ func start_game():
 		game_running = true
 		print("GAME STARTED ON SERVER")
 		
-		clear_unused_teams()
+		#clear_unused_teams()
 		var i := 1
 		for player in player_list:
 			if player.peer_id == multiplayer.get_unique_id():

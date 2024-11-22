@@ -3,12 +3,15 @@ class_name BaseUnit
 
 signal death(unit:Node2D)
 signal taken_damage()
+signal arrived
+signal started_move
 
 var team_id:int:
 	set(value):
 		var team := MultiplayerScript.get_team_from_id(team_id)
 		if team:
-			color_sprite.modulate = team.color
+			if unit_sprite:
+				unit_sprite.color = team.color
 		team_id = value
 var waypoints:Array[Vector2]
 var selected := false: set = set_selected
@@ -47,6 +50,7 @@ var attack_target:Node2D:
 @export var agression_distance:int
 
 @export_group("Sprite")
+@export var unit_sprite:UnitSprite
 @export var display_icon:CompressedTexture2D = preload("res://game/resources/sprites/placeholder/32x.png")
 @export var attack_animation_time:float = 0.2
 @export var death_sound := AudioManager.SFX.Unit.Death.explosion
@@ -54,8 +58,8 @@ var attack_target:Node2D:
 @export var attack_sound := AudioManager.SFX.Unit.Attack.gunshot
 
 @export_group("Components")
-@export var base_sprite:AnimatedSprite2D
-@export var color_sprite:AnimatedSprite2D
+#@export var base_sprite:AnimatedSprite2D
+#@export var color_sprite:AnimatedSprite2D
 @export var collision_shape:CollisionShape2D
 @export var production_component:ProductionComponent
 @export var multiplayer_sync:MultiplayerSynchronizer
@@ -95,8 +99,8 @@ enum states {STANDBY, ATTACKING, ATTACK_CHASE, HOLD}
 var cur_state:int = states.STANDBY
 
 func _ready() -> void:
-	if base_sprite:
-		base_sprite.frame_changed.connect(sprite_frame_changed)
+	#if base_sprite:
+	#	base_sprite.frame_changed.connect(sprite_frame_changed)
 	
 	health_bar.name = "HealthBar"
 	health_bar.show_percentage = false
@@ -223,13 +227,15 @@ func movement(_delta:float):
 			waypoints.remove_at(0)
 			if !waypoints: 
 				moving = false
+				emit_signal("arrived")
 				return
 		moving = true
 		velocity = Vector2.ZERO
 		var direction := (waypoints[0] - position).normalized()
 		velocity += direction * base_speed
 		#base_sprite.frame = get_sprite_frame_from_rotation(direction.angle())
-		set_sprite_rotation(direction.angle())
+		#set_sprite_rotation(direction.angle())
+		unit_sprite.set_visual_rotation(direction.angle())
 		move_and_slide()
 
 func set_team(_team_id:int):
@@ -238,14 +244,15 @@ func set_team(_team_id:int):
 	
 	team_id = _team_id
 
-func sprite_frame_changed():
-	color_sprite.frame = base_sprite.frame
-
 func get_sprite_frame_from_rotation(rotation:float, frames:int = 16) -> float:
 	return snapped((rotation + PI) / TAU * (frames), 1)
 
-func set_sprite_rotation(rotation:float):
-	base_sprite.frame = get_sprite_frame_from_rotation(rotation)
+"""func set_sprite_rotation(rotation:float):
+	if rotation_per_frame:
+		base_sprite.frame = get_sprite_frame_from_rotation(rotation)
+		return
+	
+	base_sprite.play(str(get_sprite_frame_from_rotation(rotation)) + "_run")"""
 
 func is_owned_by_user() -> bool:
 	if team_id == RTS.player.team_id:
@@ -270,7 +277,6 @@ func on_box_select(box:Rect2, list:Array[BaseUnit]):
 
 @rpc("any_peer")
 func waypoint(_position:Vector2, clicked_unit:Node2D, hold:bool):
-	print(hold)
 	if frozen: return
 	if dummy: return
 	if dying: return
@@ -278,6 +284,8 @@ func waypoint(_position:Vector2, clicked_unit:Node2D, hold:bool):
 		rpc_id(1, "waypoint", _position, null, Input.is_action_pressed("shift"))
 		return
 	
+	if !waypoints:
+		emit_signal("started_move")
 	if clicked_unit:
 		pass
 	if hold:
@@ -336,10 +344,14 @@ func attack_start():
 	attack_target.damage(attack_damage)
 
 func attack_end():
+	if moving:
+		emit_signal("started_move")
 	attacking = false
 
 func attack_animation():
 	sound_player.play()
+	unit_sprite.set_visual_rotation(position.angle_to_point(attack_target.position))
+	unit_sprite.play_anim("attack")
 	#base_sprite.frame = get_sprite_frame_from_rotation(position.direction_to(attack_target.position).angle())
 	attack_anim_timer.start()
 
@@ -726,3 +738,5 @@ func is_owned_by_user() -> bool:
 		return true
 	return false
 """
+
+# alpha release when?

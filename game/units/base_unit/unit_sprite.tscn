@@ -1,30 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://od13t5sdilfi"]
+[gd_scene load_steps=2 format=3 uid="uid://vj5qlce8ssm1"]
 
-[sub_resource type="GDScript" id="GDScript_coc2h"]
-resource_name = "Unit sprite"
-script/source = "extends AnimatedSprite2D
+[ext_resource type="Script" path="res://game/units/base_unit/unit_sprite.gd" id="1_x2sfq"]
 
-@onready var color_sprite := $Color
+[node name="UnitSprite" type="Sprite2D"]
+script = ExtResource("1_x2sfq")
 
-@export var color_sprite_frames: SpriteFrames
-@export var color:Color:
-	set(value):
-		if is_node_ready(): color_sprite.modulate = value
-		else: return
-	get:
-		if is_node_ready(): return color_sprite.modulate
-		else: return Color.WHITE
+[node name="ColorSprite" type="Sprite2D" parent="."]
 
-func _ready() -> void:
-	color_sprite.sprite_frames = color_sprite_frames
-
-func _on_frame_changed() -> void:
-	color_sprite.frame = frame
-"
-
-[node name="Base" type="AnimatedSprite2D"]
-script = SubResource("GDScript_coc2h")
-
-[node name="Color" type="AnimatedSprite2D" parent="."]
+[node name="AnimTimer" type="Timer" parent="."]
 
 [connection signal="frame_changed" from="." to="." method="_on_frame_changed"]
+[connection signal="timeout" from="AnimTimer" to="." method="_on_anim_timer_timeout"]
