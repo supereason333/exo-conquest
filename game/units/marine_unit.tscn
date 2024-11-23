@@ -1187,11 +1187,11 @@ speed = 0.2
 frames = Array[int]([5])
 frame_positions = Array[Vector2]([])
 
-[sub_resource type="Resource" id="Resource_escy6"]
+[sub_resource type="Resource" id="Resource_24xqk"]
 script = ExtResource("7_ldux2")
 animation_name = &"walk"
 one_shot = false
-speed = 0.2
+speed = 0.1
 frames = Array[int]([0, 1, 2, 3])
 frame_positions = Array[Vector2]([])
 
@@ -1234,12 +1234,10 @@ sprite_frames = SubResource("SpriteFrames_kfy1d")
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_d2bi1")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-
 [node name="UnitSprite" parent="." instance=ExtResource("5_rr74t")]
 texture = ExtResource("3_wmu7d")
 hframes = 6
 vframes = 16
 color_texture = ExtResource("6_ighnc")
-animations = Array[ExtResource("7_ldux2")]([SubResource("Resource_abvbd"), SubResource("Resource_escy6"), SubResource("Resource_6kena")])
+animations = Array[ExtResource("7_ldux2")]([SubResource("Resource_abvbd"), SubResource("Resource_24xqk"), SubResource("Resource_6kena")])
 default_anim = &"idle"

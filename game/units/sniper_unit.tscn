@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://h3f0rypervaa"]
+[gd_scene load_steps=13 format=3 uid="uid://h3f0rypervaa"]
 
 [ext_resource type="Script" path="res://game/units/sniper_unit.gd" id="1_usqqt"]
 [ext_resource type="Script" path="res://classes/material.gd" id="2_0yqb6"]
@@ -31,12 +31,28 @@ properties/3/path = NodePath(".:team_id")
 properties/3/spawn = true
 properties/3/replication_mode = 1
 
-[sub_resource type="Resource" id="Resource_fx17d"]
+[sub_resource type="Resource" id="Resource_jvkk7"]
 script = ExtResource("7_6ikj2")
 animation_name = &"idle"
 one_shot = true
 speed = 0.2
-frames = Array[int]([0])
+frames = Array[int]([5])
+frame_positions = Array[Vector2]([])
+
+[sub_resource type="Resource" id="Resource_xitmg"]
+script = ExtResource("7_6ikj2")
+animation_name = &"walk"
+one_shot = false
+speed = 0.2
+frames = Array[int]([0, 1, 2, 3])
+frame_positions = Array[Vector2]([])
+
+[sub_resource type="Resource" id="Resource_ri557"]
+script = ExtResource("7_6ikj2")
+animation_name = &"attack"
+one_shot = true
+speed = 0.2
+frames = Array[int]([4, 5])
 frame_positions = Array[Vector2]([])
 
 [node name="SniperUnit" type="CharacterBody2D" node_paths=PackedStringArray("unit_sprite", "collision_shape", "multiplayer_sync") groups=["unit"]]
@@ -67,5 +83,5 @@ texture = ExtResource("3_1hbxx")
 hframes = 6
 vframes = 16
 color_texture = ExtResource("6_inm87")
-animations = Array[ExtResource("7_6ikj2")]([SubResource("Resource_fx17d")])
+animations = Array[ExtResource("7_6ikj2")]([SubResource("Resource_jvkk7"), SubResource("Resource_xitmg"), SubResource("Resource_ri557")])
 default_anim = &"idle"
