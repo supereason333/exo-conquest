@@ -16,7 +16,7 @@ plainium = 0
 xenite = 0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xlo8r"]
-size = Vector2(16, 22)
+size = Vector2(12, 22)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rbuyf"]
 atlas = ExtResource("3_wmu7d")

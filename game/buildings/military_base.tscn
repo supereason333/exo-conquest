@@ -1,6 +1,7 @@
-[gd_scene load_steps=28 format=3 uid="uid://bsp7wroomlji5"]
+[gd_scene load_steps=29 format=3 uid="uid://bsp7wroomlji5"]
 
 [ext_resource type="Script" path="res://game/buildings/military_base.gd" id="1_jm5bs"]
+[ext_resource type="Texture2D" uid="uid://dbfbd04anbhcv" path="res://game/resources/sprites/icons/military camp.png" id="2_d510r"]
 [ext_resource type="Texture2D" uid="uid://u3lgfvavso7g" path="res://game/resources/sprites/buildings/military_base_color_sprite.png" id="2_wu2fm"]
 [ext_resource type="Texture2D" uid="uid://btjnsngnec15t" path="res://game/resources/sprites/buildings/military_base_building.png" id="3_7sgmy"]
 [ext_resource type="Script" path="res://game/units/components/production_component.gd" id="5_ok207"]
@@ -160,6 +161,7 @@ building_size = Vector2i(3, 2)
 unit_name = "Military Base"
 unit_id = 2
 base_health = 2000.0
+display_icon = ExtResource("2_d510r")
 production_component = NodePath("ProductionComponent")
 multiplayer_sync = NodePath("MultiplayerSynchronizer")
 

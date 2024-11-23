@@ -19,14 +19,16 @@ func _ready() -> void:
 	add_to_group("building")
 	frozen = true
 
-func _on_production_component_produced_unit(unit: PackedScene) -> void:
+func unit_produced(unit: PackedScene) -> void:
 	var _unit := unit.instantiate()
 	if _unit:
 		_unit.position = position + Vector2(0, 64)
-		_unit.waypoints.append(Vector2(64, 64) + position)
-		_unit.waypoints.append(Vector2(64, -64) + position)
-		_unit.waypoints.append(Vector2(-64, -64) + position)
-		_unit.waypoints.append(Vector2(-64, 64) + position)
+		_unit.waypoints.append(_unit.position + Vector2(100, 0))
+		_unit.waypoints.append(_unit.position + Vector2(100, -150))
+		_unit.waypoints.append(_unit.position + Vector2(-100, -150))
+		_unit.waypoints.append(_unit.position + Vector2(-100, 0))
+		#_unit.waypoint(_unit.position + Vector2(100, 0), null, false)
+		print_debug("AWDAWDWADADW")
 		game_env.add_unit(_unit)
 
 func on_box_select(box:Rect2, list:Array[BaseUnit]):
