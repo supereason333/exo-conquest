@@ -79,8 +79,9 @@ func add_unit(unit:BaseUnit):
 		return
 	unit.name = "unit_" + str(multiplayer.get_unique_id()) + "_" + str(next_unit_id)
 	next_unit_id += 1
-	unit.peer_id = multiplayer.get_unique_id()
-	if !unit.team_id:
+	if unit.peer_id == 0:
+		unit.peer_id = multiplayer.get_unique_id()
+	if unit.team_id == 0:
 		unit.team_id = MultiplayerScript.get_player_from_peer_id(multiplayer.get_unique_id()).team_id
 	add_child(unit)
 
@@ -110,9 +111,10 @@ func add_building(build:BaseBuilding):
 		return
 	#building = build
 	build.name = "building_" + str(multiplayer.get_unique_id()) + "_" + str(next_build_id)
-	build.peer_id = multiplayer.get_unique_id()
+	if build.peer_id == 0:
+		build.peer_id = multiplayer.get_unique_id()
 	next_build_id += 1
-	if !build.team_id:
+	if build.team_id == 0:
 		build.team_id = MultiplayerScript.get_player_from_peer_id(multiplayer.get_unique_id()).team_id
 	add_child(build)
 	return

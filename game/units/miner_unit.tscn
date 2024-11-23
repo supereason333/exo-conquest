@@ -39,6 +39,9 @@ properties/5/replication_mode = 2
 properties/6/path = NodePath(".:team_id")
 properties/6/spawn = true
 properties/6/replication_mode = 1
+properties/7/path = NodePath(".:peer_id")
+properties/7/spawn = true
+properties/7/replication_mode = 1
 
 [sub_resource type="Resource" id="Resource_6ncso"]
 script = ExtResource("6_0ujve")

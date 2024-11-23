@@ -76,6 +76,10 @@ func update_selected_data():
 		label = Label.new()
 		label.text = "Team ID: " + str(RTS.selected_list[unit_sb.value].team_id)
 		selected_data.add_child(label)
+		
+		label = Label.new()
+		label.text = "Peer ID: " + str(RTS.selected_list[unit_sb.value].peer_id)
+		selected_data.add_child(label)
 
 func switch_team(team_id:int):
 	RTS.change_team(team_id)
