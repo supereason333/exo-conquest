@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://c4vu28w7nfnwt"]
+[gd_scene load_steps=24 format=3 uid="uid://c4vu28w7nfnwt"]
 
 [ext_resource type="Script" path="res://game/player/player_control.gd" id="1_83dnc"]
 [ext_resource type="Theme" uid="uid://bujlagwci5a1f" path="res://menu/menu_resources/themes/default_gui.tres" id="2_kekrh"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://clj7m8yhuu874" path="res://game/resources/sprites/icons/xenite16.png" id="6_gx6lu"]
 [ext_resource type="Texture2D" uid="uid://dqnaqp2s37d0d" path="res://game/resources/sprites/placeholder/32x.png" id="7_5p51g"]
 [ext_resource type="Script" path="res://game/player/building_actions.gd" id="9_qxs22"]
+[ext_resource type="Script" path="res://game/player/pause_menu.gd" id="10_rv0bb"]
 
 [sub_resource type="GDScript" id="GDScript_oivxw"]
 script/source = "extends Button
@@ -64,6 +65,13 @@ func add_building(building_id:int):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+"
+
+[sub_resource type="GDScript" id="GDScript_utj0g"]
+script/source = "extends Button
+
+func _on_pressed() -> void:
+	$\"../..\".hide()
 "
 
 [sub_resource type="GDScript" id="GDScript_nl0vn"]
@@ -290,6 +298,43 @@ func set_costs(cost:MaterialCost):
 	xenite.text = str(cost.xenite)
 "
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ocvhk"]
+bg_color = Color(0.190762, 0.190762, 0.190762, 0.717647)
+
+[sub_resource type="GDScript" id="GDScript_pkj4k"]
+script/source = "extends PanelContainer
+
+@onready var master := $MarginContainer/VBoxContainer/MasterSlider
+@onready var SFX := $MarginContainer/VBoxContainer/SFXSlider
+@onready var BGM := $MarginContainer/VBoxContainer/BGMSlider
+@onready var master_db_label := $MarginContainer/VBoxContainer/Labels/Label4
+@onready var SFX_db_label := $MarginContainer/VBoxContainer/Labels2/Label4
+@onready var BGM_db_label := $MarginContainer/VBoxContainer/Labels3/Label4
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	master.value = -5
+	SFX.value = -10
+	BGM.value = -5
+
+func _on_master_slider_value_changed(value: float) -> void:
+	if value < -40: value = -INF
+	AudioServer.set_bus_volume_db(0, value)
+	master_db_label.text = str(value) + \" db\"
+
+
+func _on_sfx_slider_value_changed(value: float) -> void:
+	if value < -40: value = -INF
+	AudioServer.set_bus_volume_db(2, value)
+	SFX_db_label.text = str(value) + \" db\"
+
+
+func _on_bgm_slider_value_changed(value: float) -> void:
+	if value < -40: value = -INF
+	AudioServer.set_bus_volume_db(1, value)
+	BGM_db_label.text = str(value) + \" db\"
+"
+
 [node name="PlayerControl" type="Camera2D"]
 anchor_mode = 0
 limit_left = 0
@@ -320,6 +365,7 @@ texture = ExtResource("3_3s602")
 expand_mode = 1
 
 [node name="DebugMenu" type="Control" parent="UI/Control"]
+visible = false
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -381,6 +427,27 @@ theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
+
+[node name="TextDisplay" type="PanelContainer" parent="UI/Control/MarginContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/MarginContainer/TextDisplay"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="Label" type="Label" parent="UI/Control/MarginContainer/TextDisplay/VBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Text"
+autowrap_mode = 2
+
+[node name="Button" type="Button" parent="UI/Control/MarginContainer/TextDisplay/VBoxContainer"]
+layout_mode = 2
+text = "OK"
+script = SubResource("GDScript_utj0g")
 
 [node name="LeftBox" type="VBoxContainer" parent="UI/Control/MarginContainer"]
 layout_mode = 2
@@ -720,7 +787,135 @@ metadata/_tab_index = 2
 layout_mode = 2
 stretch_mode = 2
 
+[node name="PauseMenu" type="PanelContainer" parent="UI/Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ocvhk")
+script = ExtResource("10_rv0bb")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Control/PauseMenu"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/PauseMenu/MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Game Paused"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftBox" type="VBoxContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="AudioSliders" type="PanelContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox"]
+layout_mode = 2
+script = SubResource("GDScript_pkj4k")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer"]
+layout_mode = 2
+
+[node name="Labels" type="HBoxContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/Labels"]
+layout_mode = 2
+text = "Master volume
+"
+
+[node name="Control" type="Control" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/Labels"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label4" type="Label" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/Labels"]
+layout_mode = 2
+text = "-0db
+"
+
+[node name="MasterSlider" type="HSlider" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer"]
+layout_mode = 2
+min_value = -41.0
+max_value = 2.0
+
+[node name="Labels2" type="HBoxContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/Labels2"]
+layout_mode = 2
+text = "SFX"
+
+[node name="Control" type="Control" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/Labels2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label4" type="Label" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/Labels2"]
+layout_mode = 2
+text = "-0db
+"
+
+[node name="SFXSlider" type="HSlider" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer"]
+layout_mode = 2
+min_value = -41.0
+max_value = 2.0
+
+[node name="Labels3" type="HBoxContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/Labels3"]
+layout_mode = 2
+text = "BGM
+"
+
+[node name="Control" type="Control" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/Labels3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label4" type="Label" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/Labels3"]
+layout_mode = 2
+text = "-0db
+"
+
+[node name="BGMSlider" type="HSlider" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer"]
+layout_mode = 2
+min_value = -41.0
+max_value = 2.0
+
+[node name="Control" type="Control" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightBox" type="VBoxContainer" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="ExitTitleButton" type="Button" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/RightBox"]
+layout_mode = 2
+text = "Exit to title"
+
+[node name="ExitGameButton" type="Button" parent="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/RightBox"]
+layout_mode = 2
+text = "Exit to desktop"
+
 [connection signal="value_changed" from="UI/Control/DebugMenu/SelectedData/UnitSelect" to="." method="_on_unit_select_value_changed"]
 [connection signal="pressed" from="UI/Control/DebugMenu/AddUnit" to="UI/Control/DebugMenu/AddUnit" method="_on_pressed"]
 [connection signal="value_changed" from="UI/Control/DebugMenu/UnitSelector" to="UI/Control/DebugMenu/AddUnit" method="_on_unit_selector_value_changed"]
+[connection signal="pressed" from="UI/Control/MarginContainer/TextDisplay/VBoxContainer/Button" to="UI/Control/MarginContainer/TextDisplay/VBoxContainer/Button" method="_on_pressed"]
 [connection signal="pressed" from="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay/AddButton" to="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay" method="_on_add_button_pressed"]
+[connection signal="value_changed" from="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/MasterSlider" to="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders" method="_on_master_slider_value_changed"]
+[connection signal="value_changed" from="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/SFXSlider" to="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders" method="_on_sfx_slider_value_changed"]
+[connection signal="value_changed" from="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/BGMSlider" to="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders" method="_on_bgm_slider_value_changed"]
+[connection signal="pressed" from="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/RightBox/ExitTitleButton" to="UI/Control/PauseMenu" method="_on_exit_title_button_pressed"]
+[connection signal="pressed" from="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/RightBox/ExitGameButton" to="UI/Control/PauseMenu" method="_on_exit_game_button_pressed"]

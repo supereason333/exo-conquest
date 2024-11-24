@@ -7,6 +7,7 @@ class_name BaseBuilding
 var map_position:Vector2i
 
 func _ready() -> void:
+	position = snapped(position, Vector2(32, 32))
 	collision_shape = CollisionShape2D.new()
 	var rect_shape := RectangleShape2D.new()
 	rect_shape.size = Vector2(building_size * 32)

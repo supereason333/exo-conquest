@@ -10,10 +10,10 @@ var box:Rect2
 @onready var tile_map := $Map/BaseTiles
 @onready var data_tile_map := $Map/DataTiles
 @onready var player := $PlayerControl
-@onready var data_viewer := $TileDataViewer
 @onready var building_detector := $BuildingDetector
 @onready var bgm_player := $BGM
 @onready var spawnpoints := $Map/Spawnpoints
+var tutorial:Node
 
 var placing_building := false
 var building:BaseBuilding
@@ -25,6 +25,9 @@ var next_unit_id := 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	if has_node("Tutorial"):
+		tutorial = $Tutorial
+		tutorial.init()
 	
 	var limit:Vector2 = tile_map.get_used_rect().size
 	limit *= Vector2(tile_map.tile_set.tile_size)

@@ -8,6 +8,9 @@ var Disp := preload("res://game/player/team_display.tscn")
 @onready var selected_data := $UI/Control/DebugMenu/SelectedData
 @onready var debug_menu := $UI/Control/DebugMenu
 @onready var building_selector := $UI/Control/DebugMenu/BuildingSelector
+@onready var pause_menu := $UI/Control/PauseMenu
+@onready var text_display := $UI/Control/MarginContainer/TextDisplay
+@onready var text_display_label := $UI/Control/MarginContainer/TextDisplay/VBoxContainer/Label
 
 signal add_new_building(building)
 
@@ -86,6 +89,8 @@ func switch_team(team_id:int):
 	update_team_list()
 
 func handle_camera_move(delta:float):
+	if pause_menu.visible: return
+	
 	var mouse_pos = get_viewport().get_mouse_position()
 	var move_vector = Vector2(0, 0)
 	
@@ -118,6 +123,10 @@ func on_add_building(building_id:int):
 func _on_unit_select_value_changed(value: float) -> void:
 	unit_sb.max_value = len(RTS.selected_list) - 1
 	update_selected_data()
+
+func set_dialogue(text:String):
+	text_display_label.text = text
+	text_display.show()
 
 func _draw():
 	draw_rect(select_box, RTS.game_settings.select_color, false, 2)

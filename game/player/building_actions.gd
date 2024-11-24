@@ -46,14 +46,16 @@ func update_display_data():
 		if !RTS.selected_building.is_owned_by_user():
 			name_label.modulate = Color.RED
 			building_icon.modulate = Color.RED
+			container_tabs.current_tab = 0
 		else:
 			name_label.modulate = Color.WHITE
 			building_icon.modulate = Color.WHITE
+			if RTS.selected_building.production_component:
+				container_tabs.current_tab = 1
+			else:
+				container_tabs.current_tab = 0
+		
 		name_label.text = RTS.selected_building.unit_name
 		health_bar.value = RTS.selected_building.health
 		building_icon.texture = RTS.selected_building.display_icon
 		
-		if RTS.selected_building.production_component:
-			container_tabs.current_tab = 1
-		else:
-			container_tabs.current_tab = 0

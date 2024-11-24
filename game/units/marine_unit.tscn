@@ -1,7 +1,8 @@
-[gd_scene load_steps=144 format=3 uid="uid://ca4mnvogpcna"]
+[gd_scene load_steps=145 format=3 uid="uid://ca4mnvogpcna"]
 
 [ext_resource type="Script" path="res://game/units/marine_unit.gd" id="1_qatu3"]
 [ext_resource type="Script" path="res://classes/material.gd" id="2_pcwxc"]
+[ext_resource type="Texture2D" uid="uid://cb3jht2d80p8m" path="res://game/resources/sprites/icons/marine.png" id="3_op0sx"]
 [ext_resource type="Texture2D" uid="uid://b2b5jigitr8pp" path="res://game/resources/sprites/marine_unit.png" id="3_wmu7d"]
 [ext_resource type="Texture2D" uid="uid://c8i2bwvcpypro" path="res://game/resources/sprites/testing_unit_color_layer.png" id="4_gksvf"]
 [ext_resource type="PackedScene" uid="uid://vj5qlce8ssm1" path="res://game/units/base_unit/unit_sprite.tscn" id="5_rr74t"]
@@ -1216,6 +1217,7 @@ attack_range = 150
 vision_radius = 300
 agression_distance = 200
 unit_sprite = NodePath("UnitSprite")
+display_icon = ExtResource("3_op0sx")
 collision_shape = NodePath("CollisionShape2D")
 multiplayer_sync = NodePath("MultiplayerSynchronizer")
 

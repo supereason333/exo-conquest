@@ -1,0 +1,60 @@
+[gd_scene load_steps=3 format=3 uid="uid://dpnulkofkdqgt"]
+
+[ext_resource type="Script" path="res://menu/win_screen.gd" id="1_4b0fa"]
+[ext_resource type="Texture2D" uid="uid://dehbtdahxwb5x" path="res://game/resources/579329.jpg" id="2_irvis"]
+
+[node name="WinScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4b0fa")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+texture_filter = 2
+layout_mode = 0
+offset_left = 63.0
+offset_top = 220.0
+offset_right = 563.0
+offset_bottom = 455.0
+texture = ExtResource("2_irvis")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+texture_filter = 2
+layout_mode = 0
+offset_left = 413.0
+offset_top = 62.0
+offset_right = 686.0
+offset_bottom = 164.0
+rotation = 0.621337
+texture = ExtResource("2_irvis")
+expand_mode = 1
+
+[node name="TextureRect3" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -24.0
+offset_top = 274.0
+offset_right = 249.0
+offset_bottom = 376.0
+rotation = -0.765708
+texture = ExtResource("2_irvis")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 195.0
+offset_top = 76.0
+offset_right = 295.0
+offset_bottom = 99.0
+text = "You Won!!!!!!!"
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Return to title screen"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

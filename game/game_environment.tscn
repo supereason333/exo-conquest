@@ -15,7 +15,7 @@ script/source = "extends Node2D
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c3ruu"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_km06j"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_t7uec"]
 texture = ExtResource("3_m21k8")
 texture_region_size = Vector2i(128, 128)
 1:0/0 = 0
@@ -23,9 +23,9 @@ texture_region_size = Vector2i(128, 128)
 
 [sub_resource type="TileSet" id="TileSet_jald5"]
 tile_size = Vector2i(128, 128)
-sources/0 = SubResource("TileSetAtlasSource_km06j")
+sources/0 = SubResource("TileSetAtlasSource_t7uec")
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_frcti"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0tofk"]
 texture = ExtResource("4_vdawp")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
@@ -40,7 +40,7 @@ texture_region_size = Vector2i(32, 32)
 3:0/0/custom_data_0 = "xenite"
 3:0/0/custom_data_1 = 3
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_w1rcv"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_08f7r"]
 texture = ExtResource("5_hv2vf")
 texture_region_size = Vector2i(32, 32)
 4:2/0 = 0
@@ -293,8 +293,8 @@ custom_data_layer_1/name = "Material ID"
 custom_data_layer_1/type = 2
 custom_data_layer_2/name = "Not buildable"
 custom_data_layer_2/type = 1
-sources/0 = SubResource("TileSetAtlasSource_frcti")
-sources/2 = SubResource("TileSetAtlasSource_w1rcv")
+sources/0 = SubResource("TileSetAtlasSource_0tofk")
+sources/2 = SubResource("TileSetAtlasSource_08f7r")
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_yg7q7"]
 normal = Vector2(0, 1)

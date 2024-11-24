@@ -54,6 +54,19 @@ func join_server(address:String = "localhost", port:int = 9998):
 	multiplayer.connected_to_server.connect(connected_successfully)
 	multiplayer.connection_failed.connect(connection_failed)
 
+func close_multiplayer():
+	if multiplayer.is_server():
+		rpc("server_closed")
+		print("Server closed")
+	await get_tree().create_timer(1)
+	multiplayer.multiplayer_peer.close()
+
+@rpc
+func server_closed():
+	print("Server closed")
+	get_tree().change_scene_to_file("res://menu/main_menus/title_screen.tscn")
+	multiplayer.multiplayer_peer.close()
+
 func connected_successfully():
 	RTS.player.peer_id = multiplayer.get_unique_id()
 	rpc("recieve_player_data", RTS.player.peer_id, RTS.player.username, RTS.player.team_id)

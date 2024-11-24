@@ -6,13 +6,6 @@ signal taken_damage()
 signal arrived
 signal started_move
 
-var team_id:int:
-	set(value):
-		var team := MultiplayerScript.get_team_from_id(team_id)
-		if team:
-			if unit_sprite:
-				unit_sprite.color = team.color
-		team_id = value
 var peer_id:int
 var waypoints:Array[Vector2]
 var selected := false: set = set_selected
@@ -38,6 +31,13 @@ var attack_target:Node2D:
 @export var unit_name:String
 @export var unit_id:int
 @export var unit_cost:MaterialCost
+@export var team_id:int:
+	set(value):
+		var team := MultiplayerScript.get_team_from_id(team_id)
+		if team:
+			if unit_sprite:
+				unit_sprite.color = team.color
+		team_id = value
 
 @export_group("Movement")
 @export var base_speed:int

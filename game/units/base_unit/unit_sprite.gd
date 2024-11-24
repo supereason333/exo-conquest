@@ -20,17 +20,20 @@ var playing := false
 var animation_frame_index:int = 0
 var color:Color:
 	set(value):
-		color_sprite.modulate = value
+		if color_sprite:
+			color_sprite.modulate = value
 		color = value
 
 @onready var color_sprite := $ColorSprite
 @onready var anim_timer := $AnimTimer
+@onready var unit := $".."
 
 func _ready() -> void:
 	color_sprite.texture = color_texture
 	color_sprite.modulate = color
 	color_sprite.hframes = hframes
 	color_sprite.vframes = vframes
+	color_sprite.modulate = color
 	if default_anim:
 		play_anim(default_anim)
 
