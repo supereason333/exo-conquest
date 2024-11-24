@@ -18,7 +18,12 @@ var attackable_list:Array[BaseUnit]
 var dying := false
 var override_target := false
 var attacking := false
-var moving := false
+var moving := false:
+	set(value):
+		if value != moving:
+			if value: emit_signal("started_move")
+			else: emit_signal("arrived")
+			moving = value
 var attack_target:Node2D:
 	set(value):
 		if attack_target:
@@ -27,6 +32,8 @@ var attack_target:Node2D:
 			value.death.connect(target_death)
 		
 		attack_target = value
+var chase_target:BaseUnit
+var rand := RandomNumberGenerator.new()
 
 @export var unit_name:String
 @export var unit_id:int
@@ -49,6 +56,8 @@ var attack_target:Node2D:
 @export var attack_range:int
 @export var vision_radius:int
 @export var agression_distance:int
+@export var chase_time:float = 4
+@export var chase_cooldown:float = 4
 
 @export_group("Sprite")
 @export var unit_sprite:UnitSprite
@@ -93,6 +102,9 @@ var health_bar:ProgressBar = ProgressBar.new()
 var attack_timer:Timer = Timer.new()
 var attack_tick_timer:Timer = Timer.new()
 var attack_anim_timer:Timer = Timer.new()
+var chase_timer:Timer = Timer.new()
+var chase_cooldown_timer:Timer = Timer.new()
+var idle_anim_timer:Timer = Timer.new()
 #var unit_finder_timer:Timer = Timer.new()
 var sound_player:AudioStreamPlayer2D = AudioStreamPlayer2D.new()
 
@@ -122,6 +134,19 @@ func _ready() -> void:
 	set_team(team_id)
 	
 	if !is_multiplayer_authority(): return
+	
+	chase_timer.one_shot = true
+	chase_timer.wait_time = chase_time
+	chase_timer.autostart = false
+	chase_timer.timeout.connect(chase_timer_timeout)
+	add_child(chase_timer)
+	chase_cooldown_timer.wait_time = chase_cooldown
+	chase_cooldown_timer.one_shot = true
+	chase_cooldown_timer.autostart = false
+	add_child(chase_cooldown_timer)
+	idle_anim_timer.one_shot = true
+	idle_anim_timer.autostart = false
+	add_child(idle_anim_timer)
 	
 	if production_component:
 		production_component._produced_unit.connect(unit_produced)
@@ -225,12 +250,29 @@ func movement(_delta:float):
 	if frozen: return
 	if !is_multiplayer_authority(): return
 	
+	if chase_target and !attacking:
+		if !is_instance_valid(chase_target):
+			chase_target = null
+			moving = false
+			return
+		if position.distance_squared_to(chase_target.position) <= pow(attack_range, 2) * 0.7:
+			chase_target = null
+			moving = false
+			return
+		moving = true
+		velocity = Vector2.ZERO
+		var direction := position.direction_to(chase_target.position).normalized()
+		velocity += direction * base_speed
+		#base_sprite.frame = get_sprite_frame_from_rotation(direction.angle())
+		#set_sprite_rotation(direction.angle())
+		unit_sprite.set_visual_rotation(direction.angle())
+		move_and_slide()
+		return
 	if waypoints and !attacking:
 		if position.distance_squared_to(waypoints[0]) <= 100:
 			waypoints.remove_at(0)
 			if !waypoints: 
 				moving = false
-				emit_signal("arrived")
 				return
 		moving = true
 		velocity = Vector2.ZERO
@@ -240,6 +282,23 @@ func movement(_delta:float):
 		#set_sprite_rotation(direction.angle())
 		unit_sprite.set_visual_rotation(direction.angle())
 		move_and_slide()
+		return
+	moving = false
+	if idle_anim_timer.is_stopped():
+		idle_anim_timer.wait_time = rand.randf_range(2, 10)
+		idle_anim_timer.start()
+		if rand.randf() <= 0.5:
+			var num = rand.randi_range(1, 2)
+			if unit_sprite.frame_coords.y + num >= unit_sprite.vframes:
+				unit_sprite.frame_coords.y = num
+			else:
+				unit_sprite.frame_coords.y += 1
+		else:
+			var num = rand.randi_range(1, 2)
+			if unit_sprite.frame_coords.y - num < 0:
+				unit_sprite.frame_coords.y = unit_sprite.vframes - 1 - num
+			else:
+				unit_sprite.frame_coords.y -= 1
 
 func set_team(_team_id:int):
 	if dummy: return
@@ -287,8 +346,9 @@ func waypoint(_position:Vector2, clicked_unit:Node2D, hold:bool):
 		rpc_id(1, "waypoint", _position, null, Input.is_action_pressed("shift"))
 		return
 	
-	if !waypoints:
-		emit_signal("started_move")
+	chase_target = null
+#	if !waypoints:
+#		emit_signal("started_move")
 	if clicked_unit:
 		pass
 	if hold:
@@ -340,6 +400,7 @@ func attack_ai():
 		attack_start()
 	else:
 		print_debug("ATTACKED NULL")
+		if !attack_timer.is_stopped(): attack_timer.stop()
 
 func attack_start():
 	attacking = true
@@ -359,6 +420,7 @@ func attack_animation():
 	attack_anim_timer.start()
 
 func attack_tick():
+	# Only runs of something inside vision
 	if dying: return
 	if !is_multiplayer_authority(): return
 	
@@ -366,24 +428,47 @@ func attack_tick():
 		#var bodies = attack_area.get_overlapping_bodies()
 		if attackable_list:
 			attack_target = attackable_list[0]
+		elif !chase_target and chase_cooldown_timer.is_stopped():
+			var _unit := find_target_within()
+			if _unit:
+				chase_target = _unit
+				if chase_timer.is_stopped():
+					chase_timer.start()
 	else:
 		if attack_timer.is_stopped():
 			attack_timer.start()
+			attack_ai()
 
-"""func target_search():
-	#print("Target search")
-	if !attack_target:
-		var target = find_target()
-		if target: 
-			#print("Found target")
-			attack_target = target
-			unit_finder_timer.stop()
+func chase_timer_timeout():
+	chase_target = null
+	if chase_cooldown_timer.is_stopped():
+		chase_cooldown_timer.start()
 
-func find_target(in_attack_distance:bool = true) -> Node2D:
+
+#func target_search():
+#	#print("Target search")
+#	if !attack_target:
+#		var target = find_target()
+#		if target: 
+#			#print("Found target")
+#			attack_target = target
+#			unit_finder_timer.stop()
+
+func find_target_within(dist:float = -1) -> BaseUnit:
+	if !vision_list: return null
+	if dist == -1: dist = agression_distance
+	
+	for unit in vision_list:
+		if position.distance_to(unit.position) <= dist:
+			return unit
+	
+	return null
+
+func find_target(in_attack_distance:bool = true) -> BaseUnit:
 	if !vision_list: return null
 	
 	var closest_dist:float = INF
-	var closest_unit:Node2D
+	var closest_unit:BaseUnit
 	for unit in vision_list:
 		var dist = position.distance_squared_to(unit.position)
 		if dist < closest_dist:
@@ -400,7 +485,7 @@ func find_target(in_attack_distance:bool = true) -> Node2D:
 
 func target_in_range() -> bool:
 	if position.distance_squared_to(attack_target.position) <= pow(attack_range, 2): return true
-	else: return false"""
+	else: return false
 
 func target_death(unit:Node2D):
 	attack_target = null

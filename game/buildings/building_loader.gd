@@ -7,7 +7,7 @@ var building_list := [
 ]
 var ins_building_list:Array[BaseBuilding]
 
-const MAX_BUILDINGS := 100
+const MAX_BUILDINGS := 10
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

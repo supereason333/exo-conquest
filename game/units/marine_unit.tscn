@@ -1225,6 +1225,8 @@ multiplayer_sync = NodePath("MultiplayerSynchronizer")
 position = Vector2(0, 1)
 shape = SubResource("RectangleShape2D_xlo8r")
 
+[node name="Timer" type="Timer" parent="CollisionShape2D"]
+
 [node name="BaseSprite" type="AnimatedSprite2D" parent="."]
 visible = false
 sprite_frames = SubResource("SpriteFrames_25w7o")

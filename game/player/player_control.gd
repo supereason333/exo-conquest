@@ -11,6 +11,7 @@ var Disp := preload("res://game/player/team_display.tscn")
 @onready var pause_menu := $UI/Control/PauseMenu
 @onready var text_display := $UI/Control/MarginContainer/TextDisplay
 @onready var text_display_label := $UI/Control/MarginContainer/TextDisplay/VBoxContainer/Label
+@onready var building_placer := $UI/Control/MarginContainer/BuildingPlacer
 
 signal add_new_building(building)
 
@@ -28,6 +29,7 @@ var select_box:Rect2:
 func _ready() -> void:
 	RTS.select_list_changed.connect(select_list_changed)
 	building_selector.add_new_building.connect(on_add_building)
+	building_placer.add_new_building.connect(on_add_building)
 	update_team_list()
 	update_selected_data()
 

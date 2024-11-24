@@ -1,7 +1,8 @@
-[gd_scene load_steps=29 format=3 uid="uid://bsp7wroomlji5"]
+[gd_scene load_steps=31 format=3 uid="uid://bsp7wroomlji5"]
 
 [ext_resource type="Script" path="res://game/buildings/military_base.gd" id="1_jm5bs"]
 [ext_resource type="Texture2D" uid="uid://dbfbd04anbhcv" path="res://game/resources/sprites/icons/military camp.png" id="2_d510r"]
+[ext_resource type="Script" path="res://classes/material.gd" id="2_sql62"]
 [ext_resource type="Texture2D" uid="uid://u3lgfvavso7g" path="res://game/resources/sprites/buildings/military_base_color_sprite.png" id="2_wu2fm"]
 [ext_resource type="Texture2D" uid="uid://btjnsngnec15t" path="res://game/resources/sprites/buildings/military_base_building.png" id="3_7sgmy"]
 [ext_resource type="Script" path="res://game/units/components/production_component.gd" id="5_ok207"]
@@ -9,6 +10,13 @@
 [ext_resource type="PackedScene" uid="uid://vj5qlce8ssm1" path="res://game/units/base_unit/unit_sprite.tscn" id="7_nf6lp"]
 [ext_resource type="PackedScene" uid="uid://h3f0rypervaa" path="res://game/units/sniper_unit.tscn" id="7_v2qbs"]
 [ext_resource type="Script" path="res://game/units/base_unit/unit_sprite_animation.gd" id="8_cv3ch"]
+
+[sub_resource type="Resource" id="Resource_82y0x"]
+script = ExtResource("2_sql62")
+selnite = 270
+luminite = 120
+plainium = 0
+xenite = 0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_f53rv"]
 atlas = ExtResource("3_7sgmy")
@@ -160,6 +168,7 @@ script = ExtResource("1_jm5bs")
 building_size = Vector2i(3, 2)
 unit_name = "Military Base"
 unit_id = 2
+unit_cost = SubResource("Resource_82y0x")
 base_health = 800.0
 display_icon = ExtResource("2_d510r")
 production_component = NodePath("ProductionComponent")

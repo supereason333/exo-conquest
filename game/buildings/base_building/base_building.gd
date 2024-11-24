@@ -7,7 +7,7 @@ class_name BaseBuilding
 var map_position:Vector2i
 
 func _ready() -> void:
-	position = snapped(position, Vector2(32, 32))
+	position = snapped(position, Vector2(32, 32)) - Vector2(16, 0)
 	collision_shape = CollisionShape2D.new()
 	var rect_shape := RectangleShape2D.new()
 	rect_shape.size = Vector2(building_size * 32)
@@ -19,6 +19,9 @@ func _ready() -> void:
 	remove_from_group("unit")
 	add_to_group("building")
 	frozen = true
+
+func movement(_delta:float):
+	pass
 
 func unit_produced(unit: PackedScene) -> void:
 	var _unit := unit.instantiate()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://c4vu28w7nfnwt"]
+[gd_scene load_steps=25 format=3 uid="uid://c4vu28w7nfnwt"]
 
 [ext_resource type="Script" path="res://game/player/player_control.gd" id="1_83dnc"]
 [ext_resource type="Theme" uid="uid://bujlagwci5a1f" path="res://menu/menu_resources/themes/default_gui.tres" id="2_kekrh"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://clj7m8yhuu874" path="res://game/resources/sprites/icons/xenite16.png" id="6_gx6lu"]
 [ext_resource type="Texture2D" uid="uid://dqnaqp2s37d0d" path="res://game/resources/sprites/placeholder/32x.png" id="7_5p51g"]
 [ext_resource type="Script" path="res://game/player/building_actions.gd" id="9_qxs22"]
+[ext_resource type="Script" path="res://game/player/building_placer.gd" id="10_4i84l"]
 [ext_resource type="Script" path="res://game/player/pause_menu.gd" id="10_rv0bb"]
 
 [sub_resource type="GDScript" id="GDScript_oivxw"]
@@ -515,6 +516,7 @@ layout_mode = 2
 text = "0"
 
 [node name="AddButton" type="Button" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay"]
+visible = false
 layout_mode = 2
 
 [node name="ControlContainer" type="GridContainer" parent="UI/Control/MarginContainer"]
@@ -634,6 +636,7 @@ texture_disabled = ExtResource("7_5p51g")
 texture_focused = ExtResource("7_5p51g")
 
 [node name="BuildingActions" type="PanelContainer" parent="UI/Control/MarginContainer"]
+visible = false
 custom_minimum_size = Vector2(400, 120)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -786,6 +789,76 @@ metadata/_tab_index = 2
 [node name="BuildingIcon" type="TextureRect" parent="UI/Control/MarginContainer/BuildingActions/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 stretch_mode = 2
+
+[node name="BuildingPlacer" type="HBoxContainer" parent="UI/Control/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+script = ExtResource("10_4i84l")
+
+[node name="PanelContainer" type="PanelContainer" parent="UI/Control/MarginContainer/BuildingPlacer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer"]
+layout_mode = 2
+
+[node name="MaterialDisplay" type="VBoxContainer" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+script = SubResource("GDScript_aqbxq")
+
+[node name="Selnite" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay"]
+layout_mode = 2
+
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay/Selnite"]
+layout_mode = 2
+texture = ExtResource("3_wdp7i")
+
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay/Selnite"]
+layout_mode = 2
+text = "0"
+
+[node name="Luminite" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay"]
+layout_mode = 2
+
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay/Luminite"]
+layout_mode = 2
+texture = ExtResource("4_7hewy")
+
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay/Luminite"]
+layout_mode = 2
+text = "0"
+
+[node name="Plainium" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay"]
+layout_mode = 2
+
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay/Plainium"]
+layout_mode = 2
+texture = ExtResource("5_0h180")
+
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay/Plainium"]
+layout_mode = 2
+text = "0"
+
+[node name="Xenite" type="HBoxContainer" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay"]
+layout_mode = 2
+
+[node name="Texture" type="TextureRect" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay/Xenite"]
+layout_mode = 2
+texture = ExtResource("6_gx6lu")
+
+[node name="AmountLabel" type="Label" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer/MarginContainer/MaterialDisplay/Xenite"]
+layout_mode = 2
+text = "0"
+
+[node name="PanelContainer2" type="PanelContainer" parent="UI/Control/MarginContainer/BuildingPlacer"]
+layout_mode = 2
+
+[node name="Buildings" type="GridContainer" parent="UI/Control/MarginContainer/BuildingPlacer/PanelContainer2"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+columns = 3
 
 [node name="PauseMenu" type="PanelContainer" parent="UI/Control"]
 visible = false
