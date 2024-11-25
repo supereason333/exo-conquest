@@ -96,16 +96,16 @@ func handle_camera_move(delta:float):
 	var mouse_pos = get_viewport().get_mouse_position()
 	var move_vector = Vector2(0, 0)
 	
-	if mouse_pos.x <= cam_mov_zone:
+	if mouse_pos.x <= cam_mov_zone or Input.is_action_pressed("cam_left"):
 		move_vector.x -= 1
 	
-	if mouse_pos.x >= 640 - cam_mov_zone:
+	if mouse_pos.x >= 640 - cam_mov_zone or Input.is_action_pressed("cam_right"):
 		move_vector.x += 1
 	
-	if mouse_pos.y <= cam_mov_zone:
+	if mouse_pos.y <= cam_mov_zone or Input.is_action_pressed("cam_up"):
 		move_vector.y -= 1
 	
-	if mouse_pos.y >= 480 - cam_mov_zone:
+	if mouse_pos.y >= 480 - cam_mov_zone or Input.is_action_pressed("cam_down"):
 		move_vector.y += 1
 	
 	position += move_vector.normalized() * MOVE_SPEED * delta
