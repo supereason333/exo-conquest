@@ -195,14 +195,16 @@ var Numbered_button := preload(\"res://menu/menu_resources/numbered_button.tscn\
 
 var last_building:BaseBuilding
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	visibility_changed.connect(on_visibility_changed)
-	RTS.select_list_changed.connect(selected_building_changed)
 
 func on_visibility_changed():
 	if visible:
-		pass
+		selected_building_changed()
+		if !RTS.select_list_changed.is_connected(selected_building_changed):
+			RTS.select_list_changed.connect(selected_building_changed)
+	else:
+		RTS.select_list_changed.disconnect(selected_building_changed)
 
 func selected_building_changed():
 	if !visible: return

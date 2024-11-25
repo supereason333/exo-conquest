@@ -73,7 +73,6 @@ var rand := RandomNumberGenerator.new()
 @export var collision_shape:CollisionShape2D
 @export var production_component:ProductionComponent
 @export var multiplayer_sync:MultiplayerSynchronizer
-
 @export var other_components:Array[Component]
 
 @export_group("Other") 
@@ -133,7 +132,8 @@ func _ready() -> void:
 	
 	set_team(team_id)
 	
-	if !is_multiplayer_authority(): return
+	if !is_multiplayer_authority(): 
+		return
 	
 	chase_timer.one_shot = true
 	chase_timer.wait_time = chase_time
@@ -496,14 +496,6 @@ func target_death(unit:Node2D):
 
 func damage(_damage:int):
 	health -= _damage
-
-"""func enable_attack_area():
-	if !attack_area.get_collision_mask_value(2):
-		attack_area.set_collision_mask_value(2, true)
-
-func disable_attack_area():
-	if attack_area.get_collision_mask_value(2):
-		attack_area.set_collision_mask_value(2, false)"""
 
 func kill():
 	if dying: return

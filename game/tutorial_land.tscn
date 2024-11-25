@@ -361,20 +361,12 @@ position = Vector2(981, 2536)
 [node name="Tutorial" type="Node" parent="."]
 script = ExtResource("6_venc2")
 
-[node name="SniperUnit" parent="." instance=ExtResource("11_5l0qm")]
-position = Vector2(969, 2197)
-team_id = 1
-
-[node name="SniperUnit2" parent="." instance=ExtResource("11_5l0qm")]
-position = Vector2(931, 2177)
-team_id = 1
-
 [node name="SniperUnit3" parent="." instance=ExtResource("11_5l0qm")]
-position = Vector2(1014, 2220)
+position = Vector2(952, 2158)
 team_id = 1
 
 [node name="SniperUnit4" parent="." instance=ExtResource("11_5l0qm")]
-position = Vector2(1060, 2243)
+position = Vector2(1030, 2199)
 team_id = 1
 
 [node name="MilitaryBase" parent="." instance=ExtResource("9_fsl5h")]

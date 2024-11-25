@@ -22,6 +22,7 @@ func _ready():
 
 func queue_unit(list_index: int):
 	if unit.dummy: return
+	if unit.peer_id != multiplayer.get_unique_id(): return
 	if production_queue.size() < MAX_QUEUE_SIZE and list_index < produce_list.size():
 		var inst_unit := produce_list[list_index].instantiate()
 		if RTS.materials.can_afford(inst_unit.unit_cost):
