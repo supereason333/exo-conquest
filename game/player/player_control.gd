@@ -12,12 +12,12 @@ var Disp := preload("res://game/player/team_display.tscn")
 @onready var text_display := $UI/Control/MarginContainer/TextDisplay
 @onready var text_display_label := $UI/Control/MarginContainer/TextDisplay/VBoxContainer/Label
 @onready var building_placer := $UI/Control/MarginContainer/BuildingPlacer
+@onready var building_actions := $UI/Control/MarginContainer/BuildingActions
+@onready var win_window := $UI/Window
 
 signal add_new_building(building)
 
 var building
-var cam_mov_zone := 2
-const MOVE_SPEED := 1000.0
 
 var select_box:Rect2:
 	set(value):
@@ -32,6 +32,8 @@ func _ready() -> void:
 	building_placer.add_new_building.connect(on_add_building)
 	update_team_list()
 	update_selected_data()
+	RTS.core_death.connect(on_core_death)
+	MultiplayerScript.game_ended.connect(on_game_ended)
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("map_key"):
@@ -96,19 +98,19 @@ func handle_camera_move(delta:float):
 	var mouse_pos = get_viewport().get_mouse_position()
 	var move_vector = Vector2(0, 0)
 	
-	if mouse_pos.x <= cam_mov_zone or Input.is_action_pressed("cam_left"):
+	if mouse_pos.x <= RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_left"):
 		move_vector.x -= 1
 	
-	if mouse_pos.x >= 640 - cam_mov_zone or Input.is_action_pressed("cam_right"):
+	if mouse_pos.x >= 640 - RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_right"):
 		move_vector.x += 1
 	
-	if mouse_pos.y <= cam_mov_zone or Input.is_action_pressed("cam_up"):
+	if mouse_pos.y <= RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_up"):
 		move_vector.y -= 1
 	
-	if mouse_pos.y >= 480 - cam_mov_zone or Input.is_action_pressed("cam_down"):
+	if mouse_pos.y >= 480 - RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_down"):
 		move_vector.y += 1
 	
-	position += move_vector.normalized() * MOVE_SPEED * delta
+	position += move_vector.normalized() * RTS.game_settings.camera_move_speed * delta
 	
 	if position.x < limit_left:
 		position.x = limit_left
@@ -122,9 +124,20 @@ func handle_camera_move(delta:float):
 func on_add_building(building_id:int):
 	emit_signal("add_new_building", building_id)
 
-func _on_unit_select_value_changed(value: float) -> void:
+func _on_unit_select_value_changed(_value: float) -> void:
 	unit_sb.max_value = len(RTS.selected_list) - 1
 	update_selected_data()
+
+func on_core_death():
+	building_actions.hide()
+	building_placer.hide()
+	RTS.select_list_changed.disconnect(building_actions.select_list_changed)
+
+func on_game_ended():
+	pause_menu.hide()
+	building_actions.hide()
+	building_placer.hide()
+	win_window.popup()
 
 func set_dialogue(text:String):
 	text_display_label.text = text

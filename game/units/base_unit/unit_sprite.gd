@@ -58,8 +58,8 @@ func stop_animation():
 		anim_timer.stop()
 
 
-func get_sprite_frame_from_rotation(rotation:float) -> float:
-	return snapped((rotation + PI) / TAU * vframes, 1)
+func get_sprite_frame_from_rotation(_rotation:float) -> int:
+	return snapped((_rotation + PI) / TAU * vframes, 1)
 
 func _on_frame_changed() -> void:
 	if color_sprite:

@@ -1,8 +1,150 @@
-[gd_scene load_steps=4 format=3 uid="uid://bycuqm1mnvlxl"]
+[gd_scene load_steps=10 format=3 uid="uid://bycuqm1mnvlxl"]
 
 [ext_resource type="Theme" uid="uid://dk83qmx0ytnuw" path="res://menu/menu_resources/themes/default_theme.tres" id="1_jbpj5"]
 [ext_resource type="Script" path="res://settings.gd" id="2_l33gp"]
 [ext_resource type="Texture2D" uid="uid://cvwhr7nkrey7h" path="res://menu/menu_resources/backgrounds/planet1.png" id="3_iurcc"]
+
+[sub_resource type="GDScript" id="GDScript_4utcf"]
+script/source = "extends Label
+
+func _on_camera_speed_slider_value_changed(value: float) -> void:
+	text = str(value) + \" px/s\"
+"
+
+[sub_resource type="GDScript" id="GDScript_bosny"]
+script/source = "extends Label
+
+func _on_camera_margin_slider_value_changed(value: float) -> void:
+	text = str(value) + \" px\"
+"
+
+[sub_resource type="Theme" id="Theme_ja7qn"]
+Button/font_sizes/font_size = 12
+ColorPicker/constants/h_width = 15
+Label/font_sizes/font_size = 12
+LineEdit/font_sizes/font_size = 12
+
+[sub_resource type="GDScript" id="GDScript_ycvmr"]
+script/source = "extends MarginContainer
+
+var Input_button := preload(\"res://menu/settings/input_button.tscn\")
+
+@onready var action_list := $VBoxContainer/ScrollContainer/ActionList
+
+var is_remapping := false
+var action_to_remap = null
+var remapping_button = null
+
+var input_actions := {
+	\"unit_move\": \"Unit move\",
+	\"shift\": \"Shift\",
+	\"place\": \"Place\",
+	\"cancel\": \"Cancel\",
+	\"self_destruct\": \"Self destruct\",
+	\"cam_left\": \"Camera move left\",
+	\"cam_right\": \"Camera move right\",
+	\"cam_up\": \"Camera move up\",
+	\"cam_down\": \"Camera move down\"
+}
+
+func _ready() -> void:
+	_create_action_list()
+
+func _create_action_list():
+	InputMap.load_from_project_settings()
+	for child in action_list.get_children(): child.queue_free()
+	
+	for action in input_actions:
+		var button = Input_button.instantiate()
+		var action_label = button.find_child(\"LabelAction\")
+		var input_label = button.find_child(\"LabelInput\")
+		
+		action_label.text = input_actions[action]
+		
+		var events = InputMap.action_get_events(action)
+		if events.size() > 0:
+			input_label.text = events[0].as_text().trim_suffix(\" (Physical)\")
+		else:
+			input_label.text = \"\"
+		
+		action_list.add_child(button)
+		button.pressed.connect(_on_input_button_pressed.bind(button, action))
+
+func _on_input_button_pressed(button:Button, action):
+	if !is_remapping:
+		is_remapping = true
+		action_to_remap = action
+		remapping_button = button
+		button.find_child(\"LabelInput\").text = \"Press key to bind...\"
+
+func _input(event: InputEvent) -> void:
+	if is_remapping:
+		if (
+			event is InputEventKey or 
+			(event is InputEventMouseButton and event.pressed)
+		):
+			if event is InputEventMouseButton and event.double_click:
+				event.double_click = false
+			InputMap.action_erase_events(action_to_remap)
+			InputMap.action_add_event(action_to_remap, event)
+			_update_action_list(remapping_button, event)
+			
+			is_remapping = false
+			action_to_remap = null
+			remapping_button = null
+			
+			accept_event()
+
+func _update_action_list(button, event):
+	button.find_child(\"LabelInput\").text = event.as_text().trim_suffix(\" (Physical)\")
+
+
+func _on_resetbutton_pressed() -> void:
+	_create_action_list()
+"
+
+[sub_resource type="GDScript" id="GDScript_8uv1i"]
+script/source = "extends MarginContainer
+
+@onready var master := $VBoxContainer/Labels/Label4
+@onready var SFX := $VBoxContainer/Labels2/Label4
+@onready var BGM := $VBoxContainer/Labels3/Label4
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+
+func _on_master_slider_value_changed(value: float) -> void:
+	if value < -40: value = -INF
+	master.text = str(value) + \" db\"
+
+
+func _on_sfx_slider_value_changed(value: float) -> void:
+	if value < -40: value = -INF
+	SFX.text = str(value) + \" db\"
+
+
+func _on_bgm_slider_value_changed(value: float) -> void:
+	if value < -40: value = -INF
+	BGM.text = str(value) + \" db\"
+"
+
+[sub_resource type="GDScript" id="GDScript_8q8gk"]
+script/source = "extends Window
+
+
+func _on_exit_button_pressed() -> void:
+	get_tree().change_scene_to_file(\"res://menu/main_menus/title_screen.tscn\")
+
+func _on_about_to_popup() -> void:
+	pass # Replace with function body.
+"
 
 [node name="Settings" type="Control"]
 layout_mode = 3
@@ -36,13 +178,326 @@ layout_mode = 2
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 8
 
 [node name="BackButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 text = "Back"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResetButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Reset settings"
+
+[node name="SaveButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Save settings"
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 1
+
+[node name="Game" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Game"]
+layout_mode = 2
+
+[node name="LeftBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+text = "Camera control"
+
+[node name="CameraControlOptions" type="OptionButton" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "Keyboard"
+popup/item_1/text = "Mouse"
+popup/item_1/id = 1
+popup/item_2/text = "Both"
+popup/item_2/id = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+text = "Camera move speed"
+
+[node name="CameraSpeedSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+min_value = 500.0
+max_value = 1500.0
+value = 1000.0
+
+[node name="MoveSpeedLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = " px/s"
+script = SubResource("GDScript_4utcf")
+
+[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+text = "Camera move margin"
+
+[node name="CameraMarginSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+max_value = 10.0
+
+[node name="CameraMarginLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = " px/s"
+script = SubResource("GDScript_bosny")
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+text = "Selection color"
+
+[node name="SelectionColor" type="ColorPickerButton" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+theme = SubResource("Theme_ja7qn")
+text = " "
+edit_alpha = false
+
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+text = "Enemy color"
+
+[node name="EnemyColor" type="ColorPickerButton" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+theme = SubResource("Theme_ja7qn")
+text = " "
+edit_alpha = false
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox"]
+layout_mode = 2
+
+[node name="Controls" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+layout_mode = 2
+script = SubResource("GDScript_ycvmr")
+metadata/_tab_index = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Controls"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer/Controls/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
+[node name="ActionList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Controls/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Resetbutton" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Controls/VBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+text = "Reset to default"
+
+[node name="Sound" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_8uv1i")
+metadata/_tab_index = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Sound"]
+layout_mode = 2
+
+[node name="Labels" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer"]
+layout_mode = 2
+
+[node name="Master" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/Labels"]
+layout_mode = 2
+text = "Master volume
+"
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/Labels"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/Labels"]
+layout_mode = 2
+text = "-0db
+"
+
+[node name="MasterSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer"]
+layout_mode = 2
+min_value = -41.0
+max_value = 2.0
+
+[node name="Labels2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer"]
+layout_mode = 2
+
+[node name="SFX" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/Labels2"]
+layout_mode = 2
+text = "SFX"
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/Labels2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/Labels2"]
+layout_mode = 2
+text = "-0db
+"
+
+[node name="SFXSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer"]
+layout_mode = 2
+min_value = -41.0
+max_value = 2.0
+
+[node name="Labels3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer"]
+layout_mode = 2
+
+[node name="BGM" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/Labels3"]
+layout_mode = 2
+text = "BGM
+"
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/Labels3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/Labels3"]
+layout_mode = 2
+text = "-0db
+"
+
+[node name="BGMSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer"]
+layout_mode = 2
+min_value = -41.0
+max_value = 2.0
+
+[node name="Graphics" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Graphics"]
+layout_mode = 2
+text = "Bad performance? 
+hardware issue tbh."
+
+[node name="Window" type="Window" parent="."]
+initial_position = 1
+size = Vector2i(340, 100)
+visible = false
+unresizable = true
+always_on_top = true
+popup_window = true
+extend_to_title = true
+script = SubResource("GDScript_8q8gk")
+
+[node name="MarginContainer" type="MarginContainer" parent="Window"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Window/MarginContainer"]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="Window/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Window/MarginContainer/VBoxContainer/CenterContainer"]
+layout_mode = 2
+text = "Settings not saved!"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Window/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="ExitButton" type="Button" parent="Window/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Exit settings"
+
+[node name="SaveButton" type="Button" parent="Window/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Save settings"
+
+[node name="ResetWindow" type="Window" parent="."]
+auto_translate_mode = 1
+initial_position = 1
+size = Vector2i(200, 100)
+visible = false
+unresizable = true
+always_on_top = true
+popup_window = true
+extend_to_title = true
+
+[node name="MarginContainer" type="MarginContainer" parent="ResetWindow"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ResetWindow/MarginContainer"]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="ResetWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ResetWindow/MarginContainer/VBoxContainer/CenterContainer"]
+layout_mode = 2
+text = "Reset settings :("
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ResetWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Reset" type="Button" parent="ResetWindow/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Yeah"
+
+[node name="Cancel" type="Button" parent="ResetWindow/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Nah"
+
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer2/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer2/ResetButton" to="ResetWindow" method="popup"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer2/SaveButton" to="." method="_on_save_button_pressed"]
+[connection signal="item_selected" from="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/CameraControlOptions" to="." method="_on_camera_control_options_item_selected"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/CameraSpeedSlider" to="." method="_on_camera_speed_slider_value_changed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/CameraSpeedSlider" to="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/MoveSpeedLabel" method="_on_camera_speed_slider_value_changed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/CameraMarginSlider" to="." method="_on_camera_margin_slider_value_changed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/CameraMarginSlider" to="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/CameraMarginLabel" method="_on_camera_margin_slider_value_changed"]
+[connection signal="color_changed" from="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/SelectionColor" to="." method="_on_selection_color_color_changed"]
+[connection signal="color_changed" from="MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/EnemyColor" to="." method="_on_enemy_color_color_changed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/TabContainer/Controls/VBoxContainer/Resetbutton" to="MarginContainer/VBoxContainer/TabContainer/Controls" method="_on_resetbutton_pressed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/MasterSlider" to="." method="_on_master_slider_value_changed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/MasterSlider" to="MarginContainer/VBoxContainer/TabContainer/Sound" method="_on_master_slider_value_changed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/SFXSlider" to="." method="_on_sfx_slider_value_changed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/SFXSlider" to="MarginContainer/VBoxContainer/TabContainer/Sound" method="_on_sfx_slider_value_changed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/BGMSlider" to="." method="_on_bgm_slider_value_changed"]
+[connection signal="value_changed" from="MarginContainer/VBoxContainer/TabContainer/Sound/VBoxContainer/BGMSlider" to="MarginContainer/VBoxContainer/TabContainer/Sound" method="_on_bgm_slider_value_changed"]
+[connection signal="about_to_popup" from="Window" to="Window" method="_on_about_to_popup"]
+[connection signal="close_requested" from="Window" to="Window" method="hide"]
+[connection signal="pressed" from="Window/MarginContainer/VBoxContainer/HBoxContainer/ExitButton" to="Window" method="_on_exit_button_pressed"]
+[connection signal="about_to_popup" from="ResetWindow" to="ResetWindow" method="_on_about_to_popup"]
+[connection signal="close_requested" from="ResetWindow" to="ResetWindow" method="hide"]
+[connection signal="pressed" from="ResetWindow/MarginContainer/VBoxContainer/HBoxContainer/Reset" to="." method="_on_reset_pressed"]
+[connection signal="pressed" from="ResetWindow/MarginContainer/VBoxContainer/HBoxContainer/Reset" to="ResetWindow" method="hide"]
+[connection signal="pressed" from="ResetWindow/MarginContainer/VBoxContainer/HBoxContainer/Cancel" to="ResetWindow" method="hide"]

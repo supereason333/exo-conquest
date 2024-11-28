@@ -7,16 +7,15 @@ func _ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
 		visible = !visible
 
 
 func _on_exit_title_button_pressed() -> void:
-	MultiplayerScript.close_multiplayer()
-	get_tree().change_scene_to_file("res://menu/main_menus/title_screen.tscn")
+	MultiplayerScript.end_game()
 
 
 func _on_exit_game_button_pressed() -> void:
-	MultiplayerScript.close_multiplayer()
+	MultiplayerScript.end_game()
 	get_tree().quit()

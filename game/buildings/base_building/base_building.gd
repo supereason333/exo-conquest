@@ -35,5 +35,5 @@ func unit_produced(unit: PackedScene) -> void:
 		print_debug("AWDAWDWADADW")
 		game_env.add_unit(_unit)
 
-func on_box_select(box:Rect2, list:Array[BaseUnit]):
+func on_box_select(_box:Rect2, _list:Array[BaseUnit]):
 	pass

@@ -13,6 +13,7 @@ var box:Rect2
 @onready var building_detector := $BuildingDetector
 @onready var bgm_player := $BGM
 @onready var spawnpoints := $Map/Spawnpoints
+@onready var multiplayer_spwner := $MultiplayerSpawner
 var tutorial:Node
 
 var placing_building := false
@@ -39,10 +40,12 @@ func _ready() -> void:
 	
 	_on_bgm_finished()
 	
+	MultiplayerScript.game_ended.connect(on_game_ended)
+	
 	if MultiplayerScript.game_running:
 		pre_game_init()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	queue_redraw()
 	#data_viewer_code()
 	if Input.is_action_just_pressed("unit_move"):
@@ -78,14 +81,14 @@ func game_init():
 func add_unit(unit:BaseUnit):
 	if !unit: return
 	if !multiplayer.is_server():
-		rpc("rpc_add_unit", unit.unit_id, unit.position, multiplayer.get_unique_id(), unit.waypoints)
+		rpc_id(1, "rpc_add_unit", unit.unit_id, unit.position, multiplayer.get_unique_id(), unit.waypoints)
 		return
-	unit.name = "unit_" + str(multiplayer.get_unique_id()) + "_" + str(next_unit_id)
 	next_unit_id += 1
 	if unit.peer_id == 0:
 		unit.peer_id = multiplayer.get_unique_id()
 	if unit.team_id == 0:
 		unit.team_id = MultiplayerScript.get_player_from_peer_id(multiplayer.get_unique_id()).team_id
+	unit.name = "unit_" + str(unit.peer_id) + "_" + str(next_unit_id)
 	add_child(unit)
 
 @rpc("any_peer")
@@ -101,24 +104,26 @@ func rpc_add_unit(unit_id:int, _position:Vector2, peer_id:int, waypoints:Array):
 @rpc("any_peer")
 func rpc_add_building(building_id:int, _position:Vector2, peer_id:int):
 	if !multiplayer.is_server(): return
-	var building := BuildingLoader.load_building_from_id(building_id)
-	building.position = _position
-	building.team_id = MultiplayerScript.get_player_from_peer_id(peer_id).team_id
-	building.peer_id = peer_id
-	add_building(building)
+	var new_building := BuildingLoader.load_building_from_id(building_id)
+	new_building.position = _position
+	new_building.team_id = MultiplayerScript.get_player_from_peer_id(peer_id).team_id
+	new_building.peer_id = peer_id
+	add_building(new_building)
 
 func add_building(build:BaseBuilding):
 	if !build: return
 	if !multiplayer.is_server():
-		rpc("rpc_add_building", build.unit_id, build.position, multiplayer.get_unique_id())
+		rpc_id(1, "rpc_add_building", build.unit_id, build.position, multiplayer.get_unique_id())
 		return
-	#building = build
-	build.name = "building_" + str(multiplayer.get_unique_id()) + "_" + str(next_build_id)
 	if build.peer_id == 0:
 		build.peer_id = multiplayer.get_unique_id()
 	next_build_id += 1
 	if build.team_id == 0:
 		build.team_id = MultiplayerScript.get_player_from_peer_id(multiplayer.get_unique_id()).team_id
+	if build.unit_id == 1:
+		build.name = "core_" + str(build.peer_id) + "_" + str(next_build_id)
+	else:
+		build.name = "building_" + str(build.peer_id) + "_" + str(next_build_id)
 	add_child(build)
 	return
 	
@@ -228,19 +233,45 @@ func _on_bgm_finished() -> void:
 	bgm_player.play()
 
 func pre_game_init():
-	var core := BuildingLoader.load_building_from_id(1)
-	for point in spawnpoints.get_children():
-		if point.name.to_int() == RTS.start_position:
-			if true: #multiplayer.is_server():
-				core.name = "core_" + str(multiplayer.get_unique_id())
-				core.position = snapped(point.position, Vector2(32, 32))
-				player.position = core.position - Vector2(320, 240)
-				core.team_id = RTS.player.team_id
-				add_building(core)
-				for i in 3:
-					var miner := UnitLoader.load_unit_from_id(4)
-					miner.position = core.position + Vector2(20 * i, 100)
-					add_unit(miner)
+	if multiplayer.is_server():
+		var i = 1
+		for _player in MultiplayerScript.player_list:
+			var core = BuildingLoader.load_building_from_id(1)
+			core.team_id = _player.team_id
+			core.peer_id = _player.peer_id
+			var point = spawnpoints.find_child(str(i))
+			if point:
+				core.position = point.position
+				if _player.peer_id == multiplayer.get_unique_id():
+					set_player_pos(point.position)
+					RTS.base_core = core
+				else:
+					rpc_id(_player.peer_id, "set_player_pos", point.position)
 			else:
-				rpc("rpc_add_building", 1, snapped(point.position, Vector2(32, 32)), multiplayer.get_unique_id())
-				player.position = snapped(point.position, Vector2(32, 32)) - Vector2(320, 240)
+				printerr("Not found spawnpoint " + str(i))
+			MultiplayerScript.core_list.append(core)
+			core.death.connect(MultiplayerScript.core_death)
+			add_building(core)
+			i += 1
+		MultiplayerScript
+		return
+	
+	return
+	
+
+func on_game_ended():
+	if !multiplayer.is_server(): return
+	for child in get_children():
+		if child.has_method("despawn"):
+			child.despawn()
+
+@rpc
+func set_player_pos(_position:Vector2):
+	player.position = _position - Vector2(320, 240)
+
+func _on_multiplayer_spawner_spawned(node: Node) -> void:
+	print(node.name.split("_"))
+	if node is BaseBuilding:
+		if node.name.split("_")[0] == "core" and node.name.split("_")[1] == str(multiplayer.get_unique_id()):
+			RTS.base_core = node
+			print("BASE CORE SET FOR " + str(multiplayer.get_unique_id()))

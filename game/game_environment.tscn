@@ -398,3 +398,4 @@ _spawnable_scenes = PackedStringArray("res://game/buildings/core_building.tscn",
 spawn_path = NodePath("..")
 
 [connection signal="finished" from="BGM" to="." method="_on_bgm_finished"]
+[connection signal="spawned" from="MultiplayerSpawner" to="." method="_on_multiplayer_spawner_spawned"]

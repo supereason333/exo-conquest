@@ -16,11 +16,6 @@ func _ready() -> void:
 	id_label.text = str(team.id)
 	color_rect.color = team.color
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
 func _on_button_pressed() -> void:
 	RTS.change_team(team.id)
 	#emit_signal(\"switch_team\", team.id)

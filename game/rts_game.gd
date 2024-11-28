@@ -5,6 +5,10 @@ signal material_changed
 signal point_select(point:Vector2)
 signal box_select(box:Rect2)
 signal client_player_updated(_player:PlayerData)
+signal settings_changed
+signal core_death
+
+const SAVE_PATH := "user://"
 
 var player:PlayerData		# Data for self client what
 var game_settings:GameSettings
@@ -18,10 +22,12 @@ var selected_list:Array[BaseUnit]
 var selected_building:BaseBuilding:
 	set(value):
 		if selected_building:
-			selected_building.selected = false
+			if is_instance_valid(selected_building):
+				selected_building.selected = false
 		selected_building = value
 		if selected_building:
 			selected_building.selected = true
+var base_core:BaseBuilding
 
 var selected_controllable := true
 
@@ -35,9 +41,10 @@ func _ready() -> void:
 	#add_child(unit_loader)
 	set_default_player()
 	load_settings()
-	
+	core_death.connect(on_core_death)
+	MultiplayerScript.game_ended.connect(on_game_ended)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	pass
 	
 	if Input.is_action_just_pressed("self_destruct"):
@@ -47,8 +54,12 @@ func _process(delta: float) -> void:
 			if selected_building:
 				selected_building.kill()
 
-func load_settings():			# CHANGE THIS TO ACTUALLY LOAD SETTINGS
+func load_settings():
+	if FileAccess.file_exists(SAVE_PATH + "settings.tres"):
+		game_settings = ResourceLoader.load(SAVE_PATH + "settings.tres")
+		return
 	game_settings = ResourceLoader.load("res://menu/settings/default_settings.tres")
+	ResourceSaver.save(game_settings, SAVE_PATH + "settings.tres")
 
 func set_default_player():
 	player = PlayerData.new()
@@ -59,6 +70,8 @@ func set_default_player():
 	emit_signal("client_player_updated", player)
 
 func on_right_click(position:Vector2):
+	if !base_core: return
+	
 	if !selected_controllable: return
 	var clicked := get_point_select(position)
 	
@@ -66,6 +79,8 @@ func on_right_click(position:Vector2):
 		unit.waypoint(position, clicked, Input.is_action_pressed("shift"))
 
 func do_point_select(point:Vector2):
+	if !base_core: return
+	
 	var list:Array[BaseUnit]
 	var list_building:Array[BaseUnit]
 	get_tree().call_group("unit", "on_point_select", point, list)
@@ -100,7 +115,7 @@ func do_point_select(point:Vector2):
 
 func get_point_select(point:Vector2) -> Node2D:
 	var list:Array[Node2D]
-	get_tree().call_group("unit", "on_point_select", point, list)					# THIS DOSENT WORK FIX THIS
+	get_tree().call_group("unit", "on_point_select", point, list)
 	#get_tree().call_group("building", "on_point_select", point, list)
 	
 	if list:
@@ -109,6 +124,8 @@ func get_point_select(point:Vector2) -> Node2D:
 		return null
 
 func do_box_select(box:Rect2):
+	if !base_core: return
+	
 	var list:Array[BaseUnit]
 	get_tree().call_group("unit", "on_box_select", box, list)
 	if !list:
@@ -130,6 +147,8 @@ func do_box_select(box:Rect2):
 	emit_signal("select_list_changed")
 
 func add_selection(unit:BaseUnit):
+	if !base_core: return
+	
 	if selected_list.size() < MAX_SELECT_AMOUNT:
 		if !selected_list.has(unit):
 			unit.selected = true
@@ -146,16 +165,20 @@ func remove_selection(unit:BaseUnit, _signal:bool = false):
 	if _signal: emit_signal("select_list_changed")
 
 func set_selection(list:Array[BaseUnit]):
+	if !base_core: return
+	
 	if list.size() > MAX_SELECT_AMOUNT: list.resize(MAX_SELECT_AMOUNT)
 	for i in selected_list:
-		i.selected = false
+		if is_instance_valid(i):
+			i.selected = false
 	selected_list = list
 	for i in selected_list:
 		i.selected = true
 
 func clear_selection(_signal:bool = false):
 	for i in selected_list:
-		i.selected = false
+		if is_instance_valid(i):
+			i.selected = false
 	selected_list = []
 	
 	if _signal: emit_signal("select_list_changed")
@@ -167,94 +190,13 @@ func pre_game_init():
 func set_start_pos(pos:int):
 	start_position = pos
 
-
-
-"""
-func handle_building_point_select(building:Node2D):
-	if selected_building: selected_building.deselected()
-	selected_building = building
-	selected_building.selected()
-
-func clear_selected_building():
-	if selected_building: selected_building.deselected()
+func on_core_death():
+	clear_selection()
+	selected_controllable = false
 	selected_building = null
 
-func handle_box_select(epsteins_list:Array, add:bool = false):
-	if !selected_controllable:
-		clear_selected()
-	selected_controllable = true
-	if add:
-		for unit in epsteins_list:
-			if !selected_list.has(unit) and selected_list.size() < MAX_SELECT_AMOUNT:
-				selected_list.append(unit)
-		
-	else:
-		for unit in selected_list:
-			unit.deselected()
-		
-		if epsteins_list.size() > MAX_SELECT_AMOUNT:
-			epsteins_list.resize(MAX_SELECT_AMOUNT)
-		selected_list = epsteins_list
-	
-	for unit in selected_list:
-		unit.selected()
-	
-	emit_signal("select_list_changed")
-
-func handle_point_select(unit, add:bool = false):
-	if !unit.is_owned_by_user():
-		clear_selected()
-		selected_list = [unit]
-		unit.selected()
-		selected_controllable = false
-		emit_signal("select_list_changed")
-		return
-	
-	selected_controllable = true
-	if add:
-		if !selected_list.has(unit) and selected_list.size() < MAX_SELECT_AMOUNT:
-			selected_list.append(unit)
-		elif selected_list.has(unit):
-			for i in selected_list.size():
-				if selected_list[i] == unit:
-					selected_list[i].deselected()
-					selected_list.remove_at(i)
-					break
-		
-	else:
-		for a in selected_list:
-			a.deselected()
-		selected_list = []
-		selected_list.append(unit)
-	
-	for a in selected_list:
-		a.selected()
-	
-	emit_signal("select_list_changed")
-
-func on_right_click(pos:Vector2, unit:Node2D = null):
-	if !selected_controllable: return
-	
-	for _unit in selected_list:
-		_unit.on_right_click(pos, unit)
-
-
-func clear_selected(_emit_signal:bool = false):
-	for i in selected_list:
-		i.deselected()
-	
-	selected_list = []
-	
-	if _emit_signal: emit_signal("select_list_changed")
-
-func remove_from_select(unit):
-	if selected_list.has(unit): selected_list.remove_at(selected_list.find(unit))
-	
-	emit_signal("select_list_changed")
-	#for i in len(selected_list):
-	#	if selected_list[i] == unit:
-	#		selected_list.remove_at(i)
-"""
+func on_game_ended():
+	pass
 
 func change_team(team_id:int):
 	player.team_id = team_id

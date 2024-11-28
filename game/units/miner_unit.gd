@@ -2,7 +2,7 @@ extends BaseUnit
 
 @onready var gather_timer := $GatherTimer
 @onready var label := $GatheringLabel
-var base_core:BaseBuilding
+#var base_core:BaseBuilding
 
 var gathering := false:
 	set(value):
@@ -30,7 +30,7 @@ const GATHER_AMOUNT := 2
 
 func _ready() -> void:
 	super()
-	base_core = get_close_core()
+	#base_core = get_close_core()
 	if peer_id != multiplayer.get_unique_id(): gather_timer.queue_free()
 
 func _process(delta: float) -> void:
@@ -43,9 +43,9 @@ func _physics_process(delta: float) -> void:
 
 func _draw() -> void:
 	super()
-	if selected:
-		if base_core:
-			draw_line(Vector2.ZERO, base_core.position - position, Color.WHITE)
+	if selected and is_owned_by_user():
+		if RTS.base_core:
+			draw_line(Vector2.ZERO, RTS.base_core.position - position, Color.WHITE)
 		if gathering:
 			pass
 
@@ -78,7 +78,7 @@ func gather_resource():
 			pass
 	
 
-func waypoint(_position:Vector2, clicked_unit:Node2D, hold:bool):
+func waypoint(_position:Vector2, clicked_unit:Node2D, _hold:bool):
 	super(_position, clicked_unit, false)
 	gathering = false
 	
@@ -106,3 +106,7 @@ func get_close_core() -> BaseBuilding:
 	
 	print(shortest_core)
 	return shortest_core
+
+func core_death():
+	super()
+	gathering = false

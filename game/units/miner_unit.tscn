@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://detxmk1f7bbba"]
+[gd_scene load_steps=13 format=3 uid="uid://detxmk1f7bbba"]
 
 [ext_resource type="Script" path="res://game/units/miner_unit.gd" id="1_ecd2s"]
 [ext_resource type="Script" path="res://classes/material.gd" id="2_si5pp"]
@@ -16,7 +16,7 @@ plainium = 0
 xenite = 0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7xqau"]
-size = Vector2(16, 32)
+size = Vector2(12, 24)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ovp1r"]
 properties/0/path = NodePath(".:position")
@@ -49,7 +49,15 @@ script = ExtResource("6_0ujve")
 animation_name = &"idle"
 one_shot = true
 speed = 0.2
-frames = Array[int]([0])
+frames = Array[int]([2])
+frame_positions = Array[Vector2]([])
+
+[sub_resource type="Resource" id="Resource_gcnaa"]
+script = ExtResource("6_0ujve")
+animation_name = &"walk"
+one_shot = false
+speed = 0.2
+frames = Array[int]([0, 1])
 frame_positions = Array[Vector2]([])
 
 [node name="MinerUnit" type="CharacterBody2D" node_paths=PackedStringArray("unit_sprite", "collision_shape", "multiplayer_sync") groups=["unit"]]
@@ -69,6 +77,7 @@ collision_shape = NodePath("CollisionShape2D")
 multiplayer_sync = NodePath("MultiplayerSynchronizer")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_7xqau")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
@@ -87,9 +96,10 @@ text = "Gathering"
 
 [node name="UnitSprite" parent="." instance=ExtResource("3_bk22h")]
 texture = ExtResource("3_55ojm")
+hframes = 3
 vframes = 16
 color_texture = ExtResource("5_bdg08")
-animations = Array[ExtResource("6_0ujve")]([SubResource("Resource_6ncso")])
+animations = Array[ExtResource("6_0ujve")]([SubResource("Resource_6ncso"), SubResource("Resource_gcnaa")])
 default_anim = &"idle"
 
 [connection signal="timeout" from="GatherTimer" to="." method="gather_resource"]

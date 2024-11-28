@@ -11,16 +11,7 @@ func init():
 	var core := BuildingLoader.load_building_from_id(1)
 	core.position = Vector2(1000, 2530)
 	core.team_id = 1
-	core.death.connect(enemy_death)
 	game_env.add_building(core)
 
 func select_list_changed():
 	pass
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-func enemy_death(unit:BaseUnit):
-	print_debug("WOO HOO YOU WIN THE TUTORIAL!!!!")
-	get_tree().change_scene_to_file("res://menu/win_screen.tscn")

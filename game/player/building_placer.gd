@@ -36,5 +36,5 @@ func on_numbered_button_clicked(number:int):
 func on_numbered_button_mouse_entered(number:int):
 	material_display.set_costs(BuildingLoader.load_building_from_id(number).unit_cost)
 
-func on_numbered_button_mouse_exited(number:int):
+func on_numbered_button_mouse_exited(_number:int):
 	material_display.set_costs(MaterialCost.new(0, 0, 0, 0))

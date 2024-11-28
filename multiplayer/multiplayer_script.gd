@@ -7,20 +7,27 @@ signal player_list_changed	# A signal called when player list updates (client on
 signal player_updated(player:PlayerData)	# Not used but i cant be bothered to remove it
 signal can_start_changed(status:bool)
 signal game_started
+signal game_ended
 
 var player_list:Array[PlayerData]	# An array of current players connected
 var team_list:Array[Team]			# An array of all teams that currently exist DOES NOT CONTAIN PLAYERS
 var ready_list:PackedInt32Array		# An array of all players that are ready
+var core_list:Array[BaseBuilding]
 var ready_status:bool:
 	set(value):
-		if multiplayer.is_server():
-			update_ready_status(multiplayer.get_unique_id(), value)
-			rpc("update_ready_status", multiplayer.get_unique_id(), value)
-		else:
-			rpc("server_update_ready_status", multiplayer.get_unique_id(), value)
+		if multiplayer.multiplayer_peer:
+			if multiplayer.is_server():
+				update_ready_status(multiplayer.get_unique_id(), value)
+				rpc("update_ready_status", multiplayer.get_unique_id(), value)
+			else:
+				rpc("server_update_ready_status", multiplayer.get_unique_id(), value)
 		ready_status = value
 var can_start := false
 var game_running := false
+var left_game := false
+var game_start_time
+var game_end_time
+var game_winner:int
 
 var rand := RandomNumberGenerator.new()
 var adj_list:WordList = ResourceLoader.load("res://menu/menu_resources/adjectives.tres")
@@ -35,8 +42,10 @@ func host_server(port:int = 9998, players:int = 2):
 		printerr("Cannot host: " + str(error))
 		return "Cannot host: " + str(error)
 	multiplayer.multiplayer_peer = enet_peer
-	multiplayer.peer_connected.connect(handle_connect)
-	multiplayer.peer_disconnected.connect(handle_disconnect)
+	if !multiplayer.peer_connected.is_connected(handle_connect):
+		multiplayer.peer_connected.connect(handle_connect)
+	if !multiplayer.peer_disconnected.is_connected(handle_disconnect):
+		multiplayer.peer_disconnected.connect(handle_disconnect)
 	
 	print("Server hosted on port " + str(port))
 	
@@ -51,21 +60,10 @@ func join_server(address:String = "localhost", port:int = 9998):
 		printerr("Cannot host: " + str(error))
 		return "Cannot host: " + str(error)
 	multiplayer.multiplayer_peer = enet_peer
-	multiplayer.connected_to_server.connect(connected_successfully)
-	multiplayer.connection_failed.connect(connection_failed)
-
-func close_multiplayer():
-	if multiplayer.is_server():
-		rpc("server_closed")
-		print("Server closed")
-	await get_tree().create_timer(1)
-	multiplayer.multiplayer_peer.close()
-
-@rpc
-func server_closed():
-	print("Server closed")
-	get_tree().change_scene_to_file("res://menu/main_menus/title_screen.tscn")
-	multiplayer.multiplayer_peer.close()
+	if !multiplayer.connected_to_server.is_connected(connected_successfully):
+		multiplayer.connected_to_server.connect(connected_successfully)
+	if !multiplayer.connection_failed.is_connected(connection_failed):
+		multiplayer.connection_failed.connect(connection_failed)
 
 func connected_successfully():
 	RTS.player.peer_id = multiplayer.get_unique_id()
@@ -332,35 +330,36 @@ func set_default_team() -> void:
 	new_team("TEAM 0", "", Color.BLUE, 0)
 	new_team("TEAM 1", "", Color.RED, 1)
 
-func new_team(name:String, slogan:String, color:Color, id:int = -1):
+func new_team(team_name:String, slogan:String, color:Color, id:int = -1):
 	var team = Team.new()
 	if id < 0:
-		id = hash(name)
+		id = hash(team_name)
 	for a in team_list:
-		if a.name == name or id == a.id:
+		if a.name == team_name or id == a.id:
 			return "NAME OR ID TAKEN"
 	
-	team.name = name
+	team.name = team_name
 	team.color = color
 	team.id = id
 	if multiplayer.is_server():
 		team_list.append(team)
-		rpc("client_recieve_new_team", name, slogan, color, id)
+		rpc("client_recieve_new_team", team_name, slogan, color, id)
 		emit_signal("team_list_changed")
 	else:
-		rpc("server_recieve_new_team", name, slogan, color, id)
+		rpc("server_recieve_new_team", team_name, slogan, color, id)
 
 @rpc("any_peer")
-func server_recieve_new_team(name:String, slogan:String, color:Color, id:int = -1):
+func server_recieve_new_team(team_name:String, slogan:String, color:Color, id:int = -1):
 	if !multiplayer.is_server(): return
 	
-	new_team(name, slogan, color, id)
+	new_team(team_name, slogan, color, id)
 
 @rpc
-func client_recieve_new_team(name:String, slogan:String, color:Color, id:int = -1):
+func client_recieve_new_team(team_name:String, slogan:String, color:Color, id:int = -1):
 	var team = Team.new()
-	team.name = name
+	team.name = team_name
 	team.color = color
+	team.slogan = slogan
 	team.id = id
 	team_list.append(team)
 	emit_signal("team_list_changed")
@@ -394,15 +393,15 @@ func clear_unused_teams():
 ################################################################################
 
 func random_team_name() -> String:
-	var name:String
+	var team_name:String
 	
 	if random_chance():
-		name = "The "
+		team_name = "The "
 	
-	name += adj_list.list[int(rand.randi_range(0, adj_list.list.size() - 1))] + " "
-	name += noun_list.list[int(rand.randi_range(0, noun_list.list.size() - 1))]
+	team_name += adj_list.list[int(rand.randi_range(0, adj_list.list.size() - 1))] + " "
+	team_name += noun_list.list[int(rand.randi_range(0, noun_list.list.size() - 1))]
 	
-	var words = name.split(" ")                # Split the string into words
+	var words = team_name.split(" ")                # Split the string into words
 	var capitalized_words = []
 	for word in words:
 		capitalized_words.append(word.capitalize())  # Capitalize each word
@@ -427,19 +426,91 @@ func start_game():
 		print("GAME STARTED ON SERVER")
 		
 		#clear_unused_teams()
-		var i := 1
-		for player in player_list:
-			if player.peer_id == multiplayer.get_unique_id():
-				RTS.set_start_pos(i)
-			else:
-				RTS.rpc_id(player.peer_id, "set_start_pos", i)
-			i += 1
+#		var i := 1
+#		for player in player_list:
+#			if player.peer_id == multiplayer.get_unique_id():
+#				RTS.set_start_pos(i)
+#			else:
+#				RTS.rpc_id(player.peer_id, "set_start_pos", i)
+#			i += 1
 		
+		game_start_time = Time.get_unix_time_from_system()
 		rpc("start_game")
 		RTS.pre_game_init()
 		emit_signal("game_started")
 	else:
 		game_running = true
+		game_start_time = Time.get_unix_time_from_system()
 		print("GAME STARTED ON PEER " + str(multiplayer.get_unique_id()))
 		RTS.pre_game_init()
 		emit_signal("game_started")
+
+@rpc("reliable")
+func end_game():
+	if !multiplayer.is_server():
+		if !left_game:
+			left_game = true
+			game_end_time = Time.get_unix_time_from_system()
+			
+			game_ended.emit()
+		return
+	
+	rpc("end_game")
+	
+	left_game = true
+	game_end_time = Time.get_unix_time_from_system()
+	game_ended.emit()
+	
+
+@rpc("reliable")
+func eliminate(peer_id:int):
+	if peer_id == multiplayer.get_unique_id():
+		RTS.base_core = null
+		RTS.core_death.emit()
+		
+		return
+		
+	#rpc("eliminate", peer_id)
+	rpc_id(peer_id, "eliminate", peer_id)
+
+func core_death(core:BaseBuilding):
+	print("CORE DEATH " + str(core))
+	print(str(core.peer_id))
+	eliminate(core.peer_id)
+	core_list.remove_at(core_list.find(core))
+	if core_list.size() <= 1:
+		set_winner(core_list[0].peer_id)
+		end_game()
+		print("WINNER")
+
+@rpc
+func set_winner(peer_id):
+	if !multiplayer.is_server():
+		game_winner = peer_id
+		return
+	
+	rpc("set_winner", peer_id)
+	game_winner = peer_id
+
+func multiplayer_cleanup():
+	multiplayer.multiplayer_peer.close()
+	multiplayer.multiplayer_peer = null
+	RTS.player.peer_id = 0
+	RTS.player.team_id = 0
+	RTS.materials = MaterialCost.new(0, 0, 0, 0)
+	RTS.selected_building = null
+	RTS.selected_list = []
+	RTS.base_core = null
+	RTS.selected_controllable = true
+	RTS.start_position = 0
+	player_list = []
+	team_list = []
+	ready_list = []
+	core_list = []
+	ready_status = false
+	can_start = false
+	game_running = false
+	game_start_time = 0
+	game_end_time = 0
+	left_game = false
+	game_winner = 0

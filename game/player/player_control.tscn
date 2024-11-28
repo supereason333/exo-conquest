@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://c4vu28w7nfnwt"]
+[gd_scene load_steps=27 format=3 uid="uid://c4vu28w7nfnwt"]
 
 [ext_resource type="Script" path="res://game/player/player_control.gd" id="1_83dnc"]
 [ext_resource type="Theme" uid="uid://bujlagwci5a1f" path="res://menu/menu_resources/themes/default_gui.tres" id="2_kekrh"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" path="res://game/player/building_actions.gd" id="9_qxs22"]
 [ext_resource type="Script" path="res://game/player/building_placer.gd" id="10_4i84l"]
 [ext_resource type="Script" path="res://game/player/pause_menu.gd" id="10_rv0bb"]
+[ext_resource type="Theme" uid="uid://dk83qmx0ytnuw" path="res://menu/menu_resources/themes/default_theme.tres" id="12_vadvc"]
 
 [sub_resource type="GDScript" id="GDScript_oivxw"]
 script/source = "extends Button
@@ -21,20 +22,17 @@ script/source = "extends Button
 func _ready() -> void:
 	unit_sb.max_value = UnitLoader.MAX_UNITS
 
-func _process(delta: float) -> void:
-	pass
-
 func _on_unit_selector_value_changed(value: float) -> void:
 	for child in unit_sb.get_children():
 		child.queue_free()
 	
 	var unit:CharacterBody2D = UnitLoader.load_unit_from_id(unit_sb.value)
 	if unit:
-		unit.position.y += 50
-		unit.dummy = true
-		#print(unit)
-		#print(type_string(typeof(unit.tags)))
-		unit_sb.add_child(unit)
+		var rect:TextureRect = TextureRect.new()
+		rect.texture = UnitLoader.load_unit_from_id(unit_sb.value).display_icon
+		
+		rect.position.y += 50
+		unit_sb.add_child(rect)
 
 func _on_pressed() -> void:
 	var unit = UnitLoader.load_unit_from_id(unit_sb.value)
@@ -62,10 +60,6 @@ func _ready() -> void:
 
 func add_building(building_id:int):
 	emit_signal(\"add_new_building\", building_id)
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
 "
 
 [sub_resource type="GDScript" id="GDScript_utj0g"]
@@ -78,14 +72,8 @@ func _on_pressed() -> void:
 [sub_resource type="GDScript" id="GDScript_nl0vn"]
 script/source = "extends Label
 
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	text = \"FPS: \" + str(Engine.get_frames_per_second())
 "
 
@@ -100,11 +88,6 @@ script/source = "extends VBoxContainer
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	RTS.material_changed.connect(update_display)
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
 
 func update_display():
 	selnite.text = str(RTS.materials.selnite)
@@ -130,11 +113,6 @@ script/source = "extends GridContainer
 	$\"8/TextureButton\",
 	$\"9/TextureButton\"
 ]
-func _ready() -> void:
-	pass
-
-func _process(delta: float) -> void:
-	pass
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dr2s1"]
@@ -154,10 +132,6 @@ func _ready() -> void:
 	var label := Label.new()
 	label.text = \"None\"
 	add_child(label)
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
 
 func update_display():
 	for child in get_children():
@@ -259,7 +233,7 @@ func on_unit_button_pressed(number:int):
 func on_unit_button_mouse_entered(number:int):
 	update_costs(number)
 
-func on_unit_button_mouse_exited(number:int):
+func on_unit_button_mouse_exited(_number:int):
 	update_costs(-1)
 
 func update_costs(unit_number:int):
@@ -278,7 +252,7 @@ func update_list(_unit:PackedScene = PackedScene.new()):
 				texture_rect.texture = RTS.selected_building.production_component.produce_list[queue_unit].instantiate().display_icon
 				queue_list.add_child(texture_rect)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if !visible: return
 	if !RTS.selected_building: return
 	
@@ -336,6 +310,21 @@ func _on_bgm_slider_value_changed(value: float) -> void:
 	if value < -40: value = -INF
 	AudioServer.set_bus_volume_db(1, value)
 	BGM_db_label.text = str(value) + \" db\"
+"
+
+[sub_resource type="GDScript" id="GDScript_cfhmg"]
+script/source = "extends Window
+
+@onready var label := $MarginContainer/VBoxContainer/HBoxContainer/Label
+
+func _on_button_pressed() -> void:
+	get_tree().change_scene_to_file(\"res://menu/end_screen.tscn\")
+
+func _on_about_to_popup() -> void:
+	if MultiplayerScript.game_winner == multiplayer.get_unique_id():
+		label.text = \"You win!\"
+	else:
+		label.text = \"You lost!\"
 "
 
 [node name="PlayerControl" type="Camera2D"]
@@ -518,7 +507,6 @@ layout_mode = 2
 text = "0"
 
 [node name="AddButton" type="Button" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay"]
-visible = false
 layout_mode = 2
 
 [node name="ControlContainer" type="GridContainer" parent="UI/Control/MarginContainer"]
@@ -984,6 +972,41 @@ text = "Exit to title"
 layout_mode = 2
 text = "Exit to desktop"
 
+[node name="Window" type="Window" parent="UI"]
+initial_position = 1
+size = Vector2i(160, 100)
+visible = false
+unresizable = true
+theme = ExtResource("12_vadvc")
+script = SubResource("GDScript_cfhmg")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Window"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Window/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 11
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/Window/MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="UI/Window/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "text"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="UI/Window/MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Button" type="Button" parent="UI/Window/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Okay"
+
 [connection signal="value_changed" from="UI/Control/DebugMenu/SelectedData/UnitSelect" to="." method="_on_unit_select_value_changed"]
 [connection signal="pressed" from="UI/Control/DebugMenu/AddUnit" to="UI/Control/DebugMenu/AddUnit" method="_on_pressed"]
 [connection signal="value_changed" from="UI/Control/DebugMenu/UnitSelector" to="UI/Control/DebugMenu/AddUnit" method="_on_unit_selector_value_changed"]
@@ -994,3 +1017,5 @@ text = "Exit to desktop"
 [connection signal="value_changed" from="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders/MarginContainer/VBoxContainer/BGMSlider" to="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/LeftBox/AudioSliders" method="_on_bgm_slider_value_changed"]
 [connection signal="pressed" from="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/RightBox/ExitTitleButton" to="UI/Control/PauseMenu" method="_on_exit_title_button_pressed"]
 [connection signal="pressed" from="UI/Control/PauseMenu/MarginContainer/VBoxContainer/HBoxContainer2/RightBox/ExitGameButton" to="UI/Control/PauseMenu" method="_on_exit_game_button_pressed"]
+[connection signal="about_to_popup" from="UI/Window" to="UI/Window" method="_on_about_to_popup"]
+[connection signal="pressed" from="UI/Window/MarginContainer/VBoxContainer/HBoxContainer2/Button" to="UI/Window" method="_on_button_pressed"]

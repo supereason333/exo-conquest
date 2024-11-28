@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3 uid="uid://duul71f7psypu"]
+
+[ext_resource type="Script" path="res://menu/end_screen.gd" id="1_4op1l"]
+[ext_resource type="Texture2D" uid="uid://cvwhr7nkrey7h" path="res://menu/menu_resources/backgrounds/planet1.png" id="2_fel2e"]
+
+[node name="EndScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4op1l")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_fel2e")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Return to title screen"
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 40.0
+offset_right = 64.0
+offset_bottom = 63.0
+text = "Game finished"
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 128.0
+offset_right = 124.0
+offset_bottom = 151.0
+text = "Elapsed time"
+
+[node name="Label3" type="Label" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 152.0
+offset_right = 124.0
+offset_bottom = 175.0
+text = "0s"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

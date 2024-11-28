@@ -22,10 +22,6 @@ func _ready() -> void:
 		print("BUILDING LOADED " + str(ins_building_list[i].unit_id) + " " + ins_building_list[i].unit_name)
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
 func load_building_from_id(id:int) -> BaseBuilding:
 	for i in len(ins_building_list):
 		

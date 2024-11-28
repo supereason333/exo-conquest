@@ -4,6 +4,7 @@
 
 [resource]
 default_font_size = 0
+BoxContainer/constants/separation = 2
 Button/fonts/font = ExtResource("1_0gi78")
 Label/fonts/font = ExtResource("1_0gi78")
 MarginContainer/constants/margin_bottom = 5
