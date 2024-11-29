@@ -34,6 +34,8 @@ var attack_target:Node2D:
 		attack_target = value
 var chase_target:BaseUnit
 var rand := RandomNumberGenerator.new()
+var last_pos:Vector2
+var frames_stuck:int
 
 @export var unit_name:String
 @export var unit_id:int
@@ -48,6 +50,7 @@ var rand := RandomNumberGenerator.new()
 
 @export_group("Movement")
 @export var base_speed:int
+@export var stuck_threshold:float = 0.2
 
 @export_group("Attack")
 @export var base_health:float
@@ -252,7 +255,7 @@ func movement(_delta:float):
 	if frozen: return
 	if !is_multiplayer_authority(): return
 	
-	if chase_target and !attacking:
+	if chase_target and !attacking and !waypoints:
 		if !is_instance_valid(chase_target):
 			chase_target = null
 			moving = false
@@ -270,7 +273,7 @@ func movement(_delta:float):
 		unit_sprite.set_visual_rotation(direction.angle())
 		move_and_slide()
 		return
-	if waypoints and !attacking:
+	elif waypoints and !attacking:
 		if position.distance_squared_to(waypoints[0]) <= 100:
 			waypoints.remove_at(0)
 			if !waypoints: 
@@ -284,6 +287,15 @@ func movement(_delta:float):
 		#set_sprite_rotation(direction.angle())
 		unit_sprite.set_visual_rotation(direction.angle())
 		move_and_slide()
+		if position.distance_squared_to(last_pos) <= stuck_threshold and waypoints:
+			
+			frames_stuck += 1
+			if frames_stuck >= 5:
+				waypoints = []
+				frames_stuck = 0
+		else:
+			frames_stuck = 0
+		last_pos = position
 		return
 	moving = false
 	if idle_anim_timer.is_stopped():
@@ -504,8 +516,6 @@ func damage(_damage:int):
 #@rpc("any_peer")
 func kill():
 	if dying: return
-	if !MultiplayerScript.game_running: return
-	if MultiplayerScript.left_game: return
 	
 	if health != 0:
 		health = 0
@@ -520,9 +530,9 @@ func kill():
 	
 	var death_sound_player := AudioStreamPlayer2D.new()
 	death_sound_player.stream = death_sound
-	death_sound_player.autoplay = true
 	death_sound_player.finished.connect(queue_free)
 	add_child(death_sound_player)
+	death_sound_player.play()
 	
 	var _death_effect := death_effect.instantiate()
 	add_child(_death_effect)

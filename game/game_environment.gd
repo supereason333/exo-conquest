@@ -13,7 +13,7 @@ var box:Rect2
 @onready var building_detector := $BuildingDetector
 @onready var bgm_player := $BGM
 @onready var spawnpoints := $Map/Spawnpoints
-@onready var multiplayer_spwner := $MultiplayerSpawner
+@onready var multiplayer_spwner:MultiplayerSpawner
 var tutorial:Node
 
 var placing_building := false
@@ -29,6 +29,9 @@ func _ready() -> void:
 	if has_node("Tutorial"):
 		tutorial = $Tutorial
 		tutorial.init()
+	
+	if has_node("MultiplayerSpawner"):
+		multiplayer_spwner = $"MultiplayerSpawner"
 	
 	var limit:Vector2 = tile_map.get_used_rect().size
 	limit *= Vector2(tile_map.tile_set.tile_size)
@@ -164,6 +167,12 @@ func _draw():
 				if tile.get_custom_data("Not buildable"):
 					tile_build_check = false
 			
+			if RTS.selected_miner and is_instance_valid(RTS.selected_miner):
+				if rect.position.distance_squared_to(RTS.selected_miner.position) >= 40000:
+					tile_build_check = false
+			else:
+				placing_building = false
+			
 			if tile_build_check and detector_build_check:
 				draw_rect(rect, Color.LIGHT_GREEN * Color(1, 1, 1, 0.5))
 			else:
@@ -251,9 +260,14 @@ func pre_game_init():
 				printerr("Not found spawnpoint " + str(i))
 			MultiplayerScript.core_list.append(core)
 			core.death.connect(MultiplayerScript.core_death)
+			for x in 3:
+				var miner := UnitLoader.load_unit_from_id(4)
+				miner.position = point.position + Vector2(20 * x, 100)
+				miner.team_id = _player.team_id
+				miner.peer_id = _player.peer_id
+				add_child(miner, true)
 			add_building(core)
 			i += 1
-		MultiplayerScript
 		return
 	
 	return

@@ -30,7 +30,7 @@ var selected_building:BaseBuilding:
 var base_core:BaseBuilding
 
 var selected_controllable := true
-
+var selected_miner:BaseUnit
 var start_position:int
 
 #var unit_loader := preload("res://game/units/unit_loader.tscn").instantiate()

@@ -87,6 +87,23 @@ func update_selected_data():
 		label = Label.new()
 		label.text = "Peer ID: " + str(RTS.selected_list[unit_sb.value].peer_id)
 		selected_data.add_child(label)
+		
+		for unit in RTS.selected_list:
+			if unit.unit_name == "Miner":
+				building_placer.show()
+				if is_instance_valid(RTS.selected_miner):
+					if RTS.selected_miner.death.is_connected(selected_miner_death):
+						RTS.selected_miner.death.disconnect(selected_miner_death)
+				RTS.selected_miner = unit
+				if !RTS.selected_miner.death.is_connected(selected_miner_death):
+					RTS.selected_miner.death.connect(selected_miner_death)
+				break
+	else:
+		building_placer.hide()
+
+func selected_miner_death(unit:BaseUnit):
+	RTS.selected_miner = null
+	building_placer.hide()
 
 func switch_team(team_id:int):
 	RTS.change_team(team_id)
