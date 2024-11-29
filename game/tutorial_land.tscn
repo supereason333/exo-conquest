@@ -358,8 +358,35 @@ position = Vector2(319, 469)
 [node name="2" type="Node2D" parent="Map/Spawnpoints"]
 position = Vector2(981, 2536)
 
+[node name="TutorialText" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="TutorialText"]
+layout_mode = 0
+offset_left = 95.0
+offset_top = 943.0
+offset_right = 328.0
+offset_bottom = 966.0
+text = "Move miner over ores to mine"
+
+[node name="Label2" type="Label" parent="TutorialText"]
+layout_mode = 0
+offset_left = 940.0
+offset_top = 520.0
+offset_right = 1195.0
+offset_bottom = 543.0
+text = "Move units near enemy to attack"
+
 [node name="Tutorial" type="Node" parent="."]
 script = ExtResource("6_venc2")
+
+[node name="IncompetencyTimer" type="Timer" parent="Tutorial"]
+wait_time = 10.0
+one_shot = true
+autostart = true
 
 [node name="SniperUnit3" parent="." instance=ExtResource("11_5l0qm")]
 position = Vector2(952, 2158)
@@ -456,3 +483,5 @@ team_id = 1
 [node name="MarineUnit12" parent="." instance=ExtResource("10_xtqp3")]
 position = Vector2(1617, 1318)
 team_id = 1
+
+[connection signal="timeout" from="Tutorial/IncompetencyTimer" to="Tutorial" method="_on_incompetency_timer_timeout"]

@@ -1,5 +1,8 @@
 extends Camera2D
 
+signal moved(pos:Vector2)
+signal building_placer_showen
+
 var Disp := preload("res://game/player/team_display.tscn")
 
 @onready var game_env := $".."
@@ -18,6 +21,7 @@ var Disp := preload("res://game/player/team_display.tscn")
 signal add_new_building(building)
 
 var building
+var dialouge_queue:Array[String]
 
 var select_box:Rect2:
 	set(value):
@@ -91,6 +95,7 @@ func update_selected_data():
 		for unit in RTS.selected_list:
 			if unit.unit_name == "Miner":
 				building_placer.show()
+				building_placer_showen.emit()
 				if is_instance_valid(RTS.selected_miner):
 					if RTS.selected_miner.death.is_connected(selected_miner_death):
 						RTS.selected_miner.death.disconnect(selected_miner_death)
@@ -127,6 +132,7 @@ func handle_camera_move(delta:float):
 	if mouse_pos.y >= 480 - RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_down"):
 		move_vector.y += 1
 	
+	var last_pos = position
 	position += move_vector.normalized() * RTS.game_settings.camera_move_speed * delta
 	
 	if position.x < limit_left:
@@ -137,6 +143,9 @@ func handle_camera_move(delta:float):
 		position.y = limit_bottom - 480
 	if position.y < limit_top:
 		position.y = limit_top
+	
+	if last_pos != position:
+		moved.emit(position)
 
 func on_add_building(building_id:int):
 	emit_signal("add_new_building", building_id)
@@ -160,5 +169,15 @@ func set_dialogue(text:String):
 	text_display_label.text = text
 	text_display.show()
 
+func queue_dialogue(text: String):
+	dialouge_queue.append(text)
+
 func _draw():
 	draw_rect(select_box, RTS.game_settings.select_color, false, 2)
+
+func _on_button_pressed() -> void:
+	if dialouge_queue:
+		set_dialogue(dialouge_queue[0])
+		dialouge_queue.remove_at(0)
+	else:
+		text_display.hide()
