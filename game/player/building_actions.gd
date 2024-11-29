@@ -38,6 +38,7 @@ func select_list_changed():
 		health_bar.hide()
 		container_tabs.hide()
 		name_label.text = "Selected units"
+		update_display_data()
 	else:
 		hide()
 
@@ -58,4 +59,12 @@ func update_display_data():
 		name_label.text = RTS.selected_building.unit_name
 		health_bar.value = RTS.selected_building.health
 		building_icon.texture = RTS.selected_building.display_icon
-		
+	elif RTS.selected_list:
+		if !RTS.selected_controllable:
+			name_label.modulate = Color.RED
+			building_icon.modulate = Color.RED
+			container_tabs.current_tab = 0
+		else:
+			name_label.modulate = Color.WHITE
+			building_icon.modulate = Color.WHITE
+			container_tabs.current_tab = 0
