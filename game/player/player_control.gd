@@ -120,17 +120,33 @@ func handle_camera_move(delta:float):
 	var mouse_pos = get_viewport().get_mouse_position()
 	var move_vector = Vector2(0, 0)
 	
-	if mouse_pos.x <= RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_left"):
-		move_vector.x -= 1
-	
-	if mouse_pos.x >= 640 - RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_right"):
-		move_vector.x += 1
-	
-	if mouse_pos.y <= RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_up"):
-		move_vector.y -= 1
-	
-	if mouse_pos.y >= 480 - RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_down"):
-		move_vector.y += 1
+	if RTS.game_settings.movement_type == RTS.game_settings.MOVEMENT_TYPES.mouse:
+		if mouse_pos.x <= RTS.game_settings.camera_move_margin:
+			move_vector.x -= 1
+		if mouse_pos.x >= 640 - RTS.game_settings.camera_move_margin:
+			move_vector.x += 1
+		if mouse_pos.y <= RTS.game_settings.camera_move_margin:
+			move_vector.y -= 1
+		if mouse_pos.y >= 480 - RTS.game_settings.camera_move_margin:
+			move_vector.y += 1
+	elif RTS.game_settings.movement_type == RTS.game_settings.MOVEMENT_TYPES.keyboard:
+		if Input.is_action_pressed("cam_left"):
+			move_vector.x -= 1
+		if Input.is_action_pressed("cam_right"):
+			move_vector.x += 1
+		if Input.is_action_pressed("cam_up"):
+			move_vector.y -= 1
+		if Input.is_action_pressed("cam_down"):
+			move_vector.y += 1
+	else:
+		if mouse_pos.x <= RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_left"):
+			move_vector.x -= 1
+		if mouse_pos.x >= 640 - RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_right"):
+			move_vector.x += 1
+		if mouse_pos.y <= RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_up"):
+			move_vector.y -= 1
+		if mouse_pos.y >= 480 - RTS.game_settings.camera_move_margin or Input.is_action_pressed("cam_down"):
+			move_vector.y += 1
 	
 	var last_pos = position
 	position += move_vector.normalized() * RTS.game_settings.camera_move_speed * delta
