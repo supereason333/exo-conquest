@@ -29,6 +29,7 @@ AudioManager="*res://game/resources/audio/audio_manager.gd"
 
 window/size/viewport_width=640
 window/size/viewport_height=480
+window/size/mode=3
 window/stretch/mode="viewport"
 
 [dotnet]
@@ -114,3 +115,4 @@ cam_right={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
+textures/vram_compression/import_etc2_astc=true
