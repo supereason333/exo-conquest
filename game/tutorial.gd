@@ -1,12 +1,14 @@
 extends Node
 
 @onready var game_env := $".."
+@onready var idle_detector := $IdleDetector
 
 var camera_has_moved := false
 
 func _ready() -> void:
 	RTS.select_list_changed.connect(select_list_changed)
 	$"../PlayerControl".building_placer_showen.connect(building_placer_showen)
+	idle_detector.timeout.connect(idle_detector_timeout)
 	
 
 func init():
@@ -16,14 +18,22 @@ func init():
 	game_env.player.queue_dialogue("Right click to direct units")
 	game_env.player.queue_dialogue("WASD or move mouse to screen edge to move camera")
 	game_env.player.queue_dialogue("Make more miners and use the building placer at bottom right of screen to place a building")
+	game_env.player.moved.connect(player_moved)
 	var core := BuildingLoader.load_building_from_id(1)
 	core.position = Vector2(1000, 2530)
 	core.death.connect(on_core_death)
 	core.team_id = 1
 	game_env.add_building(core)
 
+func idle_detector_timeout():
+	MultiplayerScript.end_game()
+	MultiplayerScript.multiplayer_cleanup()
+
 func select_list_changed():
 	pass
+
+func player_moved(pos:Vector2):
+	idle_detector.reset()
 
 func on_core_death(unit:BaseUnit):
 	MultiplayerScript.game_winner = 1

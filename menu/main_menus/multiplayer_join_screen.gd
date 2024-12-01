@@ -2,6 +2,7 @@ extends Control
 
 @onready var port_entry := $MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer/PortEntry
 @onready var address_entry := $MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer/AddressEntry
+@onready var window := $Window
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -18,6 +19,9 @@ func _on_back_button_pressed() -> void:
 
 
 func _on_join_button_pressed() -> void:
+	window.popup()
+	
+	return
 	var port:int = port_entry.text.to_int()
 	
 	MultiplayerScript.join_server(address_entry.text, port)

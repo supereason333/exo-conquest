@@ -1,8 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://bycuqm1mnvlxl"]
+[gd_scene load_steps=12 format=3 uid="uid://bycuqm1mnvlxl"]
 
 [ext_resource type="Theme" uid="uid://dk83qmx0ytnuw" path="res://menu/menu_resources/themes/default_theme.tres" id="1_jbpj5"]
 [ext_resource type="Texture2D" uid="uid://cvwhr7nkrey7h" path="res://menu/menu_resources/backgrounds/planet1.png" id="3_iurcc"]
 [ext_resource type="Script" path="res://menu/settings/settings_menu.gd" id="3_l3klw"]
+[ext_resource type="PackedScene" uid="uid://ccpetjw1nsnbp" path="res://idle_detector.tscn" id="4_36p8t"]
 
 [sub_resource type="GDScript" id="GDScript_5qsir"]
 script/source = "extends Control
@@ -14,11 +15,6 @@ func _ready() -> void:
 	var clip_tween = create_tween()
 	settings_ui.size.x = 0
 	clip_tween.tween_property(settings_ui, \"size\", Vector2(640, 480), 1)
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
 "
 
 [sub_resource type="GDScript" id="GDScript_4utcf"]
@@ -101,8 +97,8 @@ func _input(event: InputEvent) -> void:
 		):
 			if event is InputEventMouseButton and event.double_click:
 				event.double_click = false
-			InputMap.action_erase_events(action_to_remap)
-			InputMap.action_add_event(action_to_remap, event)
+			#InputMap.action_erase_events(action_to_remap)
+			#InputMap.action_add_event(action_to_remap, event)
 			_update_action_list(remapping_button, event)
 			
 			is_remapping = false
@@ -206,16 +202,22 @@ theme_override_constants/separation = 8
 layout_mode = 2
 text = "Back"
 
+[node name="Label" type="Label" parent="Settings/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Settings do not save!"
+
 [node name="Control" type="Control" parent="Settings/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="ResetButton" type="Button" parent="Settings/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
+disabled = true
 text = "Reset settings"
 
 [node name="SaveButton" type="Button" parent="Settings/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
+disabled = true
 text = "Save settings"
 
 [node name="TabContainer" type="TabContainer" parent="Settings/MarginContainer/VBoxContainer"]
@@ -412,7 +414,7 @@ hardware issue tbh."
 
 [node name="Window" type="Window" parent="."]
 initial_position = 1
-size = Vector2i(340, 100)
+size = Vector2i(340, 115)
 visible = false
 unresizable = true
 always_on_top = true
@@ -439,7 +441,9 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Window/MarginContainer/VBoxContainer/CenterContainer"]
 layout_mode = 2
-text = "Settings not saved!"
+text = "Settings not saved!
+Settings do not save!"
+horizontal_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Window/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -452,6 +456,7 @@ text = "Exit settings"
 
 [node name="SaveButton" type="Button" parent="Window/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+disabled = true
 text = "Save settings"
 
 [node name="ResetWindow" type="Window" parent="."]
@@ -498,6 +503,8 @@ text = "Yeah"
 layout_mode = 2
 text = "Nah"
 
+[node name="IdleDetector" parent="." instance=ExtResource("4_36p8t")]
+
 [connection signal="pressed" from="Settings/MarginContainer/VBoxContainer/HBoxContainer2/BackButton" to="Settings" method="_on_back_button_pressed"]
 [connection signal="pressed" from="Settings/MarginContainer/VBoxContainer/HBoxContainer2/ResetButton" to="ResetWindow" method="popup"]
 [connection signal="pressed" from="Settings/MarginContainer/VBoxContainer/HBoxContainer2/SaveButton" to="Settings" method="_on_save_button_pressed"]
@@ -518,6 +525,7 @@ text = "Nah"
 [connection signal="about_to_popup" from="Window" to="Window" method="_on_about_to_popup"]
 [connection signal="close_requested" from="Window" to="Window" method="hide"]
 [connection signal="pressed" from="Window/MarginContainer/VBoxContainer/HBoxContainer/ExitButton" to="Window" method="_on_exit_button_pressed"]
+[connection signal="pressed" from="Window/MarginContainer/VBoxContainer/HBoxContainer/SaveButton" to="Settings" method="_on_save_button_pressed"]
 [connection signal="about_to_popup" from="ResetWindow" to="ResetWindow" method="_on_about_to_popup"]
 [connection signal="close_requested" from="ResetWindow" to="ResetWindow" method="hide"]
 [connection signal="pressed" from="ResetWindow/MarginContainer/VBoxContainer/HBoxContainer/Reset" to="Settings" method="_on_reset_pressed"]

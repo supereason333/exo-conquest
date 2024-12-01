@@ -17,7 +17,7 @@ func _ready() -> void:
 	set_settings()
 
 func set_settings():
-	temp_settings = RTS.game_settings
+	temp_settings = RTS.game_settings.duplicate(true)
 	
 	camera_options.selected = temp_settings.movement_type
 	camera_speed.value = temp_settings.camera_move_speed
@@ -39,6 +39,8 @@ func _on_back_button_pressed() -> void:
 
 
 func _on_save_button_pressed() -> void:
+	
+	return
 	RTS.game_settings = temp_settings
 	AudioServer.set_bus_volume_db(0, temp_settings.default_master)
 	AudioServer.set_bus_volume_db(1, temp_settings.default_bgm)

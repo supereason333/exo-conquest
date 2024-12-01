@@ -1,6 +1,7 @@
-[gd_scene load_steps=21 format=4 uid="uid://ckmlo2jicay7h"]
+[gd_scene load_steps=22 format=4 uid="uid://ckmlo2jicay7h"]
 
 [ext_resource type="Script" path="res://game/game_environment.gd" id="1_4lc3g"]
+[ext_resource type="PackedScene" uid="uid://ccpetjw1nsnbp" path="res://idle_detector.tscn" id="2_01jp8"]
 [ext_resource type="PackedScene" uid="uid://c4vu28w7nfnwt" path="res://game/player/player_control.tscn" id="2_64dr7"]
 [ext_resource type="Texture2D" uid="uid://1xht1tsa6y01" path="res://game/resources/maps/tilemaps/sand_tiles.png" id="3_mx4aj"]
 [ext_resource type="Texture2D" uid="uid://bfwyka2topjgi" path="res://game/resources/maps/tilemaps/materials.png" id="4_gwvna"]
@@ -387,6 +388,8 @@ script = ExtResource("6_venc2")
 wait_time = 10.0
 one_shot = true
 autostart = true
+
+[node name="IdleDetector" parent="Tutorial" instance=ExtResource("2_01jp8")]
 
 [node name="SniperUnit3" parent="." instance=ExtResource("11_5l0qm")]
 position = Vector2(952, 2158)
