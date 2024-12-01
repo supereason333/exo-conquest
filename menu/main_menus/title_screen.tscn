@@ -23,7 +23,8 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("1_exoh1")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="IUClipper" type="Control" parent="."]
+clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,17 +32,22 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="IUClipper"]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 284.0
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="IUClipper/PanelContainer"]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/PanelContainer"]
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/PanelContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="IUClipper/PanelContainer/MarginContainer"]
 custom_minimum_size = Vector2(200, 2.08165e-12)
 layout_mode = 2
 
-[node name="Title2" type="RichTextLabel" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Title2" type="RichTextLabel" parent="IUClipper/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 8
 text = "   ____              _____                            __ 
@@ -57,30 +63,30 @@ hint_underlined = false
 deselect_on_focus_loss_enabled = false
 drag_and_drop_selection_enabled = false
 
-[node name="HSeparator" type="HSeparator" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="IUClipper/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="HostButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HostButton" type="Button" parent="IUClipper/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Host game"
 
-[node name="JoinButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="JoinButton" type="Button" parent="IUClipper/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Join game"
 
-[node name="TutorialButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="TutorialButton" type="Button" parent="IUClipper/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Tutorial"
 
-[node name="SettingsButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="SettingsButton" type="Button" parent="IUClipper/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Settings"
 
-[node name="Spacer" type="Control" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Spacer" type="Control" parent="IUClipper/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ExitButton" type="Button" parent="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="ExitButton" type="Button" parent="IUClipper/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Exit"
 
@@ -101,8 +107,10 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "alpha testing"
 
-[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/HostButton" to="." method="_on_singleplayer_pressed"]
-[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/JoinButton" to="." method="_on_multiplayer_pressed"]
-[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/TutorialButton" to="." method="_on_tutorial_button_pressed"]
-[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
-[connection signal="pressed" from="HBoxContainer/PanelContainer/MarginContainer/VBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[connection signal="pressed" from="IUClipper/PanelContainer/MarginContainer/VBoxContainer/HostButton" to="." method="_on_singleplayer_pressed"]
+[connection signal="pressed" from="IUClipper/PanelContainer/MarginContainer/VBoxContainer/JoinButton" to="." method="_on_multiplayer_pressed"]
+[connection signal="pressed" from="IUClipper/PanelContainer/MarginContainer/VBoxContainer/TutorialButton" to="." method="_on_tutorial_button_pressed"]
+[connection signal="pressed" from="IUClipper/PanelContainer/MarginContainer/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="IUClipper/PanelContainer/MarginContainer/VBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]

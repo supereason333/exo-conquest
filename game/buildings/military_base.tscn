@@ -1,10 +1,10 @@
 [gd_scene load_steps=31 format=3 uid="uid://bsp7wroomlji5"]
 
 [ext_resource type="Script" path="res://game/buildings/military_base.gd" id="1_jm5bs"]
-[ext_resource type="Texture2D" uid="uid://dbfbd04anbhcv" path="res://game/resources/sprites/icons/military camp.png" id="2_d510r"]
+[ext_resource type="Texture2D" uid="uid://ds8tx0jixqi3u" path="res://game/resources/sprites/icons/military camp.png" id="2_d510r"]
 [ext_resource type="Script" path="res://classes/material.gd" id="2_sql62"]
-[ext_resource type="Texture2D" uid="uid://u3lgfvavso7g" path="res://game/resources/sprites/buildings/military_base_color_sprite.png" id="2_wu2fm"]
-[ext_resource type="Texture2D" uid="uid://btjnsngnec15t" path="res://game/resources/sprites/buildings/military_base_building.png" id="3_7sgmy"]
+[ext_resource type="Texture2D" uid="uid://dbkgkmxaosoe5" path="res://game/resources/sprites/buildings/military_base_color_sprite.png" id="2_wu2fm"]
+[ext_resource type="Texture2D" uid="uid://brjodtgmk4y05" path="res://game/resources/sprites/buildings/military_base_building.png" id="3_7sgmy"]
 [ext_resource type="Script" path="res://game/units/components/production_component.gd" id="5_ok207"]
 [ext_resource type="PackedScene" uid="uid://ca4mnvogpcna" path="res://game/units/marine_unit.tscn" id="6_383yx"]
 [ext_resource type="PackedScene" uid="uid://vj5qlce8ssm1" path="res://game/units/base_unit/unit_sprite.tscn" id="7_nf6lp"]

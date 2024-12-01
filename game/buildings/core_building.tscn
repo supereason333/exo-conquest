@@ -1,10 +1,10 @@
 [gd_scene load_steps=19 format=3 uid="uid://cpwygiqapx5gg"]
 
 [ext_resource type="Script" path="res://game/buildings/core_building.gd" id="1_b103j"]
-[ext_resource type="Texture2D" uid="uid://6j56xd2ew0l3" path="res://game/resources/sprites/buildings/core_color_sprite.png" id="2_0nx1a"]
+[ext_resource type="Texture2D" uid="uid://cqw1t14fqfo6q" path="res://game/resources/sprites/buildings/core_color_sprite.png" id="2_0nx1a"]
 [ext_resource type="Script" path="res://classes/material.gd" id="2_mcegc"]
-[ext_resource type="Texture2D" uid="uid://c14t3pckl32vu" path="res://game/resources/sprites/icons/core.png" id="3_d1sy2"]
-[ext_resource type="Texture2D" uid="uid://ngn3ewhjsani" path="res://game/resources/sprites/buildings/core_base.png" id="3_wng6h"]
+[ext_resource type="Texture2D" uid="uid://c50fcgcjo1i3d" path="res://game/resources/sprites/icons/core.png" id="3_d1sy2"]
+[ext_resource type="Texture2D" uid="uid://c3oatxjvxhpi7" path="res://game/resources/sprites/buildings/core_base.png" id="3_wng6h"]
 [ext_resource type="PackedScene" uid="uid://yyc0750ak52d" path="res://game/units/components/production_component.tscn" id="5_iji8p"]
 [ext_resource type="PackedScene" uid="uid://detxmk1f7bbba" path="res://game/units/miner_unit.tscn" id="6_5a8g4"]
 [ext_resource type="PackedScene" uid="uid://vj5qlce8ssm1" path="res://game/units/base_unit/unit_sprite.tscn" id="7_3klp8"]

@@ -9,9 +9,6 @@ func _ready() -> void:
 	MultiplayerScript.player_updated.connect(update_player)
 	update_player_list()
 
-func _process(delta: float) -> void:
-	pass
-
 func update_player(_player:PlayerData):
 	for child in list.get_children():
 		if child.peer_id == _player.peer_id:

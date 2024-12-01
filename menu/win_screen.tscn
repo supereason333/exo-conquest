@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dpnulkofkdqgt"]
 
 [ext_resource type="Script" path="res://menu/win_screen.gd" id="1_4b0fa"]
-[ext_resource type="Texture2D" uid="uid://dehbtdahxwb5x" path="res://game/resources/579329.jpg" id="2_irvis"]
+[ext_resource type="Texture2D" uid="uid://dc536nmlge5wf" path="res://game/resources/579329.jpg" id="2_irvis"]
 
 [node name="WinScreen" type="Control"]
 layout_mode = 3

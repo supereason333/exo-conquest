@@ -5,7 +5,7 @@ script/source = "extends VBoxContainer
 
 @onready var username_entry := $UsernameEntry
 
-func _on_username_entry_text_submitted(new_text: String) -> void:
+func _on_username_entry_text_submitted(_new_text: String) -> void:
 	set_player_data()
 
 func _on_button_pressed() -> void:

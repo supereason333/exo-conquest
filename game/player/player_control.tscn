@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" path="res://game/player/player_control.gd" id="1_83dnc"]
 [ext_resource type="Theme" uid="uid://bujlagwci5a1f" path="res://menu/menu_resources/themes/default_gui.tres" id="2_kekrh"]
-[ext_resource type="Texture2D" uid="uid://cjbjm7c8blps6" path="res://Risky_Reels_POI.jpeg" id="3_3s602"]
-[ext_resource type="Texture2D" uid="uid://yqgemwb72ssh" path="res://game/resources/sprites/icons/selnite16.png" id="3_wdp7i"]
-[ext_resource type="Texture2D" uid="uid://d084h7ki66smp" path="res://game/resources/sprites/icons/luminite16.png" id="4_7hewy"]
-[ext_resource type="Texture2D" uid="uid://dios26iq5tfip" path="res://game/resources/sprites/icons/plainium16.png" id="5_0h180"]
-[ext_resource type="Texture2D" uid="uid://clj7m8yhuu874" path="res://game/resources/sprites/icons/xenite16.png" id="6_gx6lu"]
-[ext_resource type="Texture2D" uid="uid://dqnaqp2s37d0d" path="res://game/resources/sprites/placeholder/32x.png" id="7_5p51g"]
+[ext_resource type="Texture2D" uid="uid://1uaf4cr0dy4l" path="res://Risky_Reels_POI.jpeg" id="3_3s602"]
+[ext_resource type="Texture2D" uid="uid://ccftq60bk27bo" path="res://game/resources/sprites/icons/selnite16.png" id="3_wdp7i"]
+[ext_resource type="Texture2D" uid="uid://bhb81wehyvus" path="res://game/resources/sprites/icons/luminite16.png" id="4_7hewy"]
+[ext_resource type="Texture2D" uid="uid://mmhes40au0ef" path="res://game/resources/sprites/icons/plainium16.png" id="5_0h180"]
+[ext_resource type="Texture2D" uid="uid://bq3tvff8mjhx" path="res://game/resources/sprites/icons/xenite16.png" id="6_gx6lu"]
+[ext_resource type="Texture2D" uid="uid://bstm2qcjrtdwt" path="res://game/resources/sprites/placeholder/32x.png" id="7_5p51g"]
 [ext_resource type="Script" path="res://game/player/building_actions.gd" id="9_qxs22"]
 [ext_resource type="Script" path="res://game/player/building_placer.gd" id="10_4i84l"]
 [ext_resource type="Script" path="res://game/player/pause_menu.gd" id="10_rv0bb"]
@@ -499,6 +499,7 @@ layout_mode = 2
 text = "0"
 
 [node name="AddButton" type="Button" parent="UI/Control/MarginContainer/LeftBox/MaterialDisplay/MarginContainer/MaterialDisplay"]
+visible = false
 layout_mode = 2
 
 [node name="ControlContainer" type="GridContainer" parent="UI/Control/MarginContainer"]

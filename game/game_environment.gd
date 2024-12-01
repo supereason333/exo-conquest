@@ -185,6 +185,7 @@ func _draw():
 			can_build = false
 
 func _unhandled_input(event: InputEvent) -> void:
+	if !is_inside_tree(): return
 	if event is InputEventMouseButton:
 		if event.button_index == 1:
 			mouse_down = event.pressed

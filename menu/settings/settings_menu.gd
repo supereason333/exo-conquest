@@ -3,7 +3,7 @@ extends Control
 var settings_changed := false
 var temp_settings:GameSettings
 
-@onready var save_popup := $Window
+@onready var save_popup := $"../Window"
 @onready var camera_options := $MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/CameraControlOptions
 @onready var camera_speed := $MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/CameraSpeedSlider
 @onready var selection_color_picker := $MarginContainer/VBoxContainer/TabContainer/Game/HBoxContainer/LeftBox/SelectionColor

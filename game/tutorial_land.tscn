@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" path="res://game/game_environment.gd" id="1_4lc3g"]
 [ext_resource type="PackedScene" uid="uid://c4vu28w7nfnwt" path="res://game/player/player_control.tscn" id="2_64dr7"]
-[ext_resource type="Texture2D" uid="uid://cmtq6pbeq4xrw" path="res://game/resources/maps/tilemaps/sand_tiles.png" id="3_mx4aj"]
-[ext_resource type="Texture2D" uid="uid://b75wnbcdho17n" path="res://game/resources/maps/tilemaps/materials.png" id="4_gwvna"]
-[ext_resource type="Texture2D" uid="uid://b6li1ooon5sjy" path="res://game/resources/maps/tilemaps/terrain_sand.png" id="5_vo8j8"]
+[ext_resource type="Texture2D" uid="uid://1xht1tsa6y01" path="res://game/resources/maps/tilemaps/sand_tiles.png" id="3_mx4aj"]
+[ext_resource type="Texture2D" uid="uid://bfwyka2topjgi" path="res://game/resources/maps/tilemaps/materials.png" id="4_gwvna"]
+[ext_resource type="Texture2D" uid="uid://bphcl3fsrrx3t" path="res://game/resources/maps/tilemaps/terrain_sand.png" id="5_vo8j8"]
 [ext_resource type="Script" path="res://game/tutorial.gd" id="6_venc2"]
 [ext_resource type="PackedScene" uid="uid://detxmk1f7bbba" path="res://game/units/miner_unit.tscn" id="8_uikbo"]
 [ext_resource type="PackedScene" uid="uid://bsp7wroomlji5" path="res://game/buildings/military_base.tscn" id="9_fsl5h"]

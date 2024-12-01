@@ -37,7 +37,7 @@ var enet_peer:ENetMultiplayerPeer
 
 func host_server(port:int = 9998, players:int = 2):
 	enet_peer = ENetMultiplayerPeer.new()
-	var error = enet_peer.create_server(port, players)
+	var error = enet_peer.create_server(port, players - 1)
 	if error != OK:
 		printerr("Cannot host: " + str(error))
 		return "Cannot host: " + str(error)

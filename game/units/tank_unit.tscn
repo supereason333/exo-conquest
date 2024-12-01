@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" path="res://game/units/tank_unit.gd" id="1_ccbqr"]
 [ext_resource type="Script" path="res://classes/material.gd" id="2_3ytms"]
-[ext_resource type="Texture2D" uid="uid://cwarjguxxfkem" path="res://game/resources/sprites/icons/tank.png" id="3_5anwv"]
-[ext_resource type="Texture2D" uid="uid://ojfqd1fxjwa1" path="res://game/resources/sprites/tank_unit.png" id="3_p8cm5"]
-[ext_resource type="Texture2D" uid="uid://ntxsrexwrv3q" path="res://game/resources/sprites/tank_unit_color_layer.png" id="4_3c1mm"]
+[ext_resource type="Texture2D" uid="uid://cpisk0fiqwtei" path="res://game/resources/sprites/icons/tank.png" id="3_5anwv"]
+[ext_resource type="Texture2D" uid="uid://babrsocuwk50e" path="res://game/resources/sprites/tank_unit.png" id="3_p8cm5"]
+[ext_resource type="Texture2D" uid="uid://dp2x1um1xu42h" path="res://game/resources/sprites/tank_unit_color_layer.png" id="4_3c1mm"]
 [ext_resource type="PackedScene" uid="uid://vj5qlce8ssm1" path="res://game/units/base_unit/unit_sprite.tscn" id="5_3t7ei"]
 [ext_resource type="Script" path="res://game/units/base_unit/unit_sprite_animation.gd" id="6_pbocy"]
 

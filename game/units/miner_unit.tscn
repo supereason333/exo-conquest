@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://game/units/miner_unit.gd" id="1_ecd2s"]
 [ext_resource type="Script" path="res://classes/material.gd" id="2_si5pp"]
-[ext_resource type="Texture2D" uid="uid://pp43f6as6n6j" path="res://game/resources/sprites/miner_unit.png" id="3_55ojm"]
+[ext_resource type="Texture2D" uid="uid://ih7itus71unw" path="res://game/resources/sprites/miner_unit.png" id="3_55ojm"]
 [ext_resource type="PackedScene" uid="uid://vj5qlce8ssm1" path="res://game/units/base_unit/unit_sprite.tscn" id="3_bk22h"]
-[ext_resource type="Texture2D" uid="uid://dyqunhmfad3iq" path="res://game/resources/sprites/icons/miner.png" id="3_hh02q"]
-[ext_resource type="Texture2D" uid="uid://bpd8h3qk12wyl" path="res://game/resources/sprites/miner_unit_color_layer.png" id="5_bdg08"]
+[ext_resource type="Texture2D" uid="uid://dunbobtij50nq" path="res://game/resources/sprites/icons/miner.png" id="3_hh02q"]
+[ext_resource type="Texture2D" uid="uid://ch1be6dtiqdb7" path="res://game/resources/sprites/miner_unit_color_layer.png" id="5_bdg08"]
 [ext_resource type="Script" path="res://game/units/base_unit/unit_sprite_animation.gd" id="6_0ujve"]
 
 [sub_resource type="Resource" id="Resource_3fjcx"]

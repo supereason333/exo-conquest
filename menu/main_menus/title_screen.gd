@@ -1,5 +1,16 @@
 extends Control
 
+@onready var background := $Background
+@onready var ui_clipper := $IUClipper
+
+func _ready() -> void:
+	var bg_tween = create_tween()
+	background.modulate = Color(0, 0 ,0 ,1)
+	bg_tween.tween_property(background, "modulate", Color(1, 1, 1, 1), 1)
+	var clip_tween = create_tween()
+	ui_clipper.size.x = 0
+	clip_tween.tween_property(ui_clipper, "size", Vector2(640, 480), 1)
+
 func _on_exit_button_pressed():
 	get_tree().quit()
 

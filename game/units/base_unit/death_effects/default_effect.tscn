@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://thyfuxewotp6"]
 
-[ext_resource type="Texture2D" uid="uid://dli3c0ske1vu7" path="res://game/resources/particles/explosion.png" id="1_u5ms7"]
-[ext_resource type="Texture2D" uid="uid://cjd4wtjsw3qyf" path="res://game/resources/particles/explosion2.png" id="2_kuh4p"]
+[ext_resource type="Texture2D" uid="uid://dfwuiboefqlya" path="res://game/resources/particles/explosion.png" id="1_u5ms7"]
+[ext_resource type="Texture2D" uid="uid://dcene8q7q5m8b" path="res://game/resources/particles/explosion2.png" id="2_kuh4p"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5g7q6"]
 animations = [{

@@ -1,9 +1,9 @@
 [gd_scene load_steps=19 format=3 uid="uid://dhom3cx8olyqj"]
 
 [ext_resource type="Script" path="res://game/buildings/testing_building.gd" id="1_ymmw5"]
-[ext_resource type="Texture2D" uid="uid://dmybais2mwc87" path="res://game/resources/sprites/icons/testing_building.png" id="2_td8mo"]
-[ext_resource type="Texture2D" uid="uid://b7r1vmcxjtovp" path="res://game/resources/sprites/buildings/testing_building.png" id="3_oq4sh"]
-[ext_resource type="Texture2D" uid="uid://28d0ajnp2uby" path="res://game/resources/sprites/buildings/testing_building_color.png" id="4_lc6d7"]
+[ext_resource type="Texture2D" uid="uid://b0ayi3kbkiymx" path="res://game/resources/sprites/icons/testing_building.png" id="2_td8mo"]
+[ext_resource type="Texture2D" uid="uid://b56jlpyd3824c" path="res://game/resources/sprites/buildings/testing_building.png" id="3_oq4sh"]
+[ext_resource type="Texture2D" uid="uid://b8fcwby7ooxac" path="res://game/resources/sprites/buildings/testing_building_color.png" id="4_lc6d7"]
 [ext_resource type="Script" path="res://game/units/components/production_component.gd" id="4_ryyjg"]
 [ext_resource type="PackedScene" uid="uid://ca4mnvogpcna" path="res://game/units/marine_unit.tscn" id="5_3qc0x"]
 [ext_resource type="PackedScene" uid="uid://detxmk1f7bbba" path="res://game/units/miner_unit.tscn" id="6_p1ibf"]

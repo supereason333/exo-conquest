@@ -71,12 +71,10 @@ layout_mode = 2
 
 [node name="AddressEntry" type="LineEdit" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "localhost"
 placeholder_text = "Address"
 
 [node name="PortEntry" type="LineEdit" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "9998"
 placeholder_text = "Port"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ManualType/MarginContainer/VBoxContainer"]

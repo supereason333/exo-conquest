@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://duc3xe6tj515u"
-path="res://.godot/imported/marine_unit_color_layer.png-3945235f9f0dfb409822bf2082ee28d8.ctex"
+uid="uid://rpbhmqlr7dau"
+path="res://.godot/imported/icon.png-487276ed1e3a0c39cad0279d744ee560.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://game/resources/sprites/marine_unit_color_layer.png"
-dest_files=["res://.godot/imported/marine_unit_color_layer.png-3945235f9f0dfb409822bf2082ee28d8.ctex"]
+source_file="res://icon.png"
+dest_files=["res://.godot/imported/icon.png-487276ed1e3a0c39cad0279d744ee560.ctex"]
 
 [params]
 
