@@ -42,6 +42,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("map_key"):
 		$"UI/Control/TextureRect".visible = !$"UI/Control/TextureRect".visible
+		get_tree().create_timer(.5).timeout.connect($"UI/Control/TextureRect".hide)
 	
 	handle_camera_move(delta)
 	if Input.is_action_just_pressed("debug_gui"):

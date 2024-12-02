@@ -32,7 +32,7 @@ func unit_produced(unit: PackedScene) -> void:
 		_unit.waypoints.append(_unit.position + Vector2(-100, -150))
 		_unit.waypoints.append(_unit.position + Vector2(-100, 0))
 		#_unit.waypoint(_unit.position + Vector2(100, 0), null, false)
-		print_debug("AWDAWDWADADW")
+		#print_debug("AWDAWDWADADW")
 		game_env.add_unit(_unit)
 
 func on_box_select(_box:Rect2, _list:Array[BaseUnit]):

@@ -1,4 +1,3 @@
-@icon("res://icon.svg")
 extends Node
 
 signal team_list_changed

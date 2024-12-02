@@ -9,7 +9,7 @@ var idle_time:float = 0
 
 func _process(delta: float) -> void:
 	idle_time += delta
-	if idle_time >= 10: 
+	if idle_time >= 20: 
 		timeout.emit()
 		get_tree().change_scene_to_file(\"res://menu/main_menus/title_screen.tscn\")
 

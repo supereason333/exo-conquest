@@ -110,7 +110,8 @@ func _on_arrived():
 	var tile = game_env.data_tile_map.get_cell_tile_data(game_env.data_tile_map.local_to_map(position))
 	if tile:
 		target_material = tile.get_custom_data("Material ID")
-		gathering = true
+		if target_material != -1:
+			gathering = true
 	else:
 		target_material = -1
 		gathering = false
