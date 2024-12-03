@@ -381,16 +381,16 @@ shape = SubResource("WorldBoundaryShape2D_dsxcp")
 
 [node name="Spawnpoints" type="Node2D" parent="Map"]
 
-[node name="1" type="Node2D" parent="Map/Spawnpoints"]
+[node name="0" type="Node2D" parent="Map/Spawnpoints"]
 position = Vector2(1000, 1000)
 
-[node name="2" type="Node2D" parent="Map/Spawnpoints"]
+[node name="1" type="Node2D" parent="Map/Spawnpoints"]
 position = Vector2(7000, 1000)
 
-[node name="3" type="Node2D" parent="Map/Spawnpoints"]
+[node name="2" type="Node2D" parent="Map/Spawnpoints"]
 position = Vector2(1000, 7000)
 
-[node name="4" type="Node2D" parent="Map/Spawnpoints"]
+[node name="3" type="Node2D" parent="Map/Spawnpoints"]
 position = Vector2(7000, 7000)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]

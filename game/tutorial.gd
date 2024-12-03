@@ -21,6 +21,7 @@ func init():
 	core.death.connect(on_core_death)
 	core.team_id = 1
 	game_env.add_building(core)
+	game_env.player.hide_ui_hide()
 
 func select_list_changed():
 	pass

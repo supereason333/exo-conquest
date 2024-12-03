@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cpwygiqapx5gg"]
+[gd_scene load_steps=13 format=3 uid="uid://cpwygiqapx5gg"]
 
 [ext_resource type="Script" path="res://game/buildings/core_building.gd" id="1_b103j"]
 [ext_resource type="Texture2D" uid="uid://cqw1t14fqfo6q" path="res://game/resources/sprites/buildings/core_color_sprite.png" id="2_0nx1a"]
@@ -17,50 +17,6 @@ luminite = 6969
 plainium = 6969
 xenite = 6969
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_8t216"]
-atlas = ExtResource("3_wng6h")
-region = Rect2(0, 0, 136, 102)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_s02a3"]
-atlas = ExtResource("3_wng6h")
-region = Rect2(0, 102, 136, 102)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_fo4vh"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_8t216")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_s02a3")
-}],
-"loop": true,
-"name": &"default",
-"speed": 1.0
-}]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_frm5u"]
-atlas = ExtResource("2_0nx1a")
-region = Rect2(0, 0, 136, 102)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_0kriw"]
-atlas = ExtResource("2_0nx1a")
-region = Rect2(0, 102, 136, 102)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_73253"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_frm5u")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_0kriw")
-}],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
-
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_r0c8k"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
@@ -70,7 +26,7 @@ properties/1/spawn = true
 properties/1/replication_mode = 2
 properties/2/path = NodePath(".:team_id")
 properties/2/spawn = true
-properties/2/replication_mode = 1
+properties/2/replication_mode = 2
 
 [sub_resource type="Resource" id="Resource_3ggwx"]
 script = ExtResource("8_31d68")
@@ -91,16 +47,6 @@ unit_sprite = NodePath("UnitSprite")
 display_icon = ExtResource("3_d1sy2")
 production_component = NodePath("ProductionComponent")
 multiplayer_sync = NodePath("MultiplayerSynchronizer")
-
-[node name="BaseSprite" type="AnimatedSprite2D" parent="."]
-visible = false
-sprite_frames = SubResource("SpriteFrames_fo4vh")
-autoplay = "default"
-frame = 1
-frame_progress = 0.330569
-
-[node name="ColorSprite" type="AnimatedSprite2D" parent="BaseSprite"]
-sprite_frames = SubResource("SpriteFrames_73253")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_r0c8k")

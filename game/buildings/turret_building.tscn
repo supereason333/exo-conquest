@@ -1,0 +1,64 @@
+[gd_scene load_steps=12 format=3 uid="uid://cte45gvswe1hc"]
+
+[ext_resource type="Script" path="res://game/buildings/turret_building.gd" id="1_6ud8i"]
+[ext_resource type="Script" path="res://classes/material.gd" id="2_a2we8"]
+[ext_resource type="PackedScene" uid="uid://vj5qlce8ssm1" path="res://game/units/base_unit/unit_sprite.tscn" id="2_uw4ft"]
+[ext_resource type="AudioStream" uid="uid://hs6m0uqegvxm" path="res://game/resources/audio/effects/tank.wav" id="3_22dwl"]
+[ext_resource type="Texture2D" uid="uid://dveft21llvkod" path="res://game/resources/sprites/buildings/turret_building_base.png" id="3_icys1"]
+[ext_resource type="Texture2D" uid="uid://cu3aeu6mdotfc" path="res://game/resources/sprites/icons/turret.png" id="3_u35ty"]
+[ext_resource type="Texture2D" uid="uid://dk41yp3giqg3q" path="res://game/resources/sprites/buildings/turret_building_top.png" id="5_g5ae8"]
+[ext_resource type="Script" path="res://game/units/base_unit/unit_sprite_animation.gd" id="6_gmb1a"]
+
+[sub_resource type="Resource" id="Resource_asvas"]
+script = ExtResource("2_a2we8")
+selnite = 400
+luminite = 200
+plainium = 50
+xenite = 0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_mrh8f"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:health")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:team_id")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+
+[sub_resource type="Resource" id="Resource_qd0nq"]
+script = ExtResource("6_gmb1a")
+animation_name = &"idle"
+one_shot = false
+speed = 0.2
+frames = Array[int]([0])
+frame_positions = Array[Vector2]([])
+
+[node name="TurretBuilding" type="CharacterBody2D" node_paths=PackedStringArray("unit_sprite", "multiplayer_sync")]
+script = ExtResource("1_6ud8i")
+building_size = Vector2i(3, 2)
+unit_name = "Turret"
+unit_id = 3
+unit_cost = SubResource("Resource_asvas")
+base_health = 800.0
+attack_damage = 80.0
+attack_cooldown = 6.0
+attack_range = 150
+vision_radius = 300
+unit_sprite = NodePath("UnitSprite")
+display_icon = ExtResource("3_u35ty")
+attack_sound = ExtResource("3_22dwl")
+multiplayer_sync = NodePath("MultiplayerSynchronizer")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_mrh8f")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("3_icys1")
+
+[node name="UnitSprite" parent="." instance=ExtResource("2_uw4ft")]
+texture = ExtResource("5_g5ae8")
+vframes = 16
+animations = Array[ExtResource("6_gmb1a")]([SubResource("Resource_qd0nq")])
+default_anim = &"idle"

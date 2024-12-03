@@ -451,7 +451,7 @@ func attack_tick():
 	else:
 		if attack_timer.is_stopped():
 			attack_timer.start()
-			attack_ai()
+			#attack_ai()
 
 func chase_timer_timeout():
 	chase_target = null

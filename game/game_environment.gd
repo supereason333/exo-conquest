@@ -23,6 +23,7 @@ var can_build:bool
 
 var next_build_id := 0
 var next_unit_id := 0
+var player_spawnpoints:Array[int]	# A list of all spawnpoints for players connected
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -244,7 +245,8 @@ func _on_bgm_finished() -> void:
 
 func pre_game_init():
 	if multiplayer.is_server():
-		var i = 1
+		var i = 0
+		player_spawnpoints.resize(MultiplayerScript.player_list.size())
 		for _player in MultiplayerScript.player_list:
 			var core = BuildingLoader.load_building_from_id(1)
 			core.team_id = _player.team_id
@@ -256,7 +258,8 @@ func pre_game_init():
 					set_player_pos(point.position)
 					RTS.base_core = core
 				else:
-					rpc_id(_player.peer_id, "set_player_pos", point.position)
+					player_spawnpoints[i] = _player.peer_id
+					#rpc_id(_player.peer_id, "set_player_pos", point.position)
 			else:
 				printerr("Not found spawnpoint " + str(i))
 			MultiplayerScript.core_list.append(core)
@@ -271,8 +274,9 @@ func pre_game_init():
 			i += 1
 		return
 	
-	return
+	ask_player_pos(multiplayer.get_unique_id())
 	
+	return
 
 func on_game_ended():
 	if !multiplayer.is_server(): return
@@ -280,9 +284,18 @@ func on_game_ended():
 		if child.has_method("despawn"):
 			child.despawn()
 
+@rpc("any_peer")
+func ask_player_pos(peer_id:int):
+	if !multiplayer.is_server():
+		rpc_id(1, "ask_player_pos", peer_id)
+		return
+	
+	rpc_id(peer_id, "set_player_pos", spawnpoints.find_child(str(player_spawnpoints.find(peer_id))).position)
+
 @rpc
 func set_player_pos(_position:Vector2):
 	player.position = _position - Vector2(320, 240)
+	player.hide_ui_hide()
 
 func _on_multiplayer_spawner_spawned(node: Node) -> void:
 	print(node.name.split("_"))

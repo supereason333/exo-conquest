@@ -352,10 +352,10 @@ shape = SubResource("WorldBoundaryShape2D_xe7ga")
 
 [node name="Spawnpoints" type="Node2D" parent="Map"]
 
-[node name="1" type="Node2D" parent="Map/Spawnpoints"]
+[node name="0" type="Node2D" parent="Map/Spawnpoints"]
 position = Vector2(319, 469)
 
-[node name="2" type="Node2D" parent="Map/Spawnpoints"]
+[node name="1" type="Node2D" parent="Map/Spawnpoints"]
 position = Vector2(981, 2536)
 
 [node name="TutorialText" type="Control" parent="."]

@@ -17,6 +17,7 @@ var Disp := preload("res://game/player/team_display.tscn")
 @onready var building_placer := $UI/Control/MarginContainer/BuildingPlacer
 @onready var building_actions := $UI/Control/MarginContainer/BuildingActions
 @onready var win_window := $UI/Window
+@onready var ui_hide := $UI/UIHide
 
 signal add_new_building(building)
 
@@ -174,6 +175,11 @@ func on_core_death():
 	building_actions.hide()
 	building_placer.hide()
 	RTS.select_list_changed.disconnect(building_actions.select_list_changed)
+
+func hide_ui_hide():
+	var alpha_tween := create_tween()
+	alpha_tween.tween_property(ui_hide, "modulate", Color(1, 1, 1, 0), 1)
+	alpha_tween.finished.connect(ui_hide.hide)
 
 func on_game_ended():
 	pause_menu.hide()
