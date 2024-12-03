@@ -135,6 +135,9 @@ func _ready() -> void:
 	
 	set_team(team_id)
 	
+	if production_component:
+		production_component._produced_unit.connect(unit_produced)
+	
 	if !is_multiplayer_authority(): 
 		return
 	
@@ -152,9 +155,6 @@ func _ready() -> void:
 	idle_anim_timer.one_shot = true
 	idle_anim_timer.autostart = false
 	add_child(idle_anim_timer)
-	
-	if production_component:
-		production_component._produced_unit.connect(unit_produced)
 	
 	if dummy: 
 		set_collision_layer_value(1, false)
